@@ -366,7 +366,9 @@
     .toast { top: calc(68px + env(safe-area-inset-top, 0px)); right: 16px; }
     .explore-btn { bottom: auto; top: calc(72px + env(safe-area-inset-top, 0px)); right: 16px; padding: 8px 12px; }
     .explore-ui .exit { top: calc(72px + env(safe-area-inset-top, 0px)); right: 16px; }
-    .views button { padding: 11px 14px; }
+    .views { left: 16px; right: 16px; transform: none; }
+    .views button { flex: 1; min-width: 0; padding: 11px 4px; font-size: 13px; }
+    .views .xapp { margin-left: 0; }
     .xphone { left: 16px; right: 16px; width: auto; top: auto; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); max-height: 56svh; padding: 14px; }
     .exploring .hint { display: none; }
     .xenv { left: 16px; right: 16px; width: auto; top: auto; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
@@ -1538,6 +1540,9 @@ const VIEWS = {
   in:   { pos: V(0.2, 1.65, 5.2), look: V(0, 1.2, -1) },
 };
 let exploring = false, fly = null, ret = null;
+// a tall phone screen needs the camera further back to fit the whole house
+const viewFor = key => key === 'out' && isMobile() ? { pos: V(15, 7.5, 19), look: V(0, 1.4, 0) } : VIEWS[key];
+const sheetOpen = () => !$('xphone').hidden || !$('xenv').hidden;
 const easeIO = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 // eased camera flight (no sudden start): from where the camera is now to a view
 function flyTo(view, dur = 1.4, thenRotate = false) {
@@ -1611,7 +1616,7 @@ function setExplore(on) {
     ret = null;
     controls.target.copy(cur.look);
     controls.autoRotate = false;   // starts turning once the camera has arrived
-    flyTo(VIEWS.out, 1.8, true);
+    flyTo(viewFor('out'), 1.8, true);
     setView('out', false);
     $('hint').classList.remove('gone');
     setTimeout(() => $('hint').classList.add('gone'), 5000);
@@ -1624,7 +1629,7 @@ function setExplore(on) {
 }
 function setView(key, move = true) {
   document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === key)));
-  if (move) { flyTo(VIEWS[key]); controls.autoRotate = false; }
+  if (move) { flyTo(viewFor(key)); controls.autoRotate = false; }
 }
 document.querySelectorAll('[data-explore]').forEach(b => b.addEventListener('click', () => setExplore(true)));
 $('exploreExit').addEventListener('click', () => setExplore(false));
@@ -1845,7 +1850,8 @@ function frame() {
     camera.lookAt(lookAt);
   }
   // desktop: push the greenhouse right of the panels; phone: above/below them; centred in 360°
-  const wantX = exploring || isMobile() ? 0 : cur.shift, wantY = exploring || !isMobile() ? 0 : cur.my;
+  // on a phone in 360°, lift the house above an open bottom sheet
+  const wantX = exploring || isMobile() ? 0 : cur.shift, wantY = !isMobile() ? 0 : exploring ? (sheetOpen() ? 0.24 : 0) : cur.my;
   const kv = reduce ? 1 : 1 - Math.exp(-dt * 2.5);
   viewSX += (wantX - viewSX) * kv; viewSY += (wantY - viewSY) * kv;
   if (Math.abs(viewSX) + Math.abs(viewSY) > 0.0005) camera.setViewOffset(W, Hh, -W * viewSX, Hh * viewSY, W, Hh); else camera.clearViewOffset();
