@@ -352,10 +352,12 @@
     .hero-inner { gap: 16px; }
     .hero .lead { font-size: 16px; }
     .hero .row .btn { padding: 13px 20px; font-size: 14px; }
-    .scene:not(.hero):not(.price) { align-items: flex-end; padding-block: 46svh 24px; min-height: 115svh; }
+    .scene:not(.hero):not(.price) { align-items: flex-end; padding-block: 42svh 20px; min-height: 112svh; }
     .price { padding-block: 96px 32px; }
-    .panel { padding: 18px; gap: 10px; }
-    h2 { font-size: 24px; }
+    .panel { padding: 16px 18px; gap: 9px; }
+    h2 { font-size: 23px; }
+    .pro p { font-size: 13px; }
+    .pro .fact b { font-size: 20px; }
     .panel p { font-size: 14px; line-height: 1.6; }
     .crop { padding: 9px 13px; }
     .read { padding: 8px 10px; }
@@ -364,7 +366,7 @@
     .alarm-test { padding: 8px 0; }
     .alert { padding: 9px 10px; gap: 10px; }
     .toast { top: calc(68px + env(safe-area-inset-top, 0px)); right: 16px; }
-    .explore-btn { bottom: auto; top: calc(72px + env(safe-area-inset-top, 0px)); right: 16px; padding: 8px 12px; }
+    .explore-btn { z-index: 6; bottom: auto; top: calc(10px + env(safe-area-inset-top, 0px)); right: 66px; height: 42px; box-sizing: border-box; padding: 0 12px; }
     .explore-ui .exit { top: calc(72px + env(safe-area-inset-top, 0px)); right: 16px; }
     .views { left: 16px; right: 16px; transform: none; }
     .views button { flex: 1; min-width: 0; padding: 11px 4px; font-size: 13px; }
@@ -372,7 +374,10 @@
     .xphone { left: 16px; right: 16px; width: auto; top: auto; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); max-height: 56svh; padding: 14px; }
     .exploring .hint { display: none; }
     .xenv { left: 16px; right: 16px; width: auto; top: auto; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
-    .plan { padding: 18px; }
+    .plan { padding: 14px 16px; }
+    .price .panel { gap: 14px; }
+    .plan .amt { font-size: 24px; }
+    .steps { gap: 8px; }
     footer { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
   }
 </style>
@@ -1326,16 +1331,16 @@ const sensorMat = new THREE.MeshStandardMaterial({ color: '#dfe9e2', emissive: '
 /* ================= story keyframes ================= */
 // per section: camera, look target, night amount, vent opening, fan speed, interior lights, panel-side shift
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
-// plus weather: rain, wind (0..1), cloud cover
-const BASE = { night: 0, vent: 0, fan: 0.25, light: 0, lamp: 0, shift: 0.2, my: 0.2, rain: 0, wind: 0.15, cloud: 0, snow: 0 };
+// plus weather: rain, wind (0..1), cloud cover; mz = how much further back the camera sits on a phone
+const BASE = { night: 0, vent: 0, fan: 0.25, light: 0, lamp: 0, shift: 0.2, my: 0.2, rain: 0, wind: 0.15, cloud: 0, snow: 0, mz: 1 };
 const K = (pos, look, o) => ({ ...BASE, pos, look, ...o });
 const KEYS = [
-  K(V(13, 5.2, 17),    V(0, 1.6, 0),   { my: -0.24 }),                                            // hero
-  K(V(10, 8.5, 9),     V(0, 2.8, 0),   { vent: 1, fan: 1 }),                                      // climate
-  K(V(-8, 6.2, 14.5), V(-0.5, 3.6, 3.5),  { vent: 0, fan: 0, rain: 1, wind: 1, cloud: 1 }),          // weather station
+  K(V(13, 5.2, 17),    V(0, 1.6, 0),   { my: -0.25, mz: 1.7 }),                                            // hero
+  K(V(10, 8.5, 9),     V(0, 2.8, 0),   { vent: 1, fan: 1, my: 0.15, mz: 2.5 }),                                      // climate
+  K(V(-8, 6.2, 14.5), V(-0.5, 3.6, 3.5),  { vent: 0, fan: 0, rain: 1, wind: 1, cloud: 1, my: 0.2, mz: 2.45 }),          // weather station
   K(V(0.15, 1.55, 5.1), V(0, 0.8, -4), { vent: 0.5, fan: 0.4, my: 0.12 }),                       // soil (inside)
-  K(V(-13, 4.5, 13),   V(0, 1.6, 0),   { night: 1, fan: 0, light: 1, lamp: 1 }),                           // frost / alarms
-  K(V(5, 3.6, 13.5),   V(0, 1.7, 4),   { night: 0.1, vent: 0.3, fan: 0.4, shift: 0.3 }),          // app
+  K(V(-13, 4.5, 13),   V(0, 1.6, 0),   { night: 1, fan: 0, light: 1, lamp: 1, my: 0.255, mz: 2 }),                           // frost / alarms
+  K(V(5, 3.6, 13.5),   V(0, 1.7, 4),   { night: 0.1, vent: 0.3, fan: 0.4, shift: 0.3, my: 0.25, mz: 2.85 }),          // app
   K(V(21, 11, 23),     V(0, 1.2, 0),   { vent: 0.2, fan: 0.3, shift: 0, my: 0 }),                 // contact
 ];
 const PARAMS = Object.keys(BASE);
@@ -1368,6 +1373,8 @@ function computeTarget(t) {
   tgt.pos.lerpVectors(a.pos, b.pos, f);
   tgt.look.lerpVectors(a.look, b.look, f);
   for (const k of PARAMS) tgt[k] = a[k] + (b[k] - a[k]) * f;
+  // a tall phone screen: pull the camera back so the whole house fits above the text card
+  if (isMobile()) tgt.pos.sub(tgt.look).multiplyScalar(tgt.mz).add(tgt.look);
   // around the app scene the 3D devices follow the simulated automatic controller
   const w = exploring ? 1 : Math.max(0, 1 - Math.abs(t - APP) * 1.5);
   for (const k of ['fan', 'vent', 'light', 'lamp']) tgt[k] += (auto[k] - tgt[k]) * w;
