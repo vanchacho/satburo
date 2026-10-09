@@ -325,17 +325,6 @@
 
   /* phone menu */
   .head-r { display: flex; align-items: center; gap: 8px; }
-  .sound-btn {
-    width: 42px; height: 42px; padding: 0; display: grid; place-items: center; cursor: pointer; color: var(--ink);
-    background: rgba(255,255,255,.35); border: 1px solid var(--frost-edge); border-radius: var(--r);
-  }
-  .sound-btn svg { width: 20px; height: 20px; }
-  html:not(.sound-ready) .sound-btn[aria-pressed="true"] { animation: soundHint 1.6s ease-in-out infinite; }
-  @keyframes soundHint { 50% { box-shadow: 0 0 0 6px rgba(47, 107, 58, .25); } }
-  @media (prefers-reduced-motion: reduce) { html:not(.sound-ready) .sound-btn { animation: none; } }
-  .sound-btn .off { display: none; }
-  .sound-btn[aria-pressed="false"] .on { display: none; }
-  .sound-btn[aria-pressed="false"] .off { display: inline; }
   .menu-btn {
     display: none; width: 42px; height: 42px; padding: 0; place-content: center; gap: 6px; cursor: pointer;
     background: rgba(255,255,255,.35); border: 1px solid var(--frost-edge); border-radius: var(--r);
@@ -402,13 +391,6 @@
     <a href="#app">აპლიკაცია</a>
   </nav>
   <div class="head-r">
-    <button class="sound-btn" id="soundBtn" type="button" aria-pressed="true" aria-label="ხმა" title="ხმა">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/>
-        <path class="on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>
-        <path class="off" d="m16 9.5 5 5m0-5-5 5"/>
-      </svg>
-    </button>
     <a class="btn" href="#contact">დაკავშირება</a>
     <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav" aria-label="მენიუ"><i></i><i></i></button>
   </div>
@@ -1443,7 +1425,7 @@ function renderSettings() {
 }
 document.querySelectorAll('.crop').forEach(btn => btn.addEventListener('click', () => {
   const key = btn.dataset.crop, tp = TEMPLATES[key];
-  if (key !== settings.crop) { growth.pending = key; growth.target = 0; Sound.ui('crop'); }
+  if (key !== settings.crop) { growth.pending = key; growth.target = 0; }
   Object.assign(settings, { crop: key, t: tp.t, h: tp.h, s: tp.s });
   manual.fan = manual.vent = manual.light = manual.lamp = null; heatSet = null;   // a template hands control back to automatic mode
   suppressUntil = Date.now() + 20000;
@@ -1616,7 +1598,6 @@ function setAppOpen(open) {
 $('xAppToggle').addEventListener('click', () => setAppOpen($('xphone').hidden));
 function setExplore(on) {
   exploring = on;
-  Sound.ui('whoosh');
   document.documentElement.classList.toggle('exploring', on);
   controls.enabled = on;
   if (on) {
@@ -1705,163 +1686,6 @@ document.addEventListener('click', e => {
   card.style.top = Math.min(Hh - ch - 16, Math.max(76, e.clientY - ch / 2)) + 'px';
 });
 
-/* ================= sound ================= */
-let flash = 0;   // lightning brightness, set by thunder
-const Sound = (() => {
-  let ctx = null, master, outdoor, noise, brown, wallGain, room, roomSend, on = true;
-  try { on = localStorage.getItem('satburo-sound') !== 'off'; } catch (e) {}
-  const N = {};
-  const now = () => ctx.currentTime;
-  const to = (param, v, tc = 0.2) => param.setTargetAtTime(v, now(), tc);
-  function loopNoise(type, freq, q, dest, buf = noise) {
-    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
-    src.playbackRate.value = 0.8 + Math.random() * 0.4;
-    const f = ctx.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
-    const g = ctx.createGain(); g.gain.value = 0;
-    src.connect(f).connect(g).connect(dest); src.start();
-    return { f, g };
-  }
-  function tone(type, freq, filt, dest) {
-    const o = ctx.createOscillator(); o.type = type; o.frequency.value = freq;
-    const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = filt;
-    const g = ctx.createGain(); g.gain.value = 0;
-    o.connect(f).connect(g).connect(dest); o.start();
-    return { o, f, g };
-  }
-  function init() {
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
-    master = ctx.createGain(); master.gain.value = on ? 1 : 0;
-    const comp = ctx.createDynamicsCompressor();
-    master.connect(comp).connect(ctx.destination);
-    outdoor = ctx.createBiquadFilter(); outdoor.type = 'lowpass'; outdoor.frequency.value = 16000;
-    // inside the house, outdoor sound passes the glass/film: low-passed, quieter, with a short room echo
-    wallGain = ctx.createGain(); wallGain.gain.value = 1;
-    outdoor.connect(wallGain).connect(master);
-    room = ctx.createConvolver();
-    const ir = ctx.createBuffer(2, ctx.sampleRate * 0.9, ctx.sampleRate);
-    for (let c = 0; c < 2; c++) {
-      const ch = ir.getChannelData(c);
-      for (let i = 0; i < ch.length; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / ch.length, 3);
-    }
-    room.buffer = ir;
-    roomSend = ctx.createGain(); roomSend.gain.value = 0;
-    outdoor.connect(roomSend).connect(room).connect(master);
-    noise = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-    const d = noise.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    brown = ctx.createBuffer(1, ctx.sampleRate * 3, ctx.sampleRate);
-    const bd = brown.getChannelData(0);
-    for (let i = 0, last = 0; i < bd.length; i++) { last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02; bd[i] = last * 3.5; }
-    // outdoor ambience
-    N.wind = loopNoise('lowpass', 500, 0.6, outdoor, brown);
-    N.rain = loopNoise('highpass', 1400, 0.5, outdoor);
-    N.rainBody = loopNoise('lowpass', 900, 0.5, outdoor);
-    // inside the house
-    N.roof = loopNoise('bandpass', 2600, 1.4, master);       // rain drumming on glass / film
-    N.fanAir = loopNoise('lowpass', 500, 0.6, master, brown);
-    N.fanHum = tone('sawtooth', 55, 260, master);
-    N.heater = loopNoise('lowpass', 320, 0.7, master, brown);
-    N.lamp = tone('sine', 100, 400, master);
-    N.motor = tone('sawtooth', 120, 600, master);
-    N.water = loopNoise('bandpass', 1100, 4, master);
-  }
-  function blip(freqs, dur, gain, type = 'sine', dest = master, at = 0) {
-    const t0 = now() + at;
-    const o = ctx.createOscillator(); o.type = type;
-    o.frequency.setValueAtTime(freqs[0], t0);
-    freqs.slice(1).forEach((f, i) => o.frequency.exponentialRampToValueAtTime(f, t0 + dur * (i + 1) / (freqs.length - 1)));
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(gain, t0 + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-    if (pan) { pan.pan.value = (Math.random() - 0.5) * 1.4; o.connect(g).connect(pan).connect(dest); } else o.connect(g).connect(dest);
-    o.start(t0); o.stop(t0 + dur + 0.05);
-  }
-  function burst(type, f0, f1, dur, gain, dest = master, at = 0) {
-    const t0 = now() + at;
-    const src = ctx.createBufferSource(); src.buffer = noise;
-    const f = ctx.createBiquadFilter(); f.type = type;
-    f.frequency.setValueAtTime(f0, t0); f.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(gain, t0 + Math.min(0.08, dur / 4));
-    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    src.connect(f).connect(g).connect(dest); src.start(t0); src.stop(t0 + dur + 0.05);
-  }
-  const bird = () => { const n = 2 + (Math.random() * 3 | 0), b = 2600 + Math.random() * 1400; for (let i = 0; i < n; i++) blip([b, b * 1.5, b * 1.1], 0.11, 0.14, 'sine', outdoor, i * 0.14); };
-  const cricket = () => { for (let i = 0; i < 3; i++) blip([4700, 4600], 0.03, 0.06, 'sine', outdoor, i * 0.05); };
-  const thunder = () => { burst('lowpass', 900, 60, 3.2, 0.9, outdoor); burst('lowpass', 300, 50, 2.2, 0.6, outdoor, 0.35); flash = 1; };
-  return {
-    isOn: () => on,
-    start() {
-      if (!ctx) init();
-      if (ctx.state !== 'running') ctx.resume();
-      document.documentElement.classList.add('sound-ready');
-    },
-    toggle() {
-      on = !on;
-      try { localStorage.setItem('satburo-sound', on ? 'on' : 'off'); } catch (e) {}
-      this.start();
-      to(master.gain, on ? 1 : 0, 0.1);
-      return on;
-    },
-    ui(kind) {
-      if (!ctx || ctx.state !== 'running' || !on) return;
-      if (kind === 'click') blip([1400, 1100], 0.05, 0.12, 'triangle');
-      else if (kind === 'crop') { blip([420, 840], 0.3, 0.07); burst('bandpass', 400, 2000, 0.4, 0.06); }
-      else if (kind === 'alarm') for (let i = 0; i < 3; i++) { blip([880, 880], 0.16, 0.12, 'square', master, i * 0.4); blip([660, 660], 0.16, 0.12, 'square', master, i * 0.4 + 0.2); }
-      else if (kind === 'ok') [660, 880, 1320].forEach((f, i) => blip([f, f], 0.25, 0.07, 'sine', master, i * 0.12));
-      else if (kind === 'whoosh') burst('bandpass', 250, 1800, 0.8, 0.12);
-    },
-    // called every frame with the scene state
-    update(dt, st) {
-      if (!ctx || ctx.state !== 'running') return;
-      const muf = st.inside;   // 0 outside, 1 inside the house
-      // open windows / rolled-up sides let more of the outside in
-      const shut = muf * (1 - st.vent * 0.6);
-      to(outdoor.frequency, 16000 * Math.pow(450 / 16000, shut), 0.25);
-      to(outdoor.Q, 0.7 + shut * 0.8, 0.25);
-      to(wallGain.gain, 1 - shut * 0.55, 0.25);
-      to(roomSend.gain, shut * 0.35, 0.25);
-      const gust = 1 + Math.sin(st.t * 1.3) * 0.35 * st.wind + Math.sin(st.t * 3.1) * 0.15 * st.wind;
-      const w = Math.max(0, (st.wind - 0.2) / 0.8);
-      to(N.wind.g.gain, w * w * 1.1 * gust, 0.4);
-      to(N.wind.f.frequency, 350 + w * 1100 + Math.sin(st.t * 0.7) * 200 * w);
-      to(N.rain.g.gain, st.rain * 0.55);
-      to(N.rainBody.g.gain, st.rain * 0.35);
-      to(N.roof.g.gain, st.rain * (0.08 + muf * 0.4) * st.near);
-      const fa = Math.max(0, st.fan - 0.3) / 0.7;
-      to(N.fanAir.g.gain, fa * 0.7 * st.near, 0.3);
-      to(N.fanHum.g.gain, fa * 0.12 * st.near, 0.3);
-      to(N.fanHum.o.frequency, 40 + st.fan * 70);
-      to(N.heater.g.gain, st.heat * 0.35 * st.near);
-      to(N.lamp.g.gain, st.lamp * 0.035 * st.near);
-      const mv = Math.min(1, st.ventSpeed * 5);
-      to(N.motor.g.gain, mv * 0.18 * st.near, 0.08);
-      to(N.motor.o.frequency, 90 + mv * 90, 0.08);
-      const closeBy = Math.max(muf, (st.near - 0.7) / 0.3);
-      to(N.water.g.gain, st.pump && closeBy > 0 ? (0.04 + Math.random() * 0.03) * closeBy : 0, 0.05);
-      // creatures and thunder, by chance each frame
-      const quiet = st.rain < 0.3 && st.snow < 0.3;
-      if (st.night < 0.3 && quiet && Math.random() < dt * 0.6 * (1 - st.cloud * 0.6)) bird();
-      if (st.night > 0.6 && quiet && Math.random() < dt * 1.2) cricket();
-      if (st.rain > 0.8 && st.wind > 0.65 && Math.random() < dt * 0.07) thunder();
-    },
-  };
-})();
-// browsers only allow sound after the first interaction
-let soundStartedAt = 0;
-const startSound = () => { if (Sound.isOn()) { Sound.start(); soundStartedAt = performance.now(); } };
-addEventListener('pointerdown', startSound, { once: true });
-addEventListener('keydown', startSound, { once: true });
-$('soundBtn').setAttribute('aria-pressed', String(Sound.isOn()));
-$('soundBtn').addEventListener('click', () => {
-  // the very first press only switches sound on (that pointerdown already started it)
-  if (performance.now() - soundStartedAt < 600) return;
-  $('soundBtn').setAttribute('aria-pressed', String(Sound.toggle()));
-});
-document.addEventListener('click', e => { if (e.target.closest('button, a, .crop')) Sound.ui('click'); }, true);
-let sndPrevVent = 0;
-
 /* ================= phone menu & scroll progress ================= */
 {
   const btn = $('menuBtn'), menu = $('mnav');
@@ -1928,7 +1752,6 @@ function showAlarm(title, text, kind) {
   const wait = kind === 'ok' ? 5000 - (Date.now() - lastCritAt) : 0;
   if (wait > 0) { setTimeout(() => showAlarm(title, text, kind), wait); return; }
   if (kind !== 'ok') lastCritAt = Date.now();
-  Sound.ui(kind === 'ok' ? 'ok' : 'alarm');
   const el = $('toast');
   $('toastTitle').textContent = title;
   $('toastText').textContent = text;
@@ -1984,7 +1807,7 @@ let frameAcc = 0, frameN = 0;
 const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
 addEventListener('pointermove', e => { pointer.tx = e.clientX / W - .5; pointer.ty = e.clientY / Hh - .5; }, { passive: true });
 
-let viewSX = 0.2, viewSY = 0, sndInside = 0;
+let viewSX = 0.2, viewSY = 0;
 let rainFall = 0, rainDrift = 0, snowFall = 0, snowDrift = 0, treesBent = true;
 const lookAt = new THREE.Vector3();
 function frame() {
@@ -2102,20 +1925,6 @@ function frame() {
     renderer.shadowMap.needsUpdate = true;
     lastVent = cur.vent; lastNight = n; shadowFrames = Math.max(0, shadowFrames - 1);
   }
-
-  // sound follows the scene; device sounds fade with distance, outdoor sounds are muffled inside
-  const cp = camera.position;
-  const insideNow = Math.abs(cp.x) < HW && Math.abs(cp.z) < HL && cp.y < 3.3 ? 1 : 0;
-  sndInside += (insideNow - sndInside) * Math.min(1, dt * 3);
-  Sound.update(dt, {
-    t, wind: cur.wind, rain: cur.rain, snow: cur.snow, night: cur.night, cloud: cur.cloud,
-    fan: cur.fan, heat: cur.light, lamp: cur.lamp, pump: auto.pump,
-    ventSpeed: Math.abs(cur.vent - sndPrevVent) / Math.max(dt, 1e-3),
-    near: THREE.MathUtils.clamp(1.25 - cp.length() / 26, 0.25, 1), inside: sndInside, vent: cur.vent,
-  });
-  sndPrevVent = cur.vent;
-  // lightning flash during thunder
-  if (flash > 0) { hemi.intensity += flash * 2.5; flash = Math.max(0, flash - dt * 2.5); }
 
   renderer.render(scene, camera);
 
