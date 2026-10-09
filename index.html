@@ -1,0 +1,2139 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>სათბურო</title>
+<meta name="description" content="სათბურო — ჭკვიანი სათბური, რომელიც თავად აკონტროლებს სითბოს, ტენიანობასა და მორწყვას">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;700&family=Noto+Serif+Georgian:wght@600;800&display=swap">
+<style>
+  /* Layout: a fixed 3D meadow with a real greenhouse; thin frosted-glass panels scroll over it, camera flies between scenes. */
+  :root {
+    --sky: #dcebe6;
+    --sky-top: #a9cfe3;
+    --leaf: #2f6b3a;
+    --moss: #4f7a30;
+    --sun: #d98f26;
+    --ink: #142219;
+    --frost: rgba(255, 255, 255, .3);        /* frosted glass fill */
+    --frost-edge: rgba(255, 255, 255, .55);  /* glass edge highlight */
+    --frost-dark: rgba(10, 20, 30, .34);
+    --line: rgba(20, 34, 25, .14);
+    --blur: blur(18px) saturate(1.5);
+    --r: 4px;
+    --serif: "Noto Serif Georgian", "Sylfaen", Georgia, serif;
+    --sans: "Noto Sans Georgian", "Sylfaen", system-ui, sans-serif;
+    --gutter: clamp(16px, 4vw, 56px);
+    color-scheme: light;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.65;
+    background: linear-gradient(var(--sky-top), var(--sky) 60%, #cfe0c4);
+    background-attachment: fixed; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  #stage { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+  .loader {
+    position: fixed; inset: 0; z-index: 10; display: grid; place-items: center;
+    background: var(--sky); transition: opacity .8s ease, visibility .8s;
+    font-family: var(--serif); font-size: 22px; color: var(--leaf);
+  }
+  .ready .loader { opacity: 0; visibility: hidden; }
+
+  .glass {
+    background: var(--frost);
+    -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+    border: 1px solid var(--frost-edge);
+  }
+
+  header {
+    position: fixed; z-index: 5; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) var(--gutter) 14px;
+  }
+  header.glass { border-width: 0 0 1px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: var(--serif); font-weight: 800; font-size: 18px; color: var(--leaf); text-decoration: none; }
+  .logo svg { width: 22px; height: 22px; }
+  nav { display: flex; gap: clamp(16px, 2.4vw, 34px); }
+  nav a { color: var(--ink); text-decoration: none; font-size: 13px; opacity: .75; transition: opacity .2s; }
+  nav a:hover { opacity: 1; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--leaf); cursor: pointer;
+    background: var(--leaf); color: #f4f8ef; text-decoration: none; font: 500 13px var(--sans);
+    padding: 10px 18px; border-radius: var(--r); transition: background .2s;
+  }
+  .btn:hover { background: #24552d; }
+  .btn.ghost { background: transparent; color: var(--leaf); }
+  .btn.ghost:hover { background: rgba(255,255,255,.35); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--sun); outline-offset: 3px; }
+
+  /* side progress: short ticks */
+  .dots { position: fixed; z-index: 5; right: var(--gutter); top: 50%; transform: translateY(-50%); display: grid; gap: 10px; justify-items: end; }
+  .dots a { width: 14px; height: 2px; background: rgba(20,34,25,.25); transition: width .3s, background .3s; }
+  .dots a.on { width: 28px; background: var(--leaf); }
+
+  main { position: relative; z-index: 2; }
+  .scene {
+    min-height: 100svh; display: flex; align-items: center;
+    padding-inline: var(--gutter); padding-block: 110px 60px; box-sizing: border-box;
+  }
+  .panel {
+    width: min(420px, 100%); box-sizing: border-box;
+    border-radius: var(--r); padding: clamp(22px, 2.6vw, 32px);
+    display: grid; gap: 14px;
+  }
+  .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--moss); }
+  h1, h2 { font-family: var(--serif); margin: 0; line-height: 1.1; text-wrap: balance; color: var(--ink); }
+  h1 { font-size: clamp(44px, 12vw, 136px); font-weight: 800; color: var(--leaf); letter-spacing: -.01em; }
+  h2 { font-size: clamp(26px, 2.8vw, 36px); font-weight: 800; }
+  p { margin: 0; max-width: 60ch; }
+  .panel p { font-size: 15px; }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+  .fact { border-top: 1px solid var(--line); padding-top: 10px; }
+  .fact b { display: block; font-family: var(--serif); font-size: 26px; color: var(--leaf); font-variant-numeric: tabular-nums; }
+  .fact span { font-size: 12px; opacity: .75; }
+
+  .hero { align-items: flex-start; padding-top: clamp(120px, 18vh, 200px); }
+  .hero-inner { display: grid; gap: 22px; max-width: 620px; }
+  .hero .lead { font-size: clamp(16px, 1.4vw, 19px); max-width: 34ch; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .live {
+    display: inline-flex; align-items: center; gap: 10px; width: fit-content;
+    border-radius: var(--r); padding: 8px 14px; font-size: 13px; font-variant-numeric: tabular-nums;
+  }
+  .pulse { width: 6px; height: 6px; border-radius: 50%; background: #3fae5a; animation: blink 2s infinite; }
+  @keyframes blink { 50% { opacity: .25; } }
+
+  .night .panel { --frost: var(--frost-dark); --frost-edge: rgba(255,255,255,.18); --line: rgba(233,240,244,.18); color: #e9f0f4; }
+  .night h2 { color: #f4f7fa; }
+  .night .eyebrow { color: #f0b860; }
+  .night .fact b { color: #f0b860; }
+
+  /* phone */
+  .phone { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 10px; }
+  .phone-head { display: flex; justify-content: space-between; font-size: 12px; opacity: .75; }
+  .reads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .read { background: rgba(255,255,255,.35); border-radius: var(--r); padding: 10px 12px; }
+  .read b { display: block; font-size: 19px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .read span { font-size: 11px; opacity: .7; }
+  .feat { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14px; }
+  .feat li { display: flex; gap: 10px; align-items: baseline; }
+  .feat li::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--leaf); transform: translateY(-2px); }
+  #app .btn { justify-self: start; margin-top: 4px; }
+  .app-copy { display: grid; gap: 14px; }
+  @media (max-width: 860px) {
+  }
+  .tag {
+    display: inline-block; margin-left: 8px; padding: 2px 7px; border-radius: 3px; vertical-align: 1px;
+    font-size: 10px; font-weight: 500; letter-spacing: .04em; color: var(--ink); background: rgba(255,255,255,.5);
+  }
+  .pro { display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .pro .fact b { font-size: 22px; }
+
+  /* alarms */
+  .alerts { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 6px; }
+  .alert {
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: var(--r); background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+  }
+  .alert b { display: block; font-size: 14px; font-weight: 500; }
+  .alert span { font-size: 12px; opacity: .7; }
+  .alert time { font-size: 12px; opacity: .6; font-variant-numeric: tabular-nums; }
+  .alert i { width: 8px; height: 8px; border-radius: 50%; }
+  .alert.crit i { background: #ff5a4e; box-shadow: 0 0 0 4px rgba(255,90,78,.2); animation: blink 1.2s infinite; }
+  .alert.warn i { background: #f0b860; }
+  .alert.ok i { background: #6fd18e; }
+  .phone-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .all-auto {
+    font: 500 13px var(--sans); cursor: pointer; padding: 9px 14px; border-radius: var(--r);
+    background: var(--leaf); color: #f4f8ef; border: 1px solid var(--leaf); transition: opacity .2s;
+  }
+  .all-auto:disabled { opacity: .45; cursor: default; }
+  .alarm-test {
+    justify-self: start; background: transparent; border: 0; padding: 2px 0; cursor: pointer;
+    font: 500 13px var(--sans); color: #b8382f; text-decoration: underline; text-underline-offset: 3px;
+  }
+  .toast {
+    position: fixed; z-index: 8; top: calc(76px + env(safe-area-inset-top, 0px)); right: var(--gutter);
+    width: min(360px, calc(100% - 32px)); box-sizing: border-box;
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: start;
+    padding: 14px 14px 14px 16px; border-radius: var(--r); color: #f4f7fa;
+    background: rgba(28, 18, 20, .72); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+    border: 1px solid rgba(255, 120, 110, .45);
+    box-shadow: 0 18px 50px rgba(0,0,0,.25);
+    animation: toast-in .35s ease, shake .5s .35s;
+  }
+  .toast[hidden] { display: none; }
+  .pcard {
+    position: fixed; z-index: 9; width: min(370px, calc(100% - 32px)); box-sizing: border-box;
+    padding: 14px 16px; border-radius: var(--r); display: grid; gap: 8px;
+    background: rgba(248, 251, 245, .9); box-shadow: 0 20px 50px rgba(20, 34, 25, .2);
+    animation: toast-in .25s ease;
+  }
+  .pcard[hidden] { display: none; }
+  .pc-head { display: flex; justify-content: space-between; align-items: center; }
+  .pc-head b { font-family: var(--serif); font-size: 21px; color: var(--leaf); }
+  .pc-x { background: transparent; border: 0; font-size: 22px; line-height: 1; cursor: pointer; color: var(--ink); opacity: .6; padding: 0 2px; }
+  .pc-x:hover { opacity: 1; }
+  .pc-sub { font-size: 11px; letter-spacing: .06em; color: var(--moss); font-weight: 700; }
+  .pc-grid { display: grid; grid-template-columns: max-content max-content 1fr; gap: 7px 12px; margin: 0; font-size: 13px; font-variant-numeric: tabular-nums; align-items: baseline; }
+  .pc-grid dt { opacity: .75; }
+  .pc-grid dd { margin: 0; font-weight: 500; white-space: nowrap; }
+  .pc-grid .now { font-size: 12px; text-align: right; white-space: nowrap; }
+  .pc-grid .now.ok { color: #2f6b3a; }
+  .pc-grid .now.bad { color: #b8382f; font-weight: 700; }
+  .pc-grid .sep { grid-column: 1 / -1; height: 1px; background: var(--line); }
+  .pc-note { margin: 0; font-size: 11px; opacity: .65; }
+  @media (max-width: 860px) {
+    .pcard { left: 16px !important; right: 16px; top: auto !important; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); width: auto; }
+  }
+  .toast.ok { background: rgba(16, 32, 22, .72); border-color: rgba(120, 220, 150, .45); animation: toast-in .35s ease; }
+  .toast.ok .toast-dot { background: #6fd18e; box-shadow: 0 0 0 5px rgba(111,209,142,.25); animation: none; }
+  .toast.ok .toast-body b { color: #9fe6b4; }
+  .read.bad { background: rgba(255, 90, 78, .18); box-shadow: inset 0 0 0 1px rgba(184, 56, 47, .45); }
+  .read.bad b { color: #b8382f; }
+  .toast-dot { width: 10px; height: 10px; margin-top: 6px; border-radius: 50%; background: #ff5a4e; box-shadow: 0 0 0 5px rgba(255,90,78,.25); animation: blink 1s infinite; }
+  .toast-body { display: grid; gap: 2px; font-size: 14px; }
+  .toast-body b { font-weight: 700; color: #ff9b92; font-size: 12px; letter-spacing: .06em; }
+  .toast-x { background: transparent; border: 0; color: inherit; font-size: 20px; line-height: 1; cursor: pointer; opacity: .7; padding: 0 2px; }
+  .toast-x:hover { opacity: 1; }
+  @keyframes toast-in { from { opacity: 0; transform: translateY(-10px); } }
+  @keyframes shake { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+  @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+
+  .ideal { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; padding: 10px 12px; border-radius: var(--r); background: rgba(255,255,255,.35); font-variant-numeric: tabular-nums; }
+  .ideal b { flex-basis: 100%; font-weight: 500; font-size: 12px; color: var(--leaf); }
+  .devs { display: grid; gap: 6px; }
+  .dev {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0 10px;
+    padding: 8px 10px 4px; border-radius: var(--r); background: rgba(255,255,255,.35);
+  }
+  .dev-head { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; min-width: 0; }
+  .dev-head output { font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .dev input[type="range"] { grid-column: 1 / -1; width: 100%; margin: 2px 0 0; accent-color: var(--leaf); }
+  .dev .seg.mini { grid-column: 1 / -1; margin: 2px 0 6px; }
+  .seg.mini button { font-size: 11.5px; padding: 5px 8px; }
+  .mode {
+    font: 500 11px var(--sans); cursor: pointer; padding: 3px 8px; border-radius: 3px;
+    border: 1px solid var(--line); background: transparent; color: var(--ink);
+  }
+  .mode[aria-pressed="true"] { background: var(--leaf); border-color: var(--leaf); color: #f4f8ef; }
+  .crops { display: flex; flex-wrap: wrap; gap: 6px; }
+  .crop {
+    font: 500 13px var(--sans); color: var(--ink); cursor: pointer;
+    padding: 6px 12px; border-radius: var(--r); border: 1px solid var(--line); background: rgba(255,255,255,.35);
+    transition: background .2s, color .2s;
+  }
+  .crop:hover { background: rgba(255,255,255,.6); }
+  .crop[aria-pressed="true"] { background: var(--leaf); border-color: var(--leaf); color: #f4f8ef; }
+  .tgs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .tg {
+    display: flex; align-items: center; justify-content: center; gap: 7px; min-width: 0;
+    background: rgba(255,255,255,.35); border: 1px solid var(--line); border-radius: var(--r);
+    padding: 9px 4px; cursor: pointer; font: 400 12px var(--sans); color: var(--ink);
+    transition: background .2s, color .2s;
+  }
+  .tg i { width: 6px; height: 6px; border-radius: 50%; background: rgba(20,34,25,.3); flex: none; }
+  .tg[aria-pressed="true"] { background: var(--leaf); border-color: var(--leaf); color: #f4f8ef; }
+  .tg[aria-pressed="true"] i { background: #9ff0b4; }
+
+  /* pricing */
+  .price { justify-content: center; }
+  .price .panel { width: min(920px, 100%); gap: 22px; }
+  .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+  .plan { padding: 22px; background: rgba(255,255,255,.45); display: grid; gap: 8px; align-content: start; }
+  .plan.main { background: rgba(47,107,58,.9); color: #eef5e8; }
+  .plan .amt { font-family: var(--serif); font-size: clamp(28px, 3.2vw, 40px); font-weight: 800; font-variant-numeric: tabular-nums; }
+  .plan ul { margin: 0; padding-left: 18px; font-size: 14px; opacity: .85; }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; counter-reset: s; }
+  .step { border-top: 1px solid var(--line); padding-top: 12px; font-size: 14px; }
+  .step::before { counter-increment: s; content: "0" counter(s); display: block; font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--sun); margin-bottom: 2px; }
+  .note { font-size: 13px; opacity: .75; }
+
+  footer { position: relative; z-index: 2; text-align: center; padding: 24px 16px 40px; font-size: 12px; color: var(--ink); opacity: .7; }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    :root { --frost: rgba(255,255,255,.82); --frost-dark: rgba(14,24,34,.86); }
+  }
+  /* 360° explore mode */
+  .explore-btn {
+    position: fixed; z-index: 4; right: var(--gutter); bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    padding: 10px 16px; border-radius: var(--r); color: var(--ink); font: 700 14px var(--sans);
+    transition: background .2s;
+  }
+  .explore-btn svg { width: 20px; height: 20px; }
+  .explore-btn:hover { background: rgba(255,255,255,.55); }
+  .exploring, .exploring body { overflow: hidden; }
+  main, footer, .dots, .explore-btn { transition: opacity .6s ease, visibility 0s linear 0s; }
+  .exploring main, .exploring footer, .exploring .dots, .exploring .explore-btn, .exploring .mnav {
+    opacity: 0; visibility: hidden; transition: opacity .5s ease, visibility 0s linear .5s;
+  }
+  .exploring #stage { cursor: grab; touch-action: none; }
+  .exploring #stage:active { cursor: grabbing; }
+  .explore-ui { opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s; }
+  .exploring .explore-ui { opacity: 1; visibility: visible; transition: opacity .7s ease .35s, visibility 0s; }
+  .xphone, .xenv { transition: transform .8s cubic-bezier(.2, .8, .2, 1) .3s; }
+  .xphone { transform: translateX(-24px); }
+  .xenv { transform: translateX(24px); }
+  .exploring .xphone, .exploring .xenv { transform: none; }
+  @media (prefers-reduced-motion: reduce) { .explore-ui, .xphone, .xenv, main, footer { transition: none !important; } }
+  .explore-ui .exit { position: fixed; z-index: 7; right: var(--gutter); top: calc(78px + env(safe-area-inset-top, 0px)); }
+  .hint {
+    position: fixed; z-index: 7; left: 50%; transform: translateX(-50%); bottom: calc(86px + env(safe-area-inset-bottom, 0px));
+    margin: 0; padding: 8px 14px; border-radius: var(--r); font-size: 13px; text-align: center;
+    width: max-content; max-width: calc(100% - 32px); transition: opacity .6s;
+  }
+  .hint.gone { opacity: 0; pointer-events: none; }
+  .views {
+    position: fixed; z-index: 7; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    display: flex; gap: 4px; padding: 4px; border-radius: var(--r);
+  }
+  .views button {
+    border: 0; background: transparent; cursor: pointer; color: var(--ink);
+    font: 500 14px var(--sans); padding: 10px 16px; border-radius: 3px;
+  }
+  .views button[aria-pressed="true"] { background: var(--leaf); color: #f4f8ef; }
+  .views .xapp { box-shadow: inset 1px 0 0 var(--line); border-radius: 0 3px 3px 0; margin-left: 4px; }
+  .xphone {
+    position: fixed; z-index: 7; left: var(--gutter); top: calc(84px + env(safe-area-inset-top, 0px));
+    width: min(360px, calc(100% - 32px)); max-height: calc(100svh - 170px); overflow: auto; box-sizing: border-box;
+    padding: 16px; border-radius: var(--r);
+  }
+  .xphone[hidden], .xenv[hidden] { display: none; }
+  .xenv {
+    position: fixed; z-index: 7; right: var(--gutter); top: calc(132px + env(safe-area-inset-top, 0px));
+    width: min(300px, calc(100% - 32px)); box-sizing: border-box; padding: 14px; border-radius: var(--r);
+    display: grid; gap: 10px;
+  }
+  .env-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .env-head b { font-size: 14px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 4px; }
+  .seg button {
+    font: 500 13px var(--sans); color: var(--ink); cursor: pointer;
+    padding: 7px 10px; border-radius: 3px; border: 1px solid var(--line); background: rgba(255,255,255,.35);
+  }
+  .seg button[aria-pressed="true"] { background: var(--leaf); border-color: var(--leaf); color: #f4f8ef; }
+  #windR { width: 100%; margin: 0; accent-color: var(--leaf); }
+  .xphone .phone { border-top: 0; padding-top: 0; }
+
+  /* scroll progress hairline under the header */
+  .progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; pointer-events: none; }
+  .progress i { display: block; height: 100%; background: var(--leaf); transform-origin: 0 50%; transform: scaleX(0); }
+
+  /* phone menu */
+  .head-r { display: flex; align-items: center; gap: 8px; }
+  .sound-btn {
+    width: 42px; height: 42px; padding: 0; display: grid; place-items: center; cursor: pointer; color: var(--ink);
+    background: rgba(255,255,255,.35); border: 1px solid var(--frost-edge); border-radius: var(--r);
+  }
+  .sound-btn svg { width: 20px; height: 20px; }
+  html:not(.sound-ready) .sound-btn[aria-pressed="true"] { animation: soundHint 1.6s ease-in-out infinite; }
+  @keyframes soundHint { 50% { box-shadow: 0 0 0 6px rgba(47, 107, 58, .25); } }
+  @media (prefers-reduced-motion: reduce) { html:not(.sound-ready) .sound-btn { animation: none; } }
+  .sound-btn .off { display: none; }
+  .sound-btn[aria-pressed="false"] .on { display: none; }
+  .sound-btn[aria-pressed="false"] .off { display: inline; }
+  .menu-btn {
+    display: none; width: 42px; height: 42px; padding: 0; place-content: center; gap: 6px; cursor: pointer;
+    background: rgba(255,255,255,.35); border: 1px solid var(--frost-edge); border-radius: var(--r);
+  }
+  .menu-btn i { display: block; width: 18px; height: 2px; background: var(--ink); transition: transform .25s; }
+  .menu-btn[aria-expanded="true"] i:first-child { transform: translateY(4px) rotate(45deg); }
+  .menu-btn[aria-expanded="true"] i:last-child { transform: translateY(-4px) rotate(-45deg); }
+  .mnav {
+    position: fixed; z-index: 6; left: 16px; right: 16px; top: calc(70px + env(safe-area-inset-top, 0px));
+    display: grid; gap: 2px; padding: 10px; border-radius: var(--r);
+    animation: toast-in .25s ease;
+  }
+  .mnav.glass { background: rgba(244, 249, 241, .9); box-shadow: 0 20px 50px rgba(20, 34, 25, .18); }
+  .mnav[hidden] { display: none; }
+  .mnav a { color: var(--ink); text-decoration: none; font-size: 17px; padding: 12px 10px; border-bottom: 1px solid var(--line); }
+  .mnav a { opacity: 1; }
+  .mnav a.btn { color: #f4f8ef; border: 1px solid var(--leaf); margin-top: 8px; justify-content: center; font-size: 15px; }
+
+  @media (max-width: 860px) {
+    :root { --blur: blur(12px) saturate(1.4); }
+    nav:not(.mnav), .dots, .head-r > .btn { display: none; }
+    .menu-btn { display: grid; }
+    header { padding-block: calc(10px + env(safe-area-inset-top, 0px)) 10px; }
+    .hero { padding-top: calc(104px + env(safe-area-inset-top, 0px)); }
+    .hero-inner { gap: 16px; }
+    .hero .lead { font-size: 16px; }
+    .hero .row .btn { padding: 13px 20px; font-size: 14px; }
+    .scene:not(.hero):not(.price) { align-items: flex-end; padding-block: 46svh 24px; min-height: 115svh; }
+    .price { padding-block: 96px 32px; }
+    .panel { padding: 18px; gap: 10px; }
+    h2 { font-size: 24px; }
+    .panel p { font-size: 14px; line-height: 1.6; }
+    .crop { padding: 9px 13px; }
+    .read { padding: 8px 10px; }
+    .read b { font-size: 17px; }
+    .tg { font-size: 11.5px; padding: 12px 2px; gap: 5px; }
+    .alarm-test { padding: 8px 0; }
+    .alert { padding: 9px 10px; gap: 10px; }
+    .toast { top: calc(68px + env(safe-area-inset-top, 0px)); right: 16px; }
+    .explore-btn { bottom: auto; top: calc(72px + env(safe-area-inset-top, 0px)); right: 16px; padding: 8px 12px; }
+    .explore-ui .exit { top: calc(72px + env(safe-area-inset-top, 0px)); right: 16px; }
+    .views button { padding: 11px 14px; }
+    .xphone { left: 16px; right: 16px; width: auto; top: auto; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); max-height: 56svh; padding: 14px; }
+    .exploring .hint { display: none; }
+    .xenv { left: 16px; right: 16px; width: auto; top: auto; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+    .plan { padding: 18px; }
+    footer { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+  }
+</style>
+
+<canvas id="stage" aria-hidden="true"></canvas>
+<div class="loader" aria-hidden="true">სათბურო</div>
+
+<header class="glass">
+  <a class="logo" href="#top" aria-label="სათბურო">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11 12 4l9 7v9H3z" stroke="#2f6b3a" stroke-width="2" stroke-linejoin="round"/><path d="M12 19c0-4 2-6 5-6-0 3-2 6-5 6Zm0 0c0-3-1.5-5-4-5 0 2.5 1.5 5 4 5Z" fill="#6f9a48"/></svg>
+    სათბურო
+  </a>
+  <nav aria-label="მთავარი">
+    <a href="#climate">კლიმატი</a>
+    <a href="#weather">ამინდი</a>
+    <a href="#soil">მორწყვა</a>
+    <a href="#frost">განგაში</a>
+    <a href="#app">აპლიკაცია</a>
+  </nav>
+  <div class="head-r">
+    <button class="sound-btn" id="soundBtn" type="button" aria-pressed="true" aria-label="ხმა" title="ხმა">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/>
+        <path class="on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>
+        <path class="off" d="m16 9.5 5 5m0-5-5 5"/>
+      </svg>
+    </button>
+    <a class="btn" href="#contact">დაკავშირება</a>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav" aria-label="მენიუ"><i></i><i></i></button>
+  </div>
+  <div class="progress" aria-hidden="true"><i id="prog"></i></div>
+</header>
+
+<nav class="mnav glass" id="mnav" aria-label="მენიუ" hidden>
+  <a href="#climate">კლიმატი</a>
+  <a href="#weather">ამინდი</a>
+  <a href="#soil">მორწყვა და კვება</a>
+  <a href="#frost">განგაში</a>
+  <a href="#app">აპლიკაცია</a>
+  <a class="btn" href="#contact">დაკავშირება</a>
+</nav>
+
+<div class="toast" id="toast" role="alert" hidden>
+  <span class="toast-dot"></span>
+  <div class="toast-body">
+    <b id="toastTitle">განგაში · სათბური</b>
+    <span id="toastText">სათბურში ტემპერატურა 3 °C-მდე დაეცა. გათბობა ჩართულია.</span>
+  </div>
+  <button class="toast-x" id="toastX" type="button" aria-label="დახურვა">×</button>
+</div>
+
+<button class="explore-btn glass" type="button" data-explore aria-label="სათბურის 360° ხედი">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><ellipse cx="12" cy="12" rx="9.5" ry="4"/><path d="M12 2.5v3M12 18.5v3"/><path d="m18 9.5 2.6-1.3M16.5 6.2 18 9.5l-3.4.4"/></svg>
+  360°
+</button>
+
+<div class="explore-ui" id="exploreUi">
+  <button class="btn exit" id="exploreExit" type="button">დახურვა ×</button>
+  <p class="hint glass" id="hint">გადაატრიალეთ მაუსით ან თითით · გაადიდეთ ბორბლით ან ორი თითით · დააჭირეთ მცენარეს</p>
+  <div class="views glass" role="group" aria-label="ხედი">
+    <button type="button" data-view="out" aria-pressed="true">გარედან</button>
+    <button type="button" data-view="in" aria-pressed="false">შიგნით</button>
+    <button type="button" class="xapp" id="xAppToggle" aria-pressed="true" aria-controls="xphone">აპლიკაცია</button>
+    <button type="button" class="xapp" id="xEnvToggle" aria-pressed="true" aria-controls="xenv">გარემო</button>
+  </div>
+  <div class="xphone glass" id="xphone" aria-label="აპლიკაცია">
+  <div class="phone">
+    <div class="phone-head"><span id="ghName">შაბლონი: პომიდორი</span><span id="mode">ავტომატური</span></div>
+    <div class="crops" role="group" aria-label="კულტურის შაბლონი">
+      <button class="crop" type="button" data-crop="strawberry" aria-pressed="false">მარწყვი</button>
+      <button class="crop" type="button" data-crop="tomato" aria-pressed="true">პომიდორი</button>
+      <button class="crop" type="button" data-crop="cucumber" aria-pressed="false">კიტრი</button>
+      <button class="crop" type="button" data-crop="pepper" aria-pressed="false">წიწაკა</button>
+      <button class="crop" type="button" data-crop="greens" aria-pressed="false">მწვანილი</button>
+    </div>
+    <div class="ideal" id="ideal"></div>
+    <div class="reads">
+      <div class="read"><b id="pT">24.3°</b><span>ჰაერი ახლა</span></div>
+      <div class="read"><b id="pH">68%</b><span>ტენი ახლა</span></div>
+      <div class="read"><b id="pS">41%</b><span>ნიადაგი ახლა</span></div>
+    </div>
+    <div class="devs">
+      <div class="dev">
+        <label class="dev-head" for="rgFan"><span>ვენტილატორები</span><output id="lvFan">0 %</output></label>
+        <button class="mode" id="mdFan" type="button" aria-pressed="true" title="ავტომატური რეჟიმი">ავტო</button>
+        <input type="range" id="rgFan" min="0" max="100" step="5" value="0">
+      </div>
+      <div class="dev">
+        <label class="dev-head" for="rgVent"><span>ფანჯრების გაღება</span><output id="lvVent">0 %</output></label>
+        <button class="mode" id="mdVent" type="button" aria-pressed="true" title="ავტომატური რეჟიმი">ავტო</button>
+        <input type="range" id="rgVent" min="0" max="100" step="5" value="0">
+      </div>
+      <div class="dev">
+        <label class="dev-head" for="rgLight"><span>გათბობა</span><output id="lvLight">24 °C</output></label>
+        <button class="mode" id="mdLight" type="button" aria-pressed="true" title="ავტომატური რეჟიმი">ავტო</button>
+        <input type="range" id="rgLight" min="4" max="35" step="1" value="24">
+      </div>
+      <div class="dev">
+        <label class="dev-head" for="rgLamp"><span>განათება</span><output id="lvLamp">0 %</output></label>
+        <button class="mode" id="mdLamp" type="button" aria-pressed="true" title="ავტომატური რეჟიმი">ავტო</button>
+        <input type="range" id="rgLamp" min="0" max="100" step="5" value="0">
+        <div class="seg mini" role="group" aria-label="სინათლის ფერი">
+          <button type="button" data-lampc="warm" aria-pressed="true">თბილი თეთრი</button>
+          <button type="button" data-lampc="grow" aria-pressed="false">ზრდის (იისფერი)</button>
+        </div>
+      </div>
+    </div>
+    <div class="phone-foot">
+          <button class="all-auto" id="allAuto" type="button">ყველაფერი ავტოზე</button>
+          <button class="alarm-test" id="alarmTest" type="button">განგაშის ტესტი</button>
+        </div>
+  </div>
+  </div>
+  <div class="xenv glass" id="xenv" aria-label="გარემო">
+    <div class="env-head"><b>გარემო</b><span id="outT">გარეთ 22 °C</span></div>
+    <div class="seg" role="group" aria-label="სათბურის ტიპი">
+      <button type="button" data-house="glass" aria-pressed="true">შუშის სათბური</button>
+      <button type="button" data-house="film" aria-pressed="false">პარკის სათბური</button>
+    </div>
+    <div class="seg" role="group" aria-label="დღე და ღამე">
+      <button type="button" data-time="day" aria-pressed="true">დღე</button>
+      <button type="button" data-time="night" aria-pressed="false">ღამე</button>
+    </div>
+    <div class="seg" role="group" aria-label="ამინდი">
+      <button type="button" data-weather="sun" aria-pressed="true">მზიანი</button>
+      <button type="button" data-weather="cloud" aria-pressed="false">ღრუბლიანი</button>
+      <button type="button" data-weather="rain" aria-pressed="false">წვიმა</button>
+      <button type="button" data-weather="snow" aria-pressed="false">თოვლი</button>
+      <button type="button" data-weather="storm" aria-pressed="false">ქარიშხალი</button>
+    </div>
+    <label class="dev-head" for="windR"><span>ქარი</span><output id="windO">3 მ/წმ</output></label>
+    <input type="range" id="windR" min="0" max="25" step="1" value="3">
+  </div>
+</div>
+
+<div class="pcard glass" id="pcard" role="dialog" aria-labelledby="pcName" hidden>
+  <div class="pc-head"><b id="pcName">პომიდორი</b><button class="pc-x" id="pcX" type="button" aria-label="დახურვა">×</button></div>
+  <span class="pc-sub">იდეალური გარემო · ახლა სათბურში</span>
+  <dl class="pc-grid" id="pcGrid"></dl>
+  <p class="pc-note">ზოგადი რეკომენდაცია სათბურისთვის. ჯიშის მიხედვით შეიძლება განსხვავდებოდეს.</p>
+</div>
+
+<div class="dots" aria-hidden="true">
+  <a href="#top"></a><a href="#climate"></a><a href="#weather"></a><a href="#soil"></a><a href="#frost"></a><a href="#app"></a><a href="#contact"></a>
+</div>
+
+<main>
+  <section class="scene hero" id="top" data-scene>
+    <div class="hero-inner">
+      <span class="eyebrow">ჭკვიანი სათბური საქართველოსთვის</span>
+      <h1>სათბურო</h1>
+      <p class="lead">აირჩიეთ კულტურა აპლიკაციაში და სათბური თავად შეინარჩუნებს მისთვის საჭირო სითბოს, ტენიანობასა და მორწყვას.</p>
+      <div class="row">
+        <a class="btn" href="#climate">როგორ მუშაობს</a>
+        <button class="btn ghost" type="button" data-explore>360° ხედი</button>
+      </div>
+      <span class="live glass"><span class="pulse"></span>ახლა სათბურში: <b id="liveT">24.3 °C</b> · <b id="liveH">68 %</b></span>
+    </div>
+  </section>
+
+  <section class="scene" id="climate" data-scene>
+    <div class="panel glass">
+      <span class="eyebrow">ვენტილაცია</span>
+      <h2>სიცხეში სათბური თავად ნიავდება</h2>
+      <p>სისტემამ იცის, რა ტემპერატურა და ტენიანობა სჭირდება თქვენს კულტურას. როცა სათბური გადახურდება, ვენტილატორები და სახურავის ფანჯრები თავად ჩაირთვება, თან იმდენად, რამდენადაც საჭიროა.</p>
+    </div>
+  </section>
+
+  <section class="scene" id="weather" data-scene>
+    <div class="panel glass">
+      <span class="eyebrow">ამინდის სადგური <span class="tag">დამატებითი მოდული</span></span>
+      <h2>ქარი ან წვიმა? ფანჯრები თავად იხურება</h2>
+      <p>ანემომეტრი ზომავს ქარის სიჩქარეს, წვიმის სენსორი კი ნალექს აფიქსირებს. თუ ქარი თქვენს მითითებულ ზღვარს გადააჭარბებს ან წვიმა წამოვა, სისტემა სახურავის ფანჯრებს დახურავს და განგაშს გამოგიგზავნით. ქარი აპკს ვეღარ დახევს, სეტყვა და კოკისპირული წვიმა კი მოსავალს ვეღარ დააზიანებს.</p>
+    </div>
+  </section>
+
+  <section class="scene" id="soil" data-scene>
+    <div class="panel glass">
+      <span class="eyebrow">ნიადაგი, მორწყვა და კვება</span>
+      <h2>მცენარე წყალს მაშინ იღებს, როცა სჭირდება</h2>
+      <p>სენსორები მუდმივად ზომავენ ნიადაგის ტენს. როცა ნიადაგი კულტურისთვის საჭირო დონეზე მეტად გამოშრება, ჩაირთვება ტუმბო და საკმარის დონეზე თავად გამოირთვება.</p>
+      <div class="pro">
+        <span class="eyebrow">პროფესიონალებისთვის <span class="tag">დამატებითი მოდული</span></span>
+        <p>pH და EC სენსორები გაჩვენებთ ნიადაგის მჟავიანობას და სასუქის კონცენტრაციას. ზუსტად გეცოდინებათ, როდის და რა დოზით სჭირდება მცენარეს მინერალები.</p>
+        <div class="facts">
+          <div class="fact"><b>pH 6.4</b><span>მჟავიანობა · მაგალითი</span></div>
+          <div class="fact"><b>1.8 mS/cm</b><span>EC, სასუქი · მაგალითი</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene night" id="frost" data-scene>
+    <div class="panel glass">
+      <span class="eyebrow">ყინვა და განგაში</span>
+      <h2>რამე თუ მოხდა, მაშინვე გაიგებთ</h2>
+      <p>თუ სათბური ძალიან აცივდება ან გადახურდება, სენსორი გაფუჭდება ან კავშირი გაწყდება, განგაში მოგივათ აპლიკაციაში, SMS-ით და ზარით, ღამითაც. ზღვრები კულტურის მიხედვით დგება, გათბობა კი მანამდე ჩაირთვება.</p>
+      <ul class="alerts" aria-label="განგაშის მაგალითები">
+        <li class="alert crit"><i></i><div><b>სათბურში ძალიან ცივა</b><span>2 °C · გათბობა ჩართულია</span></div><time>02:14</time></li>
+        <li class="alert warn"><i></i><div><b>კავშირი გაწყდა</b><span>მოწყობილობა 10 წუთია არ პასუხობს</span></div><time>02:31</time></li>
+        <li class="alert ok"><i></i><div><b>ტემპერატურა აღდგა</b><span>8 °C · ყველაფერი რიგზეა</span></div><time>03:05</time></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="scene" id="app" data-scene>
+    <div class="panel glass">
+      <span class="eyebrow">აპლიკაცია</span>
+      <h2>მთელი სათბური თქვენს ტელეფონში</h2>
+      <p>ნახეთ ტემპერატურა, ტენიანობა და ნიადაგის ტენი რეალურ დროში, სადაც არ უნდა იყოთ. აირჩიეთ კულტურა და სათბური თავად მოერგება, ან მართეთ ყველაფერი ხელით.</p>
+      <ul class="feat">
+        <li>კულტურის შაბლონები: მარწყვი, პომიდორი, კიტრი, წიწაკა, მწვანილი</li>
+        <li>ვენტილატორები, ფანჯრები, გათბობა და განათება ერთი ღილაკით</li>
+        <li>ავტომატური ან ხელით მართვა ნებისმიერ ამინდში</li>
+        <li>განგაში აპლიკაციაში, SMS-ით და ზარით</li>
+      </ul>
+      <button class="btn" type="button" data-explore>სცადეთ 360° ხედში</button>
+    </div>
+  </section>
+
+  <section class="scene price" id="contact" data-scene>
+    <div class="panel glass">
+      <span class="eyebrow">დაკავშირება</span>
+      <h2>გაჭკვიანეთ თქვენი სათბური</h2>
+      <div class="plans">
+        <div class="plan main">
+          <span class="amt">მონტაჟი</span>
+          <ul><li>მოწყობილობა და სენსორები</li><li>მონტაჟი თქვენს სათბურში</li><li>პირველადი გამართვა</li></ul>
+        </div>
+        <div class="plan">
+          <span class="amt">მომსახურება</span>
+          <ul><li>SIM ბარათი და მობილური ინტერნეტი</li><li>აპლიკაცია და მონაცემების შენახვა</li><li>დისტანციური დახმარება</li></ul>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step">ვიზიტი და სათბურის შეფასება</div>
+        <div class="step">მონტაჟი და გამართვა</div>
+        <div class="step">მონიტორინგი დღე და ღამე</div>
+      </div>
+      <p class="note">ვუერთდებით თქვენს არსებულ ტუმბოს, ვენტილატორს, გამათბობელსა და ფანჯრის ძრავას. ვმუშაობთ ქვემო ქართლში, კახეთსა და იმერეთში.</p>
+    </div>
+  </section>
+</main>
+<footer>© 2026 სათბურო · ჭკვიანი სათბურები საქართველოში</footer>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile = () => innerWidth < 860;
+
+/* ================= renderer ================= */
+const canvas = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+let dpr = Math.min(devicePixelRatio, isMobile() ? 1.25 : 1.5);
+renderer.setPixelRatio(dpr);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.autoUpdate = false;   // shadows re-render only when something moves
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 700);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.35;
+pmrem.dispose();
+
+/* seeded random so the meadow looks the same every visit */
+let seed = 7;
+const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const C = c => new THREE.Color(c);
+
+/* ================= sky, fog, stars ================= */
+const DAY = { top: C('#8fc0e2'), hor: C('#e4efe6') };
+const NIGHT = { top: C('#08142a'), hor: C('#24384d') };
+const OVERCAST = { top: C('#8d9aa3'), hor: C('#c3cbcc') };
+const skyMat = new THREE.ShaderMaterial({
+  uniforms: { top: { value: DAY.top.clone() }, hor: { value: DAY.hor.clone() } },
+  vertexShader: `varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+  fragmentShader: `uniform vec3 top; uniform vec3 hor; varying vec3 vW;
+    void main(){ float h = normalize(vW).y; gl_FragColor = vec4(mix(hor, top, smoothstep(-.02, .55, h)), 1.);
+    #include <colorspace_fragment>
+    }`,
+  side: THREE.BackSide, depthWrite: false, fog: false,
+});
+const sky = new THREE.Mesh(new THREE.SphereGeometry(400, 24, 12), skyMat);
+scene.add(sky);
+scene.fog = new THREE.Fog(DAY.hor.clone(), 70, 300);
+
+const starGeo = new THREE.BufferGeometry();
+{
+  const p = new Float32Array(600 * 3);
+  for (let i = 0; i < 600; i++) {
+    const th = rnd() * Math.PI * 2, ph = Math.acos(0.1 + rnd() * 0.9);
+    p.set([Math.sin(ph) * Math.cos(th) * 350, Math.cos(ph) * 350, Math.sin(ph) * Math.sin(th) * 350], i * 3);
+  }
+  starGeo.setAttribute('position', new THREE.BufferAttribute(p, 3));
+}
+const starMat = new THREE.PointsMaterial({ color: '#ffffff', size: 1.6, sizeAttenuation: false, transparent: true, opacity: 0, fog: false, depthWrite: false });
+scene.add(new THREE.Points(starGeo, starMat));
+
+/* ================= lights ================= */
+const hemi = new THREE.HemisphereLight('#dff0ff', '#6b8a4a', 1.3);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight('#fff1d6', 2.8);
+sun.position.set(18, 26, 14);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12, near: 5, far: 70 });
+sun.shadow.bias = -0.0006;
+sun.shadow.normalBias = 0.03;
+scene.add(sun);
+const inside = new THREE.PointLight('#ffcf8a', 0, 16, 1.6);
+inside.position.set(0, 2.7, 0);
+scene.add(inside);
+
+/* ================= ground & landscape ================= */
+const ground = new THREE.Mesh(new THREE.CircleGeometry(260, 48), new THREE.MeshLambertMaterial({ color: '#86ad5c' }));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const gravel = new THREE.MeshLambertMaterial({ color: '#cbbf9f' });
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(6.2, 12.2), gravel);
+floor.rotation.x = -Math.PI / 2; floor.position.y = 0.01; floor.receiveShadow = true;
+scene.add(floor);
+const path = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 12), gravel);
+path.rotation.x = -Math.PI / 2; path.position.set(0, 0.012, 12); path.receiveShadow = true;
+scene.add(path);
+
+// trees (instanced: 2 draw calls for 60 trees); local matrices are kept so the wind can bend them
+const trees = [];
+let treeTrunks, treeCrowns;
+{
+  const N = 60;
+  const trunks = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.12, 0.2, 1, 6), new THREE.MeshLambertMaterial({ color: '#6b4f36' }), N);
+  const crowns = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), new THREE.MeshLambertMaterial({ flatShading: true }), N);
+  const greens = ['#4e7f3a', '#5f8f40', '#3f6f35', '#729c4a', '#557a36'];
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), p = new THREE.Vector3();
+  for (let i = 0; i < N; i++) {
+    const a = rnd() * Math.PI * 2, r = 36 + rnd() * 70;
+    const x = Math.cos(a) * r, z = Math.sin(a) * r;
+    const h = 1.4 + rnd() * 1.4, cr = 1.3 + rnd() * 1.4;
+    const ry = rnd() * 3, sy = 1.1 + rnd() * .4;
+    const trunkL = new THREE.Matrix4().compose(p.set(0, h / 2, 0), q.identity(), s.set(1, h, 1));
+    const crownL = new THREE.Matrix4().compose(p.set(0, h + cr * 0.7, 0), q.setFromEuler(new THREE.Euler(0, ry, 0)), s.set(cr, cr * sy, cr));
+    trees.push({ x, z, trunkL, crownL, phase: rnd() * 6.28 });
+    trunks.setMatrixAt(i, m.makeTranslation(x, 0, z).multiply(trunkL));
+    crowns.setMatrixAt(i, m.makeTranslation(x, 0, z).multiply(crownL));
+    crowns.setColorAt(i, C(greens[i % greens.length]));
+  }
+  trunks.castShadow = crowns.castShadow = false;
+  scene.add(trunks, crowns);
+  treeTrunks = trunks; treeCrowns = crowns;
+}
+// rolling hills + far Caucasus
+{
+  const hillMat = new THREE.MeshLambertMaterial({ color: '#79a157' });
+  const hillGeo = new THREE.SphereGeometry(1, 20, 10);
+  for (let i = 0; i < 9; i++) {
+    const a = (i / 9) * Math.PI * 2 + rnd() * .4, r = 120 + rnd() * 40;
+    const hill = new THREE.Mesh(hillGeo, hillMat);
+    hill.position.set(Math.cos(a) * r, -4, Math.sin(a) * r);
+    hill.scale.set(45 + rnd() * 30, 14 + rnd() * 10, 45 + rnd() * 30);
+    scene.add(hill);
+  }
+  const rock = new THREE.MeshLambertMaterial({ color: '#8b9eaa', flatShading: true });
+  const snow = new THREE.MeshLambertMaterial({ color: '#f2f5f7', flatShading: true });
+  const cone = new THREE.ConeGeometry(1, 1, 7);
+  for (let i = 0; i < 14; i++) {
+    const a = -Math.PI * 0.95 + (i / 13) * Math.PI * 0.9, r = 230 + rnd() * 30;
+    const h = 45 + rnd() * 40, w = 40 + rnd() * 25;
+    const mtn = new THREE.Mesh(cone, rock);
+    mtn.position.set(Math.cos(a) * r, h / 2 - 2, Math.sin(a) * r);
+    mtn.scale.set(w, h, w); mtn.rotation.y = rnd() * 3;
+    const cap = new THREE.Mesh(cone, snow);
+    cap.scale.set(0.36, 0.36, 0.36); cap.position.y = 0.32;
+    mtn.add(cap);
+    scene.add(mtn);
+  }
+}
+
+/* ================= greenhouse ================= */
+const HW = 3, HL = 6, H = 2.4, R = 3.6;            // half-width, half-length, wall height, ridge height (m)
+const roofY = x => H + (R - H) * (1 - Math.abs(x) / HW);
+const gh = new THREE.Group();
+scene.add(gh);
+const glassParts = new THREE.Group();    // frame, glass, roof vents, side fans
+const tunnelParts = new THREE.Group();   // polytunnel: hoops, film, roll-up sides, gable fans
+tunnelParts.visible = false;
+gh.add(glassParts, tunnelParts);
+let fanTemplate = null;
+
+// aluminium frame: every beam is one instance of a unit box
+{
+  const beams = [];
+  const beam = (a, b, t = 0.07) => beams.push([new THREE.Vector3(...a), new THREE.Vector3(...b), t]);
+  for (let z = -HL; z <= HL + 1e-6; z += 1.5) {
+    for (const x of [HW, -HW]) { beam([x, 0, z], [x, H, z]); beam([x, H, z], [0, R, z]); }
+  }
+  for (const x of [HW, -HW]) for (const y of [0.05, 1.2, H]) beam([x, y, -HL], [x, y, HL]);
+  beam([0, R, -HL], [0, R, HL], 0.09);
+  for (const sx of [1, -1]) beam([sx * HW / 2, roofY(HW / 2), -HL], [sx * HW / 2, roofY(HW / 2), HL], 0.05);
+  for (const z of [HL, -HL]) { beam([-HW, 0.05, z], [HW, 0.05, z]); beam([-HW, H, z], [HW, H, z], 0.05); }
+  // front gable: door + side mullions
+  for (const x of [-0.6, 0.6]) beam([x, 0, HL], [x, 2.05, HL], 0.06);
+  beam([-0.6, 2.05, HL], [0.6, 2.05, HL], 0.06);
+  for (const x of [-2.2, 2.2]) beam([x, 0, HL], [x, roofY(2.2), HL], 0.05);
+  beam([0, 2.05, HL], [0, R, HL], 0.05);
+  // back gable
+  for (const x of [-1.5, 0, 1.5]) beam([x, 0, -HL], [x, roofY(x), -HL], 0.05);
+  beam([-HW, 1.2, -HL], [HW, 1.2, -HL], 0.05);
+
+  const frame = new THREE.InstancedMesh(
+    new THREE.BoxGeometry(1, 1, 1),
+    new THREE.MeshStandardMaterial({ color: '#e9ece8', metalness: 0.6, roughness: 0.35 }),
+    beams.length
+  );
+  const up = new THREE.Vector3(0, 1, 0), m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), mid = new THREE.Vector3(), dir = new THREE.Vector3();
+  beams.forEach(([a, b, t], i) => {
+    dir.subVectors(b, a); const len = dir.length();
+    q.setFromUnitVectors(up, dir.normalize());
+    m.compose(mid.addVectors(a, b).multiplyScalar(0.5), q, s.set(t, len + t, t));
+    frame.setMatrixAt(i, m);
+  });
+  frame.castShadow = true; frame.receiveShadow = true;
+  glassParts.add(frame);
+}
+
+// glass skin: one geometry, one draw call
+const glassMat = new THREE.MeshStandardMaterial({
+  color: '#e6f5ee', transparent: true, opacity: 0.17, roughness: 0.05, metalness: 0.1,
+  side: THREE.DoubleSide, depthWrite: false, envMapIntensity: 2.2,
+});
+{
+  const v = [];
+  const tri = (a, b, c) => v.push(...a, ...b, ...c);
+  const quad = (a, b, c, d) => { tri(a, b, c); tri(a, c, d); };
+  for (const x of [HW, -HW]) quad([x, 0, -HL], [x, 0, HL], [x, H, HL], [x, H, -HL]);
+  for (const x of [HW, -HW]) quad([x, H, -HL], [x, H, HL], [0, R, HL], [0, R, -HL]);
+  for (const z of [HL, -HL]) { quad([-HW, 0, z], [HW, 0, z], [HW, H, z], [-HW, H, z]); tri([-HW, H, z], [HW, H, z], [0, R, z]); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3));
+  g.computeVertexNormals();
+  const skin = new THREE.Mesh(g, glassMat);
+  skin.renderOrder = 2;
+  glassParts.add(skin);
+}
+
+// roof vents hinged at the ridge (these are the farmer's window actuators, switched by our relay)
+const vents = [];
+{
+  const slope = Math.atan2(H - R, HW);
+  const len = 1.15, wid = 2.6;
+  const g = new THREE.BoxGeometry(len, 0.03, wid); g.translate(len / 2, 0, 0);
+  const ventGlass = new THREE.MeshStandardMaterial({ color: '#dff2ea', transparent: true, opacity: 0.3, roughness: 0.05, metalness: 0.1, envMapIntensity: 2, depthWrite: false });
+  const edge = new THREE.LineBasicMaterial({ color: '#f4f6f3' });
+  for (const sx of [1, -1]) for (const zc of [-3, 3]) {
+    const holder = new THREE.Group();
+    holder.scale.x = sx;
+    const pivot = new THREE.Group();
+    pivot.position.set(0.02, R + 0.04, zc);
+    pivot.rotation.z = slope;
+    const panel = new THREE.Mesh(g, ventGlass);
+    panel.renderOrder = 3;
+    panel.add(new THREE.LineSegments(new THREE.EdgesGeometry(g), edge));
+    pivot.add(panel);
+    pivot.userData.slope = slope;
+    holder.add(pivot);
+    glassParts.add(holder);
+    vents.push(pivot);
+  }
+}
+
+// exhaust fans on both side walls: square box, round shroud, pitched blades, wire guard.
+// One fan is built, then cloned (geometry and materials are shared).
+const fanBlades = new THREE.Group();
+fanBlades.name = 'rotor';
+const fanRotors = [];
+const fanBlur = new THREE.MeshBasicMaterial({ color: '#aab4b0', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
+{
+  const fan = new THREE.Group();
+  const metal = new THREE.MeshStandardMaterial({ color: '#cdd3d0', metalness: 0.75, roughness: 0.3, side: THREE.DoubleSide });
+  const dark = new THREE.MeshStandardMaterial({ color: '#3a4240', metalness: 0.4, roughness: 0.5 });
+  const S = 1.2, D = 0.32, T = 0.03, RAD = 0.52;
+
+  for (const [w, h, x, y] of [[S, T, 0, S / 2], [S, T, 0, -S / 2], [T, S, S / 2, 0], [T, S, -S / 2, 0]]) {
+    const plate = new THREE.Mesh(new THREE.BoxGeometry(w, h, D), metal);
+    plate.position.set(x, y, D / 2); plate.castShadow = true;
+    fan.add(plate);
+  }
+  const shroud = new THREE.Mesh(new THREE.CylinderGeometry(RAD, RAD, D, 48, 1, true), metal);
+  shroud.rotation.x = Math.PI / 2; shroud.position.z = D / 2;
+  const sq = new THREE.Shape();
+  sq.moveTo(-S / 2, -S / 2); sq.lineTo(S / 2, -S / 2); sq.lineTo(S / 2, S / 2); sq.lineTo(-S / 2, S / 2); sq.closePath();
+  const hole = new THREE.Path(); hole.absarc(0, 0, RAD, 0, Math.PI * 2, true); sq.holes.push(hole);
+  const face = new THREE.Mesh(new THREE.ShapeGeometry(sq, 40), metal);
+  face.position.z = D;
+  fan.add(shroud, face);
+
+  // paddle-shaped blades; each sits in its own pivot so the pitch twists around the blade's own axis
+  const bs = new THREE.Shape();
+  bs.moveTo(-0.035, 0.07);
+  bs.quadraticCurveTo(-0.17, 0.28, -0.11, 0.47);
+  bs.quadraticCurveTo(0.0, 0.53, 0.1, 0.46);
+  bs.quadraticCurveTo(0.12, 0.24, 0.035, 0.07);
+  bs.closePath();
+  const bladeGeo = new THREE.ShapeGeometry(bs, 10);
+  const bladeMat = new THREE.MeshStandardMaterial({ color: '#8f9996', metalness: 0.6, roughness: 0.35, side: THREE.DoubleSide });
+  for (let i = 0; i < 6; i++) {
+    const pivot = new THREE.Group();
+    pivot.rotation.z = (i / 6) * Math.PI * 2;
+    const blade = new THREE.Mesh(bladeGeo, bladeMat);
+    blade.rotation.y = 0.55;
+    pivot.add(blade);
+    fanBlades.add(pivot);
+  }
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.1, 20), dark);
+  hub.rotation.x = Math.PI / 2;
+  fanBlades.add(hub);
+  fanBlades.position.z = D * 0.55;
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(RAD - 0.02, 48), fanBlur);
+  disc.position.z = D * 0.55 + 0.02;
+
+  // motor + mounting struts behind the blades
+  const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.14, 20), dark);
+  motor.rotation.x = Math.PI / 2; motor.position.z = D * 0.3;
+  const strut = new THREE.Mesh(new THREE.BoxGeometry(S, 0.025, 0.025), dark);
+  const strut2 = strut.clone(); strut2.rotation.z = Math.PI / 2;
+  strut.position.z = strut2.position.z = D * 0.2;
+
+  // wire guard on the outside
+  const wire = new THREE.MeshStandardMaterial({ color: '#e4e8e6', metalness: 0.8, roughness: 0.3 });
+  for (const r of [0.14, 0.28, 0.42, 0.52]) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.006, 4, 48), wire);
+    ring.position.z = D + 0.03;
+    fan.add(ring);
+  }
+  for (let i = 0; i < 4; i++) {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(2 * RAD, 0.01, 0.01), wire);
+    bar.rotation.z = (i / 4) * Math.PI; bar.position.z = D + 0.03;
+    fan.add(bar);
+  }
+  fan.add(fanBlades, disc, motor, strut, strut2);
+  fan.scale.setScalar(0.55);
+  // three fans per side, centred in the wall bays between the posts, facing outwards
+  for (const sx of [1, -1]) for (const z of [-3.75, -0.75, 2.25]) {
+    const f = fan.clone();
+    f.position.set(sx * (HW + 0.01), 1.8, z);
+    f.rotation.y = sx * Math.PI / 2;
+    glassParts.add(f);
+    fanRotors.push(f.getObjectByName('rotor'));
+  }
+  fanTemplate = fan;
+}
+
+// ---------- polytunnel ("პარკის სათბური"): steel hoops, milky PE film, roll-up sides, fans in the gable ends
+const TH0 = 1.3, TR = 3.5;   // straight side height, arch peak (m)
+const tunnelY = x => TH0 + (TR - TH0) * Math.sqrt(Math.max(0, 1 - (x / HW) ** 2));
+const rollUps = [];
+{
+  const steel = new THREE.MeshStandardMaterial({ color: '#c9cfcc', metalness: 0.7, roughness: 0.35 });
+  const film = new THREE.MeshStandardMaterial({
+    color: '#f1f5f0', transparent: true, opacity: 0.52, roughness: 0.55, metalness: 0,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+  // arch profile from the left side wall over the top to the right side wall
+  const prof = [];
+  const SEG = 28;
+  for (let i = 0; i <= SEG; i++) { const x = -HW + (2 * HW * i) / SEG; prof.push([x, tunnelY(x)]); }
+
+  // hoops every 1.5 m, plus purlins along the length: all one instanced mesh of unit boxes
+  const beams = [];
+  const beam = (a, b, t = 0.05) => beams.push([new THREE.Vector3(...a), new THREE.Vector3(...b), t]);
+  for (let z = -HL; z <= HL + 1e-6; z += 1.5) {
+    for (const sx of [-1, 1]) beam([sx * HW, 0, z], [sx * HW, TH0, z]);
+    for (let i = 0; i < SEG; i++) beam([prof[i][0], prof[i][1], z], [prof[i + 1][0], prof[i + 1][1], z]);
+  }
+  for (const x of [0, -HW * 0.55, HW * 0.55]) beam([x, tunnelY(x), -HL], [x, tunnelY(x), HL], 0.04);
+  for (const sx of [-1, 1]) { beam([sx * HW, TH0, -HL], [sx * HW, TH0, HL], 0.05); beam([sx * HW, 0.25, -HL], [sx * HW, 0.25, HL], 0.04); }
+  // gable framing: door posts at the front, two posts at the back
+  for (const x of [-0.6, 0.6]) beam([x, 0, HL], [x, 2.05, HL], 0.05);
+  beam([-0.6, 2.05, HL], [0.6, 2.05, HL], 0.05);
+  for (const x of [-1.2, 1.2]) beam([x, 0, -HL], [x, tunnelY(x), -HL], 0.05);
+  const hoops = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), steel, beams.length);
+  const up = new THREE.Vector3(0, 1, 0), m = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), mid = new THREE.Vector3(), dir = new THREE.Vector3();
+  beams.forEach(([a, b, t], i) => {
+    dir.subVectors(b, a); const len = dir.length();
+    q.setFromUnitVectors(up, dir.normalize());
+    hoops.setMatrixAt(i, m.compose(mid.addVectors(a, b).multiplyScalar(0.5), q, sc.set(t, len + t, t)));
+  });
+  hoops.castShadow = true;
+  tunnelParts.add(hoops);
+
+  // film over the arch (fixed part, above the roll-up sides)
+  const v = [], uv = [];
+  for (let i = 0; i < SEG; i++) {
+    const [x0, y0] = prof[i], [x1, y1] = prof[i + 1];
+    v.push(x0, y0, -HL, x1, y1, -HL, x1, y1, HL, x0, y0, -HL, x1, y1, HL, x0, y0, HL);
+  }
+  const archGeo = new THREE.BufferGeometry();
+  archGeo.setAttribute('position', new THREE.Float32BufferAttribute(v, 3));
+  archGeo.computeVertexNormals();
+  const arch = new THREE.Mesh(archGeo, film);
+  arch.renderOrder = 2;
+  tunnelParts.add(arch);
+
+  // gable end walls: film stretched over the arch outline
+  const end = new THREE.Shape();
+  end.moveTo(-HW, 0); end.lineTo(HW, 0);
+  for (let i = SEG; i >= 0; i--) end.lineTo(prof[i][0], prof[i][1]);
+  end.closePath();
+  const endGeo = new THREE.ShapeGeometry(end);
+  for (const z of [HL, -HL]) {
+    const e = new THREE.Mesh(endGeo, film);
+    e.position.z = z; e.renderOrder = 2;
+    tunnelParts.add(e);
+  }
+
+  // roll-up sides: the film hangs from the side rail and is wound up on a tube by the farmer's motor
+  const rollGeo = new THREE.PlaneGeometry(2 * HL, 1); rollGeo.translate(0, -0.5, 0); rollGeo.rotateY(Math.PI / 2);
+  const tubeMat = new THREE.MeshStandardMaterial({ color: '#8f9895', metalness: 0.6, roughness: 0.35 });
+  const tubeGeo = new THREE.CylinderGeometry(0.05, 0.05, 2 * HL, 12); tubeGeo.rotateX(Math.PI / 2);
+  for (const sx of [-1, 1]) {
+    const curtain = new THREE.Mesh(rollGeo, film);
+    curtain.position.set(sx * (HW + 0.02), TH0, 0); curtain.renderOrder = 2;
+    const tube = new THREE.Mesh(tubeGeo, tubeMat);
+    tube.position.set(sx * (HW + 0.06), 0.25, 0);
+    tunnelParts.add(curtain, tube);
+    rollUps.push({ curtain, tube });
+  }
+  // low baseboards along the sides
+  const board = new THREE.MeshStandardMaterial({ color: '#8a6a45', roughness: 0.9 });
+  for (const sx of [-1, 1]) {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.25, 2 * HL), board);
+    b.position.set(sx * HW, 0.125, 0);
+    tunnelParts.add(b);
+  }
+  // fans in the gable ends (two at the back, two at the front beside the door)
+  for (const [x, z, ry] of [[-1.8, -HL, Math.PI], [1.8, -HL, Math.PI], [-1.8, HL, 0], [2.2, HL, 0]]) {
+    const f = fanTemplate.clone();
+    f.position.set(x, 1.9, z + (z > 0 ? 0.01 : -0.01));
+    f.rotation.y = ry;
+    tunnelParts.add(f);
+    fanRotors.push(f.getObjectByName('rotor'));
+  }
+}
+let houseType = 'glass', fanCount = 6;
+function setHouse(type) {
+  houseType = type;
+  rainMat.uniforms.uHouse.value = snowMat.uniforms.uHouse.value = type === 'film' ? 1 : 0;
+  glassParts.visible = type === 'glass';
+  tunnelParts.visible = type === 'film';
+  fanCount = type === 'glass' ? 6 : 4;
+  weatherMast.position.y = type === 'glass' ? R + 0.05 : TR + 0.02;
+  document.querySelectorAll('[data-house]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.house === type)));
+  shadowFrames = Math.max(shadowFrames, 2);
+  if (typeof renderDevices === 'function') renderDevices();
+}
+
+let weatherMast;
+// weather station on a short mast bolted to the ridge: cup anemometer, wind vane, rain gauge (add-on module)
+const anemo = new THREE.Group(), vane = new THREE.Group();
+{
+  const mast = new THREE.Group();
+  mast.position.set(0, R + 0.05, 5.0);
+  const steel = new THREE.MeshStandardMaterial({ color: '#d5dad7', metalness: 0.7, roughness: 0.35 });
+  const dark = new THREE.MeshStandardMaterial({ color: '#2d3432', roughness: 0.6 });
+  const white = new THREE.MeshStandardMaterial({ color: '#f2f3f0', roughness: 0.5, side: THREE.DoubleSide });
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 1.0, 10), steel);
+  pole.position.y = 0.5; pole.castShadow = true;
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.04, 0.04), steel);
+  arm.position.y = 0.6;
+
+  anemo.position.y = 1.05;
+  anemo.add(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.12, 10), dark));
+  const cupGeo = new THREE.SphereGeometry(0.075, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+  cupGeo.rotateZ(Math.PI / 2);
+  for (let i = 0; i < 3; i++) {
+    const p = new THREE.Group();
+    p.rotation.y = (i / 3) * Math.PI * 2;
+    const rod = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.012, 0.012), steel);
+    rod.position.x = 0.15;
+    const cup = new THREE.Mesh(cupGeo, white);
+    cup.position.x = 0.32; cup.rotation.y = Math.PI / 2;
+    p.add(rod, cup);
+    anemo.add(p);
+  }
+  vane.position.set(0.5, 0.72, 0);
+  const tail = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.14, 0.01), white);
+  tail.position.x = -0.18;
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.12, 8), dark);
+  nose.rotation.z = -Math.PI / 2; nose.position.x = 0.1;
+  const vrod = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.01, 0.01), steel);
+  vane.add(tail, nose, vrod);
+
+  const gauge = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.22, 16), white);
+  gauge.position.set(-0.5, 0.73, 0);
+  const funnel = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.07, 0.05, 16, 1, true), white);
+  funnel.position.set(-0.5, 0.865, 0);
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.12, 0.16), white);   // clamp onto the ridge beam
+  box.position.set(0, 0.06, 0);
+  mast.add(pole, arm, anemo, vane, gauge, funnel, box);
+  scene.add(mast);
+  weatherMast = mast;
+}
+
+// rain: line streaks animated entirely on the GPU
+const rainMat = new THREE.ShaderMaterial({
+  uniforms: { uFall: { value: 0 }, uDrift: { value: 0 }, uOpacity: { value: 0 }, uWind: { value: 0 }, uColor: { value: C('#dfe7ec') }, uHouse: { value: 0 } },
+  vertexShader: `attribute float aSeed; uniform float uFall; uniform float uDrift; uniform float uWind;
+    uniform float uHouse; varying float vIn;
+    float roofAt(float x) {
+      float ax = abs(x) / 3.0;
+      return uHouse < 0.5 ? 2.4 + 1.2 * (1.0 - ax) : 1.3 + 2.2 * sqrt(max(0.0, 1.0 - ax * ax));
+    }
+    float insideHouse(vec3 p) { return (abs(p.x) < 3.08 && abs(p.z) < 6.08 && p.y < roofAt(p.x) + 0.06) ? 1.0 : 0.0; }
+    void main(){
+      vec3 p = position;
+      float y = mod(aSeed - uFall, 20.0);
+      p.x = mod(p.x + uDrift + 24.0, 44.0) - 24.0;
+      // top end of each streak leans upwind, so strong wind draws long diagonal lines
+      p.x -= position.y * uWind * 2.2;
+      p.y += y;
+      vIn = insideHouse(p);   // the roof keeps the rain out
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+    }`,
+  fragmentShader: `uniform float uOpacity; uniform vec3 uColor; varying float vIn;
+    void main(){ if (vIn > 0.5) discard; gl_FragColor = vec4(uColor, uOpacity);
+    #include <colorspace_fragment>
+    }`,
+  transparent: true, depthWrite: false,
+});
+// snow: soft round flakes drifting down, also on the GPU
+const snowMat = new THREE.ShaderMaterial({
+  uniforms: { uTime: { value: 0 }, uFall: { value: 0 }, uDrift: { value: 0 }, uOpacity: { value: 0 }, uWind: { value: 0 }, uHouse: { value: 0 } },
+  vertexShader: `attribute float aSeed; uniform float uTime; uniform float uFall; uniform float uDrift; uniform float uWind;
+    uniform float uHouse; varying float vIn;
+    float roofAt(float x) {
+      float ax = abs(x) / 3.0;
+      return uHouse < 0.5 ? 2.4 + 1.2 * (1.0 - ax) : 1.3 + 2.2 * sqrt(max(0.0, 1.0 - ax * ax));
+    }
+    float insideHouse(vec3 p) { return (abs(p.x) < 3.08 && abs(p.z) < 6.08 && p.y < roofAt(p.x) + 0.06) ? 1.0 : 0.0; }
+    void main(){
+      vec3 p = position;
+      p.y = mod(aSeed - uFall, 20.0);
+      float swirl = 0.35 + uWind * 1.4;
+      p.x = mod(p.x + uDrift + sin(uTime * (0.8 + uWind * 2.0) + aSeed * 3.1) * swirl + 26.0, 46.0) - 26.0;
+      p.z += cos(uTime * (0.6 + uWind * 1.7) + aSeed * 2.3) * swirl * 0.8;
+      vIn = insideHouse(p);   // flakes stop at the roof
+      vec4 mv = modelViewMatrix * vec4(p, 1.0);
+      gl_PointSize = vIn > 0.5 ? 0.0 : 70.0 / -mv.z;
+      gl_Position = projectionMatrix * mv;
+    }`,
+  fragmentShader: `uniform float uOpacity; varying float vIn;
+    void main(){
+      if (vIn > 0.5) discard;
+      float d = length(gl_PointCoord - 0.5);
+      if (d > 0.5) discard;
+      gl_FragColor = vec4(1.0, 1.0, 1.0, uOpacity * smoothstep(0.5, 0.15, d));
+      #include <colorspace_fragment>
+    }`,
+  transparent: true, depthWrite: false,
+});
+const snow = (() => {
+  const N = 2200, pos = new Float32Array(N * 3), seed = new Float32Array(N);
+  for (let i = 0; i < N; i++) { pos.set([-26 + rnd() * 46, 0, -20 + rnd() * 42], i * 3); seed[i] = rnd() * 20; }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
+  const pts = new THREE.Points(g, snowMat);
+  pts.frustumCulled = false; pts.visible = false;
+  scene.add(pts);
+  return pts;
+})();
+const GRASS = C('#86ad5c'), SNOWY = C('#e9eef0');
+
+const rain = (() => {
+  const N = 2600, pos = new Float32Array(N * 6), seed = new Float32Array(N * 2);
+  for (let i = 0; i < N; i++) {
+    const x = -24 + rnd() * 44, z = -18 + rnd() * 40, s = rnd() * 20;
+    pos.set([x, 0, z, x, 0.45, z], i * 6);
+    seed[i * 2] = seed[i * 2 + 1] = s;
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
+  const l = new THREE.LineSegments(g, rainMat);
+  l.frustumCulled = false; l.visible = false;
+  scene.add(l);
+  return l;
+})();
+
+// controller box: ESP32 + SIM modem + relays live here
+const led = new THREE.MeshStandardMaterial({ color: '#2a8f4a', emissive: '#3ee07a', emissiveIntensity: 2 });
+{
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.44, 0.14), new THREE.MeshStandardMaterial({ color: '#f3f3ee', roughness: 0.6 }));
+  box.position.set(1.45, 1.35, HL + 0.1);
+  box.castShadow = true;
+  const l = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), led);
+  l.position.set(0.1, 0.15, 0.075);
+  const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.36, 6), new THREE.MeshStandardMaterial({ color: '#222' }));
+  ant.position.set(-0.12, 0.4, 0);
+  box.add(l, ant);
+  gh.add(box);
+}
+
+// beds, plants, sensors, drip lines, grow lights
+const plantGroup = new THREE.Group();
+let buildPlants = () => {};
+const heatMat = new THREE.MeshStandardMaterial({ color: '#3a2a22', emissive: '#ff6a2a', emissiveIntensity: 0 });
+const lampMat = new THREE.MeshStandardMaterial({ color: '#f4f2ee', emissive: '#ffd9a0', emissiveIntensity: 0 });
+const LAMP_COLORS = { warm: C('#ffd9a0'), grow: C('#d68cff') };
+// fake volumetric light: an open cone, brightest at the lamp and fading towards the plants
+const coneMat = new THREE.ShaderMaterial({
+  uniforms: { uColor: { value: LAMP_COLORS.warm.clone() }, uOpacity: { value: 0 } },
+  vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `uniform vec3 uColor; uniform float uOpacity; varying vec2 vUv;
+    void main(){ gl_FragColor = vec4(uColor, uOpacity * pow(vUv.y, 1.8));
+    #include <colorspace_fragment>
+    }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+});
+const lampLights = [];
+const sensorMat = new THREE.MeshStandardMaterial({ color: '#dfe9e2', emissive: '#4fd88a', emissiveIntensity: 0.6 });
+{
+  const wood = new THREE.MeshStandardMaterial({ color: '#8a6a45', roughness: 0.9 });
+  const soil = new THREE.MeshStandardMaterial({ color: '#4a3324', roughness: 1 });
+  const BEDS = [-1.35, 1.35];
+  const fixMat = new THREE.MeshStandardMaterial({ color: '#3b4240', metalness: 0.6, roughness: 0.4 });
+  const wireGeo = new THREE.CylinderGeometry(0.005, 0.005, 0.4, 4);
+  const coneGeo = new THREE.ConeGeometry(0.75, 2.4, 24, 1, true);
+  // heaters at the back gable: dark box with a glowing grille
+  for (const hx of [-1.35, 1.35]) {
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.55, 0.28), new THREE.MeshStandardMaterial({ color: '#d9ddd9', metalness: 0.4, roughness: 0.5 }));
+    box.position.set(hx, 0.95, -HL + 0.3); box.castShadow = true;
+    const grille = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.36, 0.02), heatMat);
+    grille.position.z = 0.145;
+    box.add(grille);
+    gh.add(box);
+  }
+  for (const bx of BEDS) {
+    const bed = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.32, 10.6), wood);
+    bed.position.set(bx, 0.16, 0); bed.castShadow = bed.receiveShadow = true;
+    const top = new THREE.Mesh(new THREE.BoxGeometry(1.36, 0.04, 10.46), soil);
+    top.position.set(bx, 0.32, 0); top.receiveShadow = true;
+    gh.add(bed, top);
+    // four LED fixtures per bed, hung from the rafters on thin wires
+    for (const z of [-3.6, -1.2, 1.2, 3.6]) {
+      const fix = new THREE.Group();
+      fix.position.set(bx, 2.7, z);
+      const housing = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.05, 2.0), fixMat);
+      const led = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.012, 1.9), lampMat);
+      led.position.y = -0.03;
+      const cone = new THREE.Mesh(coneGeo, coneMat);
+      cone.position.y = -1.2; cone.scale.z = 2.2; cone.renderOrder = 5;
+      fix.add(housing, led, cone);
+      for (const dz of [-0.8, 0.8]) {
+        const w = new THREE.Mesh(wireGeo, fixMat);
+        w.position.set(0, 0.2, dz);
+        fix.add(w);
+      }
+      gh.add(fix);
+    }
+    const pl = new THREE.PointLight('#ffd9a0', 0, 9, 1.4);
+    pl.position.set(bx, 2.3, 0);
+    gh.add(pl);
+    lampLights.push(pl);
+  }
+
+  const rows = []; BEDS.forEach(bx => rows.push(bx - 0.38, bx + 0.38));
+  const PER = 12, N = rows.length * PER, LEAVES = 8, FRUIT = 4;
+  const stems = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.018, 0.028, 1, 5), new THREE.MeshStandardMaterial({ color: '#4d7a33' }), N);
+  const leaves = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.8 }), N * LEAVES);
+  const fruit = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshStandardMaterial({ roughness: 0.35 }), N * FRUIT);
+  stems.castShadow = leaves.castShadow = fruit.castShadow = true;
+  leaves.receiveShadow = true;
+  // plants grow out of the soil surface (y = 0.34) when a crop template is switched
+  plantGroup.position.y = 0.34;
+  plantGroup.add(stems, leaves, fruit);
+  gh.add(plantGroup);
+
+  // per-crop plant recipe: stem height, leaf size/spread, fruit shape and colours
+  const CROP_SHAPES = {
+    tomato:     { h: [0.8, 1.3], leaf: [0.13, 0.25], low: false, fruit: 3, fs: [0.045, 0.065], stretch: 1,   leafC: ['#3f7d3a', '#4f8f3f', '#2f6b34', '#5c9a45'], fruitC: ['#d6402b', '#e2552f', '#c9361f', '#f08a3a'] },
+    cucumber:   { h: [1.4, 1.9], leaf: [0.16, 0.27], low: false, fruit: 3, fs: [0.035, 0.04], stretch: 3.4, leafC: ['#3d7a32', '#4c8a38', '#5f9b42'], fruitC: ['#2f5d23', '#3c6e2a', '#4a7d30'] },
+    pepper:     { h: [0.55, 0.85], leaf: [0.1, 0.17], low: false, fruit: 3, fs: [0.04, 0.05], stretch: 1.9, leafC: ['#2f6b34', '#3f7d3a', '#467f36'], fruitC: ['#d63a2a', '#f2b31f', '#e2552f', '#4f8a2f'] },
+    strawberry: { h: [0, 0],      leaf: [0.08, 0.12], low: true,  fruit: 4, fs: [0.028, 0.036], stretch: 1.25, leafC: ['#3c7a35', '#4b8b3c', '#2f6b34'], fruitC: ['#d8262f', '#c51f2a', '#e8424a', '#f0f0d0'] },
+    greens:     { h: [0, 0],      leaf: [0.07, 0.1],  low: true,  fruit: 0, fs: [0, 0], stretch: 1,   leafC: ['#6dae45', '#7fbe4f', '#5c9e3c', '#8acb5a'], fruitC: ['#000'] },
+  };
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), p = new THREE.Vector3(), e = new THREE.Euler();
+  const zero = new THREE.Matrix4().makeScale(0, 0, 0);
+  buildPlants = (crop) => {
+    const c = CROP_SHAPES[crop];
+    let sd = 99; const r = () => { sd |= 0; sd = sd + 0x6D2B79F5 | 0; let t = Math.imul(sd ^ sd >>> 15, 1 | sd); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    const pick = arr => C(arr[(r() * arr.length) | 0]);
+    const lerp = ([a, b]) => a + r() * (b - a);
+    let li = 0, fi = 0, si = 0;
+    for (const rx of rows) for (let k = 0; k < PER; k++) {
+      const z = -4.8 + k * (9.6 / (PER - 1)) + (r() - .5) * .15;
+      const h = lerp(c.h);
+      stems.setMatrixAt(si++, h > 0 ? m.compose(p.set(rx, h / 2, z), q.identity(), s.set(1, h, 1)) : zero);
+      for (let j = 0; j < LEAVES; j++) {
+        const a = r() * Math.PI * 2, sc = lerp(c.leaf);
+        if (c.low) {
+          const rad = 0.03 + r() * 0.16;
+          m.compose(p.set(rx + Math.cos(a) * rad, 0.03 + r() * 0.1, z + Math.sin(a) * rad), q.setFromEuler(e.set(r() * .6, r() * 3, r() * .6)), s.set(sc, sc * .55, sc));
+        } else {
+          const y = 0.1 + (j / (LEAVES - 1)) * h, rad = 0.05 + r() * 0.13;
+          const k2 = sc * (1 - j / (LEAVES * 2));
+          m.compose(p.set(rx + Math.cos(a) * rad, y, z + Math.sin(a) * rad), q.setFromEuler(e.set(r() * 3, r() * 3, r() * 3)), s.set(k2, k2 * .7, k2));
+        }
+        leaves.setMatrixAt(li, m); leaves.setColorAt(li++, pick(c.leafC));
+      }
+      for (let j = 0; j < FRUIT; j++) {
+        if (j >= c.fruit) { fruit.setMatrixAt(fi, zero); fruit.setColorAt(fi++, pick(c.fruitC)); continue; }
+        const a = r() * Math.PI * 2, sc = lerp(c.fs);
+        const y = c.low ? 0.025 : 0.2 + r() * h * 0.6, rad = c.low ? 0.16 + r() * 0.06 : 0.13;
+        m.compose(p.set(rx + Math.cos(a) * rad, y, z + Math.sin(a) * rad), q.identity(), s.set(sc, sc * c.stretch, sc));
+        fruit.setMatrixAt(fi, m); fruit.setColorAt(fi++, pick(c.fruitC));
+      }
+    }
+    for (const im of [stems, leaves, fruit]) {
+      im.instanceMatrix.needsUpdate = true;
+      if (im.instanceColor) im.instanceColor.needsUpdate = true;
+    }
+  };
+  buildPlants('tomato');
+
+  // drip lines
+  const pipe = new THREE.CylinderGeometry(0.012, 0.012, 10.2, 6); pipe.rotateX(Math.PI / 2);
+  const pipeMat = new THREE.MeshStandardMaterial({ color: '#1d1f1d', roughness: 0.6 });
+  for (const rx of rows) { const d = new THREE.Mesh(pipe, pipeMat); d.position.set(rx, 0.36, 0); gh.add(d); }
+
+  // soil moisture sensors
+  for (const bx of BEDS) for (const z of [-2.6, 2.6]) {
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.45, 6), new THREE.MeshStandardMaterial({ color: '#d8ddd6' }));
+    post.position.set(bx, 0.55, z);
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.11, 0.04), sensorMat);
+    head.position.y = 0.27;
+    post.add(head);
+    gh.add(post);
+  }
+}
+
+/* ================= story keyframes ================= */
+// per section: camera, look target, night amount, vent opening, fan speed, interior lights, panel-side shift
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+// plus weather: rain, wind (0..1), cloud cover
+const BASE = { night: 0, vent: 0, fan: 0.25, light: 0, lamp: 0, shift: 0.2, my: 0.2, rain: 0, wind: 0.15, cloud: 0, snow: 0 };
+const K = (pos, look, o) => ({ ...BASE, pos, look, ...o });
+const KEYS = [
+  K(V(13, 5.2, 17),    V(0, 1.6, 0),   { my: -0.24 }),                                            // hero
+  K(V(10, 8.5, 9),     V(0, 2.8, 0),   { vent: 1, fan: 1 }),                                      // climate
+  K(V(-8, 6.2, 14.5), V(-0.5, 3.6, 3.5),  { vent: 0, fan: 0, rain: 1, wind: 1, cloud: 1 }),          // weather station
+  K(V(0.15, 1.55, 5.1), V(0, 0.8, -4), { vent: 0.5, fan: 0.4, my: 0.12 }),                       // soil (inside)
+  K(V(-13, 4.5, 13),   V(0, 1.6, 0),   { night: 1, fan: 0, light: 1, lamp: 1 }),                           // frost / alarms
+  K(V(5, 3.6, 13.5),   V(0, 1.7, 4),   { night: 0.1, vent: 0.3, fan: 0.4, shift: 0.3 }),          // app
+  K(V(21, 11, 23),     V(0, 1.2, 0),   { vent: 0.2, fan: 0.3, shift: 0, my: 0 }),                 // contact
+];
+const PARAMS = Object.keys(BASE);
+const sections = [...document.querySelectorAll('[data-scene]')];
+const dots = [...document.querySelectorAll('.dots a')];
+const APP = sections.findIndex(s => s.id === 'app');
+
+const cur = { ...KEYS[0], pos: KEYS[0].pos.clone(), look: KEYS[0].look.clone() };
+const tgt = { ...BASE, pos: new THREE.Vector3(), look: new THREE.Vector3() };
+let stormUntil = 0;
+const manual = { fan: null, vent: null, light: null, lamp: null };
+let lampColor = 'warm';
+const ease = t => t * t * (3 - 2 * t);
+
+let centers = [];
+function measure() {
+  centers = sections.map(s => s.offsetTop + s.offsetHeight / 2);
+}
+function storyPosition() {
+  const c = scrollY + innerHeight / 2;
+  if (c <= centers[0]) return 0;
+  for (let i = 0; i < centers.length - 1; i++) {
+    if (c < centers[i + 1]) return i + (c - centers[i]) / (centers[i + 1] - centers[i]);
+  }
+  return centers.length - 1;
+}
+function computeTarget(t) {
+  const i = Math.min(KEYS.length - 2, Math.floor(t)), f = ease(Math.min(1, Math.max(0, t - i)));
+  const a = KEYS[i], b = KEYS[i + 1];
+  tgt.pos.lerpVectors(a.pos, b.pos, f);
+  tgt.look.lerpVectors(a.look, b.look, f);
+  for (const k of PARAMS) tgt[k] = a[k] + (b[k] - a[k]) * f;
+  // around the app scene the 3D devices follow the simulated automatic controller
+  const w = exploring ? 1 : Math.max(0, 1 - Math.abs(t - APP) * 1.5);
+  for (const k of ['fan', 'vent', 'light', 'lamp']) tgt[k] += (auto[k] - tgt[k]) * w;
+  if (manual.fan !== null) tgt.fan = manual.fan;
+  if (manual.vent !== null) tgt.vent = manual.vent;
+  if (manual.light !== null) tgt.light = manual.light;
+  if (manual.lamp !== null) tgt.lamp = manual.lamp;
+  // in 360° the visitor sets the weather; rain, snow or strong wind shut the windows
+  if (exploring) {
+    const wx = WEATHER[env.weather];
+    Object.assign(tgt, { night: env.time === 'night' ? 1 : 0, cloud: wx.cloud, rain: wx.rain, snow: wx.snow, wind: Math.min(1, env.wind / 22) });
+    if (weatherShutsWindows() && manual.vent === null) tgt.vent = 0;
+  }
+  // a storm (from the weather station) always wins: windows shut to protect the film
+  if (stormUntil > Date.now()) {
+    Object.assign(tgt, { rain: 1, wind: 1, cloud: 0.85 });
+    if (manual.vent === null) tgt.vent = 0;
+  }
+  const active = Math.round(t);
+  dots.forEach((d, k) => d.classList.toggle('on', k === active));
+}
+
+/* ================= app: crop templates, user settings, simulated greenhouse ================= */
+const $ = id => document.getElementById(id);
+// general greenhouse guidelines per crop; the farmer can change every value.
+// t/h/s = target (day air °C, air RH %, soil moisture as % of field capacity)
+// lo/hi = critical limits that trigger an alarm (chilling / heat sterility, botrytis risk, drought / waterlogging)
+// day/night/rh/soil = ideal ranges shown to the farmer
+const TEMPLATES = {
+  strawberry: { name: 'მარწყვი',  t: 21, h: 65, s: 75, lo: { t: 6,  h: 50, s: 60 }, hi: { t: 30, h: 85, s: 90 }, day: '18–24', night: '8–12',  rh: '60–75', soil: '70–80', light: '12–14', ph: '5.5–6.5', ec: '1.0–1.5' },
+  tomato:     { name: 'პომიდორი', t: 24, h: 65, s: 75, lo: { t: 10, h: 50, s: 60 }, hi: { t: 32, h: 85, s: 90 }, day: '21–27', night: '16–18', rh: '60–70', soil: '70–80', light: '14–16', ph: '6.0–6.8', ec: '2.0–3.5' },
+  cucumber:   { name: 'კიტრი',    t: 26, h: 80, s: 85, lo: { t: 13, h: 60, s: 70 }, hi: { t: 35, h: 92, s: 95 }, day: '24–28', night: '18–20', rh: '70–85', soil: '80–90', light: '12–14', ph: '5.8–6.5', ec: '1.7–2.5' },
+  pepper:     { name: 'წიწაკა',   t: 25, h: 70, s: 75, lo: { t: 12, h: 50, s: 60 }, hi: { t: 32, h: 85, s: 90 }, day: '22–27', night: '16–18', rh: '60–75', soil: '70–80', light: '12–14', ph: '6.0–6.8', ec: '1.8–2.8' },
+  greens:     { name: 'მწვანილი', t: 18, h: 65, s: 70, lo: { t: 4,  h: 50, s: 55 }, hi: { t: 26, h: 85, s: 90 }, day: '15–20', night: '8–12',  rh: '60–70', soil: '65–75', light: '12–14', ph: '6.0–7.0', ec: '1.0–1.6' },
+};
+const settings = { crop: 'tomato', t: 24, h: 65, s: 75 };
+const auto = { fan: 0, vent: 0, light: 0, lamp: 0, pump: false };
+const growth = { value: 1, target: 1, pending: null };
+let temp = 24.3, hum = 66, soilV = 74;
+
+// alarm limits keep the crop's distance from the target, so they move with the farmer's own setting
+const bounds = key => {
+  const tp = TEMPLATES[settings.crop], shift = settings[key] - tp[key];
+  return [tp.lo[key] + shift, tp.hi[key] + shift];
+};
+function renderIdeal() {
+  const tp = TEMPLATES[settings.crop];
+  $('ideal').innerHTML = `<b>იდეალური გარემო · ${tp.name}</b>` +
+    `<span>დღე ${tp.day} °C</span><span>ღამე ${tp.night} °C</span><span>ჰაერი ${tp.rh} %</span><span>ნიადაგი ${tp.soil} %</span>`;
+}
+let suppressUntil = 0;   // a freshly changed setting gets time to settle before alarms can fire
+
+function renderSettings() {
+  $('ghName').textContent = 'შაბლონი: ' + TEMPLATES[settings.crop].name;
+  renderIdeal();
+  document.querySelectorAll('.crop').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.crop === settings.crop)));
+}
+document.querySelectorAll('.crop').forEach(btn => btn.addEventListener('click', () => {
+  const key = btn.dataset.crop, tp = TEMPLATES[key];
+  if (key !== settings.crop) { growth.pending = key; growth.target = 0; Sound.ui('crop'); }
+  Object.assign(settings, { crop: key, t: tp.t, h: tp.h, s: tp.s });
+  manual.fan = manual.vent = manual.light = manual.lamp = null; heatSet = null;   // a template hands control back to automatic mode
+  suppressUntil = Date.now() + 20000;
+  renderSettings(); computeAuto(); renderDevices();
+}));
+// each device has a level 0..1: fan speed (how many of the 6 fans run), window opening, heating power.
+// "auto" lets the controller pick the level; moving a slider takes manual control of that device.
+const DEVS = [['fan', 'Fan'], ['vent', 'Vent'], ['light', 'Light'], ['lamp', 'Lamp']];
+document.querySelectorAll('[data-lampc]').forEach(b => b.addEventListener('click', () => {
+  lampColor = b.dataset.lampc;
+  document.querySelectorAll('[data-lampc]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+}));
+const level = key => manual[key] ?? auto[key];
+// heating works like a thermostat: the farmer sets a temperature, power follows the gap to it
+let heatSet = null;   // manual heating setpoint in °C; null = follow the crop template; HEAT_OFF = switched off
+const HEAT_OFF = 4;  // far-left slider position
+function applyHeat() {
+  manual.light = heatSet === null ? null : heatSet <= HEAT_OFF ? 0 : Math.round(Math.min(1, Math.max(0, (heatSet - temp - 0.3) / 3)) * 20) / 20;
+}
+for (const [key, id] of DEVS) {
+  $('rg' + id).addEventListener('input', e => {
+    if (key === 'light') { heatSet = +e.target.value; applyHeat(); }
+    else manual[key] = +e.target.value / 100;
+    renderDevices();
+  });
+  $('md' + id).addEventListener('click', () => {
+    if (key === 'light') { heatSet = heatSet === null ? settings.t : null; applyHeat(); }
+    else manual[key] = manual[key] === null ? Math.round(auto[key] * 20) / 20 : null;   // toggle auto ↔ hold current level
+    renderDevices();
+  });
+}
+$('allAuto').addEventListener('click', () => {
+  manual.fan = manual.vent = manual.light = manual.lamp = null; heatSet = null;
+  computeAuto(); renderDevices();
+});
+function renderDevices() {
+  for (const [key, id] of DEVS) {
+    if (key === 'light') {
+      const isAuto = heatSet === null, val = isAuto ? settings.t : heatSet;
+      if (isAuto || document.activeElement !== $('rgLight')) $('rgLight').value = val;
+      $('lvLight').textContent = val <= HEAT_OFF ? 'გამორთულია' : `${val} °C` + (level('light') > 0 ? ' · მუშაობს' : '');
+      $('mdLight').setAttribute('aria-pressed', String(isAuto));
+      $('mdLight').textContent = isAuto ? 'ავტო' : 'ხელით';
+      continue;
+    }
+    const pct = Math.round(level(key) * 100), isAuto = manual[key] === null;
+    if (isAuto || document.activeElement !== $('rg' + id)) $('rg' + id).value = pct;
+    $('lv' + id).textContent = key === 'fan' ? `${pct} % · ${Math.round(level(key) * fanCount)}/${fanCount}` : pct + ' %';
+    $('md' + id).setAttribute('aria-pressed', String(isAuto));
+    $('md' + id).textContent = isAuto ? 'ავტო' : 'ხელით';
+  }
+  const anyManual = Object.values(manual).some(v => v !== null);
+  $('allAuto').disabled = !anyManual;
+  $('mode').textContent = anyManual ? 'ხელით მართვა' : 'ავტომატური';
+}
+
+// automatic mode: levels follow the crop's targets and the weather (proportional control, snapped to 5 %).
+// Manual mode is never overridden; the farmer can run any device in any weather.
+function computeAuto() {
+  const snap = v => Math.round(Math.min(1, Math.max(0, v)) * 20) / 20;
+  const wet = (exploring && weatherShutsWindows()) || stormUntil > Date.now();
+  auto.fan = snap((temp - settings.t - 0.3) / 3 + (wet ? 0.15 : 0));   // in rain the fans take over from the closed windows
+  auto.vent = wet ? 0 : snap(Math.max((temp - settings.t - 0.8) / 4, (hum - settings.h - 3) / 10));
+  auto.light = snap((settings.t - temp - 0.3) / 3);
+  // lights come on in the dark: at night fully, under heavy cloud partly
+  const dark = exploring ? (env.time === 'night' ? 1 : WEATHER[env.weather].cloud >= 0.85 ? 0.5 : 0) : (cur.night > 0.5 ? 1 : 0);
+  auto.lamp = snap(dark * 0.85);
+  auto.pump = soilV < settings.s - 2;
+  applyHeat();
+}
+function tick() {
+  computeAuto();
+  const fanL = level('fan'), ventL = level('vent'), heatL = level('light');
+  // without 360° weather the house drifts gently around the target; with it, toward what the outside allows
+  const amb = exploring ? insideAmbient() : settings.t + 1;
+  temp += -0.2 * fanL - 0.1 * ventL + 0.45 * heatL + (amb - temp) * 0.012 + (Math.random() - .5) * .08;
+  hum += -0.9 * ventL - 0.3 * fanL + (settings.h - hum) * 0.08 + (Math.random() - .5) * .4;
+  soilV += (auto.pump ? 1.6 : -0.15) + (Math.random() - .5) * .2;
+  temp = Math.min(40, Math.max(0, temp)); hum = Math.min(98, Math.max(30, hum)); soilV = Math.min(100, Math.max(20, soilV));
+
+  $('liveT').textContent = temp.toFixed(1) + ' °C';
+  $('liveH').textContent = Math.round(hum) + ' %';
+  if (sensorFaultUntil > Date.now()) {
+    $('pT').textContent = '—'; $('pH').textContent = '—';
+  } else {
+    $('pT').textContent = temp.toFixed(1) + '°';
+    $('pH').textContent = Math.round(hum) + '%';
+  }
+  $('pS').textContent = Math.round(soilV) + '%';
+  checkAlarms();
+  renderPlantCard();
+  renderDevices();
+}
+
+/* ================= 360° explore mode ================= */
+const controls = new OrbitControls(camera, canvas);
+Object.assign(controls, {
+  enabled: false, enableDamping: true, dampingFactor: 0.08, autoRotateSpeed: 0.7,
+  minDistance: 1.5, maxDistance: 45, maxPolarAngle: Math.PI * 0.495, screenSpacePanning: false,
+});
+controls.addEventListener('start', () => { controls.autoRotate = false; fly = null; });
+// keep panning near the greenhouse so nobody gets lost in the meadow
+controls.addEventListener('change', () => {
+  controls.target.x = THREE.MathUtils.clamp(controls.target.x, -8, 8);
+  controls.target.z = THREE.MathUtils.clamp(controls.target.z, -10, 10);
+  controls.target.y = THREE.MathUtils.clamp(controls.target.y, 0.3, 4);
+});
+const VIEWS = {
+  out:  { pos: V(11, 5.5, 13),    look: V(0, 1.6, 0) },
+  in:   { pos: V(0.2, 1.65, 5.2), look: V(0, 1.2, -1) },
+};
+let exploring = false, fly = null, ret = null;
+const easeIO = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+// eased camera flight (no sudden start): from where the camera is now to a view
+function flyTo(view, dur = 1.4, thenRotate = false) {
+  fly = { from: camera.position.clone(), fromLook: controls.target.clone(), pos: view.pos.clone(), look: view.look.clone(), t: 0, dur, thenRotate };
+}
+// the same app UI (with all its handlers) moves into the 360° view, so it controls the greenhouse there too
+
+// outside weather for the 360° view: °C outside by weather, a night drop, and how much the glass traps heat
+const WEATHER = {
+  sun:   { cloud: 0,    rain: 0, snow: 0, out: 22 },
+  cloud: { cloud: 0.7,  rain: 0, snow: 0, out: 16 },
+  rain:  { cloud: 1,    rain: 1, snow: 0, out: 12 },
+  snow:  { cloud: 0.85, rain: 0, snow: 1, out: -3 },
+  storm: { cloud: 1,    rain: 1, snow: 0, out: 10 },
+};
+const WIND_LIMIT = 12;   // m/s: windows close and an alarm goes out above this
+const env = { time: 'day', weather: 'sun', wind: 3 };
+let windAlarm = false;
+const outsideT = () => WEATHER[env.weather].out - (env.time === 'night' ? 8 : 0);
+const insideAmbient = () => outsideT() + (env.time === 'night' ? 2 : WEATHER[env.weather].cloud < 0.5 ? 10 : 5);
+const weatherShutsWindows = () => WEATHER[env.weather].rain > 0 || WEATHER[env.weather].snow > 0 || env.wind > WIND_LIMIT;
+function renderEnv() {
+  document.querySelectorAll('[data-time]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.time === env.time)));
+  document.querySelectorAll('[data-weather]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.weather === env.weather)));
+  $('windR').value = env.wind;
+  $('windO').textContent = env.wind + ' მ/წმ' + (env.wind > WIND_LIMIT ? ' · ძლიერი' : '');
+  $('outT').textContent = 'გარეთ ' + outsideT() + ' °C';
+}
+const windowsNote = () => manual.vent > 0
+  ? 'ფანჯრები ხელით ღიაა ' + Math.round(manual.vent * 100) + ' %-ზე, გირჩევთ დახუროთ.'
+  : 'სახურავის ფანჯრები დაიხურა.';
+function checkWind() {
+  const windy = exploring && env.wind > WIND_LIMIT;
+  if (windy && !windAlarm) showAlarm('განგაში · ქარი', 'ქარი ' + env.wind + ' მ/წმ-ია (ზღვარი ' + WIND_LIMIT + ' მ/წმ). ' + windowsNote(), 'crit');
+  else if (!windy && windAlarm && exploring) showAlarm('ნორმა · ქარი', 'ქარი ჩადგა.', 'ok');
+  windAlarm = windy;
+}
+document.querySelectorAll('[data-time]').forEach(b => b.addEventListener('click', () => { env.time = b.dataset.time; renderEnv(); computeAuto(); renderDevices(); }));
+document.querySelectorAll('[data-weather]').forEach(b => b.addEventListener('click', () => {
+  env.weather = b.dataset.weather;
+  if (env.weather === 'storm') env.wind = Math.max(env.wind, 18);
+  else if (env.wind > WIND_LIMIT) env.wind = 5;
+  renderEnv(); checkWind(); computeAuto(); renderDevices();
+}));
+$('windR').addEventListener('input', e => { env.wind = +e.target.value; renderEnv(); checkWind(); computeAuto(); renderDevices(); });
+function setEnvOpen(open) {
+  $('xenv').hidden = !open;
+  $('xEnvToggle').setAttribute('aria-pressed', String(open));
+  if (open && isMobile()) setAppOpen(false);
+}
+$('xEnvToggle').addEventListener('click', () => setEnvOpen($('xenv').hidden));
+document.querySelectorAll('[data-house]').forEach(b => b.addEventListener('click', () => setHouse(b.dataset.house)));
+function setAppOpen(open) {
+  $('xphone').hidden = !open;
+  $('xAppToggle').setAttribute('aria-pressed', String(open));
+  if (open && isMobile()) setEnvOpen(false);
+}
+$('xAppToggle').addEventListener('click', () => setAppOpen($('xphone').hidden));
+function setExplore(on) {
+  exploring = on;
+  Sound.ui('whoosh');
+  document.documentElement.classList.toggle('exploring', on);
+  controls.enabled = on;
+  if (on) {
+    setAppOpen(!isMobile()); setEnvOpen(!isMobile());
+    // start from whatever the story was showing
+    env.time = cur.night > 0.5 ? 'night' : 'day';
+    env.weather = cur.rain > 0.5 ? 'rain' : 'sun';
+    env.wind = cur.rain > 0.5 ? 9 : 3;
+    windAlarm = false;
+    renderEnv();
+    ret = null;
+    controls.target.copy(cur.look);
+    controls.autoRotate = false;   // starts turning once the camera has arrived
+    flyTo(VIEWS.out, 1.8, true);
+    setView('out', false);
+    $('hint').classList.remove('gone');
+    setTimeout(() => $('hint').classList.add('gone'), 5000);
+  } else {
+    setHouse('glass');   // the main page always shows the glass house
+    // glide from wherever the visitor left the camera back to the scroll story
+    fly = null;
+    ret = { pos: camera.position.clone(), look: controls.target.clone(), t: 0, dur: 1.6 };
+  }
+}
+function setView(key, move = true) {
+  document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === key)));
+  if (move) { flyTo(VIEWS[key]); controls.autoRotate = false; }
+}
+document.querySelectorAll('[data-explore]').forEach(b => b.addEventListener('click', () => setExplore(true)));
+$('exploreExit').addEventListener('click', () => setExplore(false));
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+addEventListener('keydown', e => { if (e.key === 'Escape' && exploring) setExplore(false); });
+
+/* ================= click a plant: its ideal environment ================= */
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+const plantMark = new THREE.Mesh(
+  new THREE.RingGeometry(0.2, 0.25, 40),
+  new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.9, depthTest: false, side: THREE.DoubleSide })
+);
+plantMark.rotation.x = -Math.PI / 2; plantMark.renderOrder = 10; plantMark.visible = false;
+scene.add(plantMark);
+let downAt = null;
+addEventListener('pointerdown', e => { downAt = [e.clientX, e.clientY]; }, { passive: true });
+const inRange = (v, range) => { const [a, b] = range.split('–').map(Number); return v >= a && v <= b; };
+function renderPlantCard() {
+  if ($('pcard').hidden) return;
+  const tp = TEMPLATES[settings.crop];
+  const isNight = exploring ? env.time === 'night' : cur.night > 0.5;
+  const row = (label, ideal, unit, now, range) => {
+    const nowCell = now === undefined ? '<span class="now"></span>'
+      : `<span class="now ${inRange(now, range) ? 'ok' : 'bad'}">ახლა ${now}${unit}</span>`;
+    return `<dt>${label}</dt><dd>${ideal}${unit}</dd>${nowCell}`;
+  };
+  $('pcName').textContent = tp.name;
+  $('pcGrid').innerHTML =
+    row('დღის ტემპერატურა', tp.day, ' °C', isNight ? undefined : +temp.toFixed(1), tp.day) +
+    row('ღამის ტემპერატურა', tp.night, ' °C', isNight ? +temp.toFixed(1) : undefined, tp.night) +
+    row('ჰაერის ტენი', tp.rh, ' %', Math.round(hum), tp.rh) +
+    row('ნიადაგის ტენი', tp.soil, ' %', Math.round(soilV), tp.soil) +
+    '<span class="sep"></span>' +
+    row('სინათლე დღეში', tp.light, ' სთ') +
+    row('pH', tp.ph, '') +
+    row('EC (სასუქი)', tp.ec, ' mS/cm') +
+    '<span class="sep"></span>' +
+    `<dt>განგაში</dt><dd>&lt;${tp.lo.t} ან &gt;${tp.hi.t} °C</dd><span class="now"></span>`;
+}
+function closePlantCard() { $('pcard').hidden = true; plantMark.visible = false; }
+$('pcX').addEventListener('click', closePlantCard);
+addEventListener('keydown', e => { if (e.key === 'Escape') closePlantCard(); });
+document.addEventListener('click', e => {
+  // ignore drags (orbiting) and clicks on any interface element
+  if (downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 6) return;
+  if (e.target.closest('.panel, header, .hero-inner, button, a, input, label, .toast, .mnav, .pcard, .xphone, .xenv, .views, .hint, .explore-btn')) return;
+  ndc.set((e.clientX / W) * 2 - 1, -(e.clientY / Hh) * 2 + 1);
+  raycaster.setFromCamera(ndc, camera);
+  const hit = raycaster.intersectObjects(plantGroup.children, false)[0];
+  if (!hit) { closePlantCard(); return; }
+  plantMark.position.set(hit.point.x, 0.37, hit.point.z);
+  plantMark.visible = true;
+  const card = $('pcard');
+  card.hidden = false;
+  renderPlantCard();
+  const cw = card.offsetWidth, ch = card.offsetHeight;
+  card.style.left = Math.min(W - cw - 16, Math.max(16, e.clientX + 18)) + 'px';
+  card.style.top = Math.min(Hh - ch - 16, Math.max(76, e.clientY - ch / 2)) + 'px';
+});
+
+/* ================= sound ================= */
+let flash = 0;   // lightning brightness, set by thunder
+const Sound = (() => {
+  let ctx = null, master, outdoor, noise, brown, wallGain, room, roomSend, on = true;
+  try { on = localStorage.getItem('satburo-sound') !== 'off'; } catch (e) {}
+  const N = {};
+  const now = () => ctx.currentTime;
+  const to = (param, v, tc = 0.2) => param.setTargetAtTime(v, now(), tc);
+  function loopNoise(type, freq, q, dest, buf = noise) {
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+    src.playbackRate.value = 0.8 + Math.random() * 0.4;
+    const f = ctx.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+    const g = ctx.createGain(); g.gain.value = 0;
+    src.connect(f).connect(g).connect(dest); src.start();
+    return { f, g };
+  }
+  function tone(type, freq, filt, dest) {
+    const o = ctx.createOscillator(); o.type = type; o.frequency.value = freq;
+    const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = filt;
+    const g = ctx.createGain(); g.gain.value = 0;
+    o.connect(f).connect(g).connect(dest); o.start();
+    return { o, f, g };
+  }
+  function init() {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = on ? 1 : 0;
+    const comp = ctx.createDynamicsCompressor();
+    master.connect(comp).connect(ctx.destination);
+    outdoor = ctx.createBiquadFilter(); outdoor.type = 'lowpass'; outdoor.frequency.value = 16000;
+    // inside the house, outdoor sound passes the glass/film: low-passed, quieter, with a short room echo
+    wallGain = ctx.createGain(); wallGain.gain.value = 1;
+    outdoor.connect(wallGain).connect(master);
+    room = ctx.createConvolver();
+    const ir = ctx.createBuffer(2, ctx.sampleRate * 0.9, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const ch = ir.getChannelData(c);
+      for (let i = 0; i < ch.length; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / ch.length, 3);
+    }
+    room.buffer = ir;
+    roomSend = ctx.createGain(); roomSend.gain.value = 0;
+    outdoor.connect(roomSend).connect(room).connect(master);
+    noise = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+    const d = noise.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    brown = ctx.createBuffer(1, ctx.sampleRate * 3, ctx.sampleRate);
+    const bd = brown.getChannelData(0);
+    for (let i = 0, last = 0; i < bd.length; i++) { last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02; bd[i] = last * 3.5; }
+    // outdoor ambience
+    N.wind = loopNoise('lowpass', 500, 0.6, outdoor, brown);
+    N.rain = loopNoise('highpass', 1400, 0.5, outdoor);
+    N.rainBody = loopNoise('lowpass', 900, 0.5, outdoor);
+    // inside the house
+    N.roof = loopNoise('bandpass', 2600, 1.4, master);       // rain drumming on glass / film
+    N.fanAir = loopNoise('lowpass', 500, 0.6, master, brown);
+    N.fanHum = tone('sawtooth', 55, 260, master);
+    N.heater = loopNoise('lowpass', 320, 0.7, master, brown);
+    N.lamp = tone('sine', 100, 400, master);
+    N.motor = tone('sawtooth', 120, 600, master);
+    N.water = loopNoise('bandpass', 1100, 4, master);
+  }
+  function blip(freqs, dur, gain, type = 'sine', dest = master, at = 0) {
+    const t0 = now() + at;
+    const o = ctx.createOscillator(); o.type = type;
+    o.frequency.setValueAtTime(freqs[0], t0);
+    freqs.slice(1).forEach((f, i) => o.frequency.exponentialRampToValueAtTime(f, t0 + dur * (i + 1) / (freqs.length - 1)));
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(gain, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+    if (pan) { pan.pan.value = (Math.random() - 0.5) * 1.4; o.connect(g).connect(pan).connect(dest); } else o.connect(g).connect(dest);
+    o.start(t0); o.stop(t0 + dur + 0.05);
+  }
+  function burst(type, f0, f1, dur, gain, dest = master, at = 0) {
+    const t0 = now() + at;
+    const src = ctx.createBufferSource(); src.buffer = noise;
+    const f = ctx.createBiquadFilter(); f.type = type;
+    f.frequency.setValueAtTime(f0, t0); f.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(gain, t0 + Math.min(0.08, dur / 4));
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    src.connect(f).connect(g).connect(dest); src.start(t0); src.stop(t0 + dur + 0.05);
+  }
+  const bird = () => { const n = 2 + (Math.random() * 3 | 0), b = 2600 + Math.random() * 1400; for (let i = 0; i < n; i++) blip([b, b * 1.5, b * 1.1], 0.11, 0.14, 'sine', outdoor, i * 0.14); };
+  const cricket = () => { for (let i = 0; i < 3; i++) blip([4700, 4600], 0.03, 0.06, 'sine', outdoor, i * 0.05); };
+  const thunder = () => { burst('lowpass', 900, 60, 3.2, 0.9, outdoor); burst('lowpass', 300, 50, 2.2, 0.6, outdoor, 0.35); flash = 1; };
+  return {
+    isOn: () => on,
+    start() {
+      if (!ctx) init();
+      if (ctx.state !== 'running') ctx.resume();
+      document.documentElement.classList.add('sound-ready');
+    },
+    toggle() {
+      on = !on;
+      try { localStorage.setItem('satburo-sound', on ? 'on' : 'off'); } catch (e) {}
+      this.start();
+      to(master.gain, on ? 1 : 0, 0.1);
+      return on;
+    },
+    ui(kind) {
+      if (!ctx || ctx.state !== 'running' || !on) return;
+      if (kind === 'click') blip([1400, 1100], 0.05, 0.12, 'triangle');
+      else if (kind === 'crop') { blip([420, 840], 0.3, 0.07); burst('bandpass', 400, 2000, 0.4, 0.06); }
+      else if (kind === 'alarm') for (let i = 0; i < 3; i++) { blip([880, 880], 0.16, 0.12, 'square', master, i * 0.4); blip([660, 660], 0.16, 0.12, 'square', master, i * 0.4 + 0.2); }
+      else if (kind === 'ok') [660, 880, 1320].forEach((f, i) => blip([f, f], 0.25, 0.07, 'sine', master, i * 0.12));
+      else if (kind === 'whoosh') burst('bandpass', 250, 1800, 0.8, 0.12);
+    },
+    // called every frame with the scene state
+    update(dt, st) {
+      if (!ctx || ctx.state !== 'running') return;
+      const muf = st.inside;   // 0 outside, 1 inside the house
+      // open windows / rolled-up sides let more of the outside in
+      const shut = muf * (1 - st.vent * 0.6);
+      to(outdoor.frequency, 16000 * Math.pow(450 / 16000, shut), 0.25);
+      to(outdoor.Q, 0.7 + shut * 0.8, 0.25);
+      to(wallGain.gain, 1 - shut * 0.55, 0.25);
+      to(roomSend.gain, shut * 0.35, 0.25);
+      const gust = 1 + Math.sin(st.t * 1.3) * 0.35 * st.wind + Math.sin(st.t * 3.1) * 0.15 * st.wind;
+      const w = Math.max(0, (st.wind - 0.2) / 0.8);
+      to(N.wind.g.gain, w * w * 1.1 * gust, 0.4);
+      to(N.wind.f.frequency, 350 + w * 1100 + Math.sin(st.t * 0.7) * 200 * w);
+      to(N.rain.g.gain, st.rain * 0.55);
+      to(N.rainBody.g.gain, st.rain * 0.35);
+      to(N.roof.g.gain, st.rain * (0.08 + muf * 0.4) * st.near);
+      const fa = Math.max(0, st.fan - 0.3) / 0.7;
+      to(N.fanAir.g.gain, fa * 0.7 * st.near, 0.3);
+      to(N.fanHum.g.gain, fa * 0.12 * st.near, 0.3);
+      to(N.fanHum.o.frequency, 40 + st.fan * 70);
+      to(N.heater.g.gain, st.heat * 0.35 * st.near);
+      to(N.lamp.g.gain, st.lamp * 0.035 * st.near);
+      const mv = Math.min(1, st.ventSpeed * 5);
+      to(N.motor.g.gain, mv * 0.18 * st.near, 0.08);
+      to(N.motor.o.frequency, 90 + mv * 90, 0.08);
+      const closeBy = Math.max(muf, (st.near - 0.7) / 0.3);
+      to(N.water.g.gain, st.pump && closeBy > 0 ? (0.04 + Math.random() * 0.03) * closeBy : 0, 0.05);
+      // creatures and thunder, by chance each frame
+      const quiet = st.rain < 0.3 && st.snow < 0.3;
+      if (st.night < 0.3 && quiet && Math.random() < dt * 0.6 * (1 - st.cloud * 0.6)) bird();
+      if (st.night > 0.6 && quiet && Math.random() < dt * 1.2) cricket();
+      if (st.rain > 0.8 && st.wind > 0.65 && Math.random() < dt * 0.07) thunder();
+    },
+  };
+})();
+// browsers only allow sound after the first interaction
+let soundStartedAt = 0;
+const startSound = () => { if (Sound.isOn()) { Sound.start(); soundStartedAt = performance.now(); } };
+addEventListener('pointerdown', startSound, { once: true });
+addEventListener('keydown', startSound, { once: true });
+$('soundBtn').setAttribute('aria-pressed', String(Sound.isOn()));
+$('soundBtn').addEventListener('click', () => {
+  // the very first press only switches sound on (that pointerdown already started it)
+  if (performance.now() - soundStartedAt < 600) return;
+  $('soundBtn').setAttribute('aria-pressed', String(Sound.toggle()));
+});
+document.addEventListener('click', e => { if (e.target.closest('button, a, .crop')) Sound.ui('click'); }, true);
+let sndPrevVent = 0;
+
+/* ================= phone menu & scroll progress ================= */
+{
+  const btn = $('menuBtn'), menu = $('mnav');
+  const setOpen = open => { btn.setAttribute('aria-expanded', String(open)); menu.hidden = !open; };
+  btn.addEventListener('click', () => setOpen(menu.hidden));
+  menu.addEventListener('click', e => { if (e.target.closest('a')) setOpen(false); });
+  addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+  const prog = $('prog');
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    prog.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+/* ================= alarms, driven by the farmer's own settings ================= */
+const ALARMS = [
+  { id: 'tLow',  el: 'pT', title: 'ტემპერატურა', out: () => temp < bounds('t')[0],
+    msg: () => `სათბურში ${temp.toFixed(1)} °C-ია, თქვენი ზღვარია ${bounds('t')[0]} °C. გათბობა ჩართულია.` },
+  { id: 'tHigh', el: 'pT', title: 'ტემპერატურა', out: () => temp > bounds('t')[1],
+    msg: () => `სათბურში ${temp.toFixed(1)} °C-ია, თქვენი ზღვარია ${bounds('t')[1]} °C. ვენტილაცია ჩართულია.` },
+  { id: 'hHigh', el: 'pH', title: 'ტენიანობა', out: () => hum > bounds('h')[1],
+    msg: () => `ჰაერის ტენიანობა ${Math.round(hum)} %-ია, თქვენი ზღვარია ${bounds('h')[1]} %. ფანჯრები გაიღო.` },
+  { id: 'hLow',  el: 'pH', title: 'ტენიანობა', out: () => hum < bounds('h')[0],
+    msg: () => `ჰაერი ძალიან მშრალია: ${Math.round(hum)} %, თქვენი ზღვარია ${bounds('h')[0]} %.` },
+  { id: 'sDry',  el: 'pS', title: 'ნიადაგი', out: () => soilV < bounds('s')[0],
+    msg: () => `ნიადაგი გამოშრა: ${Math.round(soilV)} %, თქვენი ზღვარია ${bounds('s')[0]} %. ტუმბო ჩართულია.` },
+  { id: 'sWet',  el: 'pS', title: 'ნიადაგი', out: () => soilV > bounds('s')[1],
+    msg: () => `ნიადაგი ზედმეტად სველია: ${Math.round(soilV)} %, თქვენი ზღვარია ${bounds('s')[1]} %. შეამოწმეთ ტუმბო.` },
+];
+const alarmState = Object.fromEntries(ALARMS.map(a => [a.id, { count: 0, active: false }]));
+let sensorFaultUntil = 0, sensorFaultActive = false;
+
+function checkAlarms() {
+  const now = Date.now();
+  const bad = { pT: false, pH: false, pS: false };
+  for (const a of ALARMS) {
+    const st = alarmState[a.id];
+    const out = !(a.el !== 'pS' && sensorFaultUntil > now) && a.out();
+    bad[a.el] ||= out;
+    st.count = out ? st.count + 1 : 0;
+    if (out && !st.active && st.count >= 3 && now > suppressUntil) {
+      st.active = true;
+      showAlarm('განგაში · ' + a.title, a.msg() + ' SMS და ზარი გაიგზავნა.', 'crit');
+    } else if (!out && st.active) {
+      st.active = false;
+      showAlarm('ნორმა · ' + a.title, 'მაჩვენებელი ნორმას დაუბრუნდა.', 'ok');
+    }
+  }
+  if (sensorFaultUntil > now && !sensorFaultActive) {
+    sensorFaultActive = true;
+    showAlarm('განგაში · სენსორი', 'ჰაერის სენსორი არ პასუხობს. შეამოწმეთ სენსორი და კაბელი.', 'crit');
+  } else if (sensorFaultUntil <= now && sensorFaultActive) {
+    sensorFaultActive = false;
+    showAlarm('ნორმა · სენსორი', 'ჰაერის სენსორი ისევ მუშაობს.', 'ok');
+  }
+  for (const id in bad) $(id).parentElement.classList.toggle('bad', bad[id] || (id !== 'pS' && sensorFaultUntil > now));
+}
+
+let toastTimer, lastCritAt = 0;
+function showAlarm(title, text, kind) {
+  // let an alarm stay readable for a few seconds before an "all clear" replaces it
+  const wait = kind === 'ok' ? 5000 - (Date.now() - lastCritAt) : 0;
+  if (wait > 0) { setTimeout(() => showAlarm(title, text, kind), wait); return; }
+  if (kind !== 'ok') lastCritAt = Date.now();
+  Sound.ui(kind === 'ok' ? 'ok' : 'alarm');
+  const el = $('toast');
+  $('toastTitle').textContent = title;
+  $('toastText').textContent = text;
+  el.classList.toggle('ok', kind === 'ok');
+  el.hidden = true; void el.offsetWidth; el.hidden = false;   // restart the entrance animation
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, kind === 'ok' ? 4000 : 8000);
+}
+$('toastX').addEventListener('click', () => { $('toast').hidden = true; });
+
+// each press simulates a different incident; the alarm itself comes from the thresholds above
+const INCIDENTS = [
+  () => { temp = bounds('t')[0] - 3; },              // cold snap
+  () => { soilV = bounds('s')[0] - 8; },             // soil dried out
+  () => { hum = bounds('h')[1] + 6; },               // humidity spike
+  () => { temp = bounds('t')[1] + 3; },              // heat wave
+  () => { sensorFaultUntil = Date.now() + 8000; },   // air sensor stops answering
+  () => {                                            // storm reported by the weather station
+    stormUntil = Date.now() + 12000;
+    showAlarm('განგაში · ამინდი', 'ძლიერი ქარი, 17 მ/წმ (თქვენი ზღვარია 12 მ/წმ), და წვიმა. ' + windowsNote(), 'crit');
+    computeAuto(); renderDevices();
+    setTimeout(() => showAlarm('ნორმა · ამინდი', 'ქარი ჩადგა. სათბური ჩვეულ რეჟიმს დაუბრუნდა.', 'ok'), 12000);
+  },
+];
+let incident = 0;
+$('alarmTest').addEventListener('click', () => {
+  suppressUntil = 0;
+  INCIDENTS[incident++ % INCIDENTS.length]();
+  for (const st of Object.values(alarmState)) st.count = Math.max(st.count, 2);   // fire on the next reading
+  tick();
+});
+
+renderSettings(); tick(); setInterval(tick, 1000);
+
+/* ================= resize ================= */
+let W = 0, Hh = 0;
+function resize() {
+  W = innerWidth; Hh = innerHeight;
+  renderer.setSize(W, Hh, false);
+  camera.aspect = W / Hh;
+  camera.fov = W < 860 ? 48 : 38;
+  camera.updateProjectionMatrix();
+  measure();
+}
+addEventListener('resize', resize);
+resize();
+
+/* ================= loop ================= */
+const clock = new THREE.Clock();
+const tmpC = new THREE.Color();
+let lastVent = -1, lastNight = -1, shadowFrames = 3;
+let frameAcc = 0, frameN = 0;
+const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+addEventListener('pointermove', e => { pointer.tx = e.clientX / W - .5; pointer.ty = e.clientY / Hh - .5; }, { passive: true });
+
+let viewSX = 0.2, viewSY = 0, sndInside = 0;
+let rainFall = 0, rainDrift = 0, snowFall = 0, snowDrift = 0, treesBent = true;
+const lookAt = new THREE.Vector3();
+function frame() {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const t = clock.elapsedTime;
+
+  computeTarget(storyPosition());
+  const k = reduce ? 1 : 1 - Math.exp(-dt * 3.2);
+  cur.pos.lerp(tgt.pos, k); cur.look.lerp(tgt.look, k);
+  for (const key of PARAMS) cur[key] += (tgt[key] - cur[key]) * k;
+
+  if (exploring) {
+    // 360° mode: the visitor drives the camera; preset buttons fly it to a new viewpoint
+    if (fly) {
+      fly.t = reduce ? fly.dur : Math.min(fly.dur, fly.t + dt);
+      const e = easeIO(fly.t / fly.dur);
+      camera.position.lerpVectors(fly.from, fly.pos, e);
+      controls.target.lerpVectors(fly.fromLook, fly.look, e);
+      if (fly.t >= fly.dur) { if (fly.thenRotate && !reduce) controls.autoRotate = true; fly = null; }
+    }
+    controls.update(dt);
+  } else {
+    // camera with a little hand-held parallax
+    pointer.x += (pointer.tx - pointer.x) * 0.04; pointer.y += (pointer.ty - pointer.y) * 0.04;
+    camera.position.copy(cur.pos);
+    if (!reduce) { camera.position.x += pointer.x * 0.6; camera.position.y += -pointer.y * 0.3 + Math.sin(t * .3) * .05; }
+    lookAt.copy(cur.look);
+    if (ret) {   // coming back from 360°: ease from the visitor's view into the story view
+      ret.t = reduce ? ret.dur : Math.min(ret.dur, ret.t + dt);
+      const e = easeIO(ret.t / ret.dur);
+      camera.position.lerpVectors(ret.pos, camera.position, e);
+      lookAt.lerpVectors(ret.look, lookAt, e);
+      if (ret.t >= ret.dur) ret = null;
+    }
+    camera.lookAt(lookAt);
+  }
+  // desktop: push the greenhouse right of the panels; phone: above/below them; centred in 360°
+  const wantX = exploring || isMobile() ? 0 : cur.shift, wantY = exploring || !isMobile() ? 0 : cur.my;
+  const kv = reduce ? 1 : 1 - Math.exp(-dt * 2.5);
+  viewSX += (wantX - viewSX) * kv; viewSY += (wantY - viewSY) * kv;
+  if (Math.abs(viewSX) + Math.abs(viewSY) > 0.0005) camera.setViewOffset(W, Hh, -W * viewSX, Hh * viewSY, W, Hh); else camera.clearViewOffset();
+
+  // day ↔ night, clear ↔ overcast
+  const n = cur.night, cl = cur.cloud;
+  skyMat.uniforms.top.value.lerpColors(DAY.top, OVERCAST.top, cl).lerp(NIGHT.top, n);
+  skyMat.uniforms.hor.value.lerpColors(DAY.hor, OVERCAST.hor, cl).lerp(NIGHT.hor, n);
+  scene.fog.color.copy(skyMat.uniforms.hor.value);
+  scene.fog.far = 300 - cl * 140;
+  sun.intensity = (2.8 * (1 - n) + 0.15 * n) * (1 - cl * 0.65);
+  sun.color.lerpColors(tmpC.set('#fff1d6'), C('#9fb7d9'), n);
+  hemi.intensity = (1.3 * (1 - n) + 0.35 * n) * (1 - cl * 0.2);
+
+  // weather station, rain
+  if (!reduce) anemo.rotation.y += dt * (1 + cur.wind * 14);
+  vane.rotation.y = -0.6 + Math.sin(t * (0.5 + cur.wind * 3)) * 0.15 * (0.3 + cur.wind);
+  rainMat.uniforms.uOpacity.value = cur.rain * 0.55;
+  rainFall += dt * (16 + cur.wind * 10); rainDrift += dt * cur.wind * 22;
+  rainMat.uniforms.uFall.value = rainFall % 2000; rainMat.uniforms.uDrift.value = rainDrift % 4400;
+  rainMat.uniforms.uWind.value = cur.wind;
+  rain.visible = cur.rain > 0.01;
+  if (plantMark.visible) plantMark.scale.setScalar(1 + Math.sin(t * 4) * 0.12);
+  snowMat.uniforms.uOpacity.value = cur.snow * 0.9;
+  snowMat.uniforms.uTime.value = t;
+  snowFall += dt * (1.4 + cur.wind * 3.2); snowDrift += dt * cur.wind * 16;
+  snowMat.uniforms.uFall.value = snowFall % 2000; snowMat.uniforms.uDrift.value = snowDrift % 4600;
+  // trees lean with the wind and sway in gusts
+  if (cur.wind > 0.02 || treesBent) {
+    const tm = new THREE.Matrix4(), rz = new THREE.Matrix4();
+    trees.forEach((tr, i) => {
+      const lean = -(cur.wind * 0.1 + Math.sin(t * (1.2 + cur.wind * 2.5) + tr.phase) * cur.wind * 0.06);
+      rz.makeRotationZ(reduce ? 0 : lean);
+      tm.makeTranslation(tr.x, 0, tr.z).multiply(rz);
+      treeTrunks.setMatrixAt(i, tm.clone().multiply(tr.trunkL));
+      treeCrowns.setMatrixAt(i, tm.multiply(tr.crownL));
+    });
+    treeTrunks.instanceMatrix.needsUpdate = treeCrowns.instanceMatrix.needsUpdate = true;
+    treesBent = cur.wind > 0.02;
+  }
+  snowMat.uniforms.uWind.value = cur.wind;
+  snow.visible = cur.snow > 0.01;
+  ground.material.color.lerpColors(GRASS, SNOWY, cur.snow * 0.85);
+  hemi.color.lerpColors(tmpC.set('#dff0ff'), C('#5a7090'), n);
+  starMat.opacity = Math.max(0, n * 1.2 - 0.2);
+  scene.environmentIntensity = 0.35 * (1 - n * .7);
+
+  // devices
+  // heating: glowing heater grilles + a warm glow at the back; lighting: LED fixtures, cones and two lamps
+  heatMat.emissiveIntensity = cur.light * 3.5;
+  inside.intensity = cur.light * 6;
+  inside.position.set(0, 1.2, -HL + 1);
+  const lc = LAMP_COLORS[lampColor];
+  lampMat.emissive.copy(lc); lampMat.emissiveIntensity = cur.lamp * 3;
+  coneMat.uniforms.uColor.value.copy(lc);
+  coneMat.uniforms.uOpacity.value = cur.lamp * (0.05 + cur.night * 0.12);
+  for (const l of lampLights) { l.color.copy(lc); l.intensity = cur.lamp * 9; }
+  if (!reduce) for (let i = 0; i < fanRotors.length; i++) fanRotors[i].rotation.z -= dt * cur.fan * (17 + i * 0.7);
+  fanBlur.opacity = Math.min(0.45, Math.max(0, cur.fan - 0.3) * 0.65);
+  for (const v of vents) v.rotation.z = v.userData.slope + cur.vent * 0.75;
+  // polytunnel: the side film rolls up from the ground to the side rail
+  const rollEdge = 0.25 + cur.vent * 0.95;
+  for (const r of rollUps) { r.curtain.scale.y = Math.max(0.02, TH0 - rollEdge); r.tube.position.y = rollEdge; }
+  sensorMat.emissiveIntensity = 0.4 + (reduce ? 0 : (Math.sin(t * 3) * .5 + .5) * 1.2);
+  sensorMat.emissive.set(auto.pump ? '#4fb6ff' : '#4fd88a');   // blue while the pump is watering
+
+  // crop switch: plants sink into the soil, get rebuilt, and grow back
+  const before = growth.value;
+  growth.value += (growth.target - growth.value) * Math.min(1, dt * (growth.target ? 2.2 : 6));
+  if (growth.pending && growth.value < 0.03) { buildPlants(growth.pending); growth.pending = null; growth.target = 1; }
+  plantGroup.scale.set(0.6 + growth.value * 0.4, Math.max(0.001, growth.value), 0.6 + growth.value * 0.4);
+  if (Math.abs(growth.value - before) > 0.002) shadowFrames = Math.max(shadowFrames, 1);
+  led.emissiveIntensity = (Math.sin(t * 6) > 0.2) ? 2.5 : 0.4;
+
+  // shadows only when vents or sun actually change
+  if (Math.abs(cur.vent - lastVent) > 0.003 || Math.abs(n - lastNight) > 0.01 || shadowFrames > 0) {
+    renderer.shadowMap.needsUpdate = true;
+    lastVent = cur.vent; lastNight = n; shadowFrames = Math.max(0, shadowFrames - 1);
+  }
+
+  // sound follows the scene; device sounds fade with distance, outdoor sounds are muffled inside
+  const cp = camera.position;
+  const insideNow = Math.abs(cp.x) < HW && Math.abs(cp.z) < HL && cp.y < 3.3 ? 1 : 0;
+  sndInside += (insideNow - sndInside) * Math.min(1, dt * 3);
+  Sound.update(dt, {
+    t, wind: cur.wind, rain: cur.rain, snow: cur.snow, night: cur.night, cloud: cur.cloud,
+    fan: cur.fan, heat: cur.light, lamp: cur.lamp, pump: auto.pump,
+    ventSpeed: Math.abs(cur.vent - sndPrevVent) / Math.max(dt, 1e-3),
+    near: THREE.MathUtils.clamp(1.25 - cp.length() / 26, 0.25, 1), inside: sndInside, vent: cur.vent,
+  });
+  sndPrevVent = cur.vent;
+  // lightning flash during thunder
+  if (flash > 0) { hemi.intensity += flash * 2.5; flash = Math.max(0, flash - dt * 2.5); }
+
+  renderer.render(scene, camera);
+
+  // adaptive resolution: drop pixel ratio if the device is struggling
+  frameAcc += dt; frameN++;
+  if (frameN === 90) {
+    const avg = frameAcc / frameN;
+    if (avg > 1 / 28 && dpr > 1) { dpr = Math.max(1, dpr - 0.25); renderer.setPixelRatio(dpr); renderer.setSize(W, Hh, false); }
+    frameAcc = 0; frameN = 0;
+  }
+  requestAnimationFrame(frame);
+}
+
+document.fonts.ready.then(() => {
+  measure();
+  requestAnimationFrame(() => {
+    document.documentElement.classList.add('ready');
+    frame();
+  });
+});
+</script>
