@@ -1548,7 +1548,7 @@ for (const [key, id] of DEVS) {
     renderDevices();
   });
   $('md' + id).addEventListener('click', () => {
-    if (key === 'light') { heatSet = heatSet === null ? settings.t : null; applyHeat(); }
+    if (key === 'light') { heatSet = heatSet === null ? targetT() : null; applyHeat(); }
     else manual[key] = manual[key] === null ? Math.round(auto[key] * 20) / 20 : null;   // toggle auto ↔ hold current level
     renderDevices();
   });
@@ -1560,7 +1560,7 @@ $('allAuto').addEventListener('click', () => {
 function renderDevices() {
   for (const [key, id] of DEVS) {
     if (key === 'light') {
-      const isAuto = heatSet === null, val = isAuto ? settings.t : heatSet;
+      const isAuto = heatSet === null, val = isAuto ? targetT() : heatSet;
       if (isAuto || document.activeElement !== $('rgLight')) $('rgLight').value = val;
       $('lvLight').textContent = val <= HEAT_OFF ? L('გამორთულია', 'Off') : `${val} °C` + (level('light') > 0 ? L(' · მუშაობს', ' · on') : '');
       $('mdLight').setAttribute('aria-pressed', String(isAuto));
@@ -1578,14 +1578,22 @@ function renderDevices() {
   $('mode').textContent = anyManual ? L('ხელით მართვა', 'Manual control') : L('ავტომატური', 'Automatic');
 }
 
+// the temperature automatic mode aims for: the crop's day target by day, the middle of its ideal night range by night
+const isNightNow = () => (exploring ? env.time === 'night' : cur.night > 0.5);
+function targetT() {
+  if (!isNightNow()) return settings.t;
+  const [lo, hi] = TEMPLATES[settings.crop].night.split('–').map(Number);
+  return Math.round((lo + hi) / 2);
+}
 // automatic mode: levels follow the crop's targets and the weather (proportional control, snapped to 5 %).
 // Manual mode is never overridden; the farmer can run any device in any weather.
 function computeAuto() {
   const snap = v => Math.round(Math.min(1, Math.max(0, v)) * 20) / 20;
   const wet = (exploring && weatherShutsWindows()) || stormUntil > Date.now();
-  auto.fan = snap((temp - settings.t - 0.3) / 3 + (wet ? 0.15 : 0));   // in rain the fans take over from the closed windows
-  auto.vent = wet ? 0 : snap(Math.max((temp - settings.t - 0.8) / 4, (hum - settings.h - 3) / 10));
-  auto.light = snap((settings.t - temp - 0.3) / 3);
+  const tT = targetT();   // day or night target of the chosen crop
+  auto.fan = snap((temp - tT - 0.3) / 3 + (wet ? 0.15 : 0));   // in rain the fans take over from the closed windows
+  auto.vent = wet ? 0 : snap(Math.max((temp - tT - 0.8) / 4, (hum - settings.h - 3) / 10));
+  auto.light = snap((tT - temp - 0.3) / 3);
   // lights come on in the dark: at night fully, under heavy cloud partly
   const dark = exploring ? (env.time === 'night' ? 1 : WEATHER[env.weather].cloud >= 0.85 ? 0.5 : 0) : (cur.night > 0.5 ? 1 : 0);
   auto.lamp = snap(dark * 0.85);
@@ -1596,7 +1604,7 @@ function tick() {
   computeAuto();
   const fanL = level('fan'), ventL = level('vent'), heatL = level('light');
   // without 360° weather the house drifts gently around the target; with it, toward what the outside allows
-  const amb = exploring ? insideAmbient() : settings.t + 1;
+  const amb = exploring ? insideAmbient() : targetT() + 1;
   temp += -0.2 * fanL - 0.1 * ventL + 0.45 * heatL + (amb - temp) * 0.012 + (Math.random() - .5) * .08;
   hum += -0.9 * ventL - 0.3 * fanL + (settings.h - hum) * 0.08 + (Math.random() - .5) * .4;
   soilV += (auto.pump ? 1.6 : -0.15) + (Math.random() - .5) * .2;
