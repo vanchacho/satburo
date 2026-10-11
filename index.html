@@ -781,9 +781,6 @@ Object.assign(sun.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12, n
 sun.shadow.bias = -0.0006;
 sun.shadow.normalBias = 0.03;
 scene.add(sun);
-const inside = new THREE.PointLight('#ffcf8a', 0, 16, 1.6);
-inside.position.set(0, 2.7, 0);
-scene.add(inside);
 
 /* ================= ground & landscape ================= */
 const ground = new THREE.Mesh(new THREE.CircleGeometry(260, 48), new THREE.MeshLambertMaterial({ color: '#86ad5c' }));
@@ -1280,6 +1277,8 @@ const led = new THREE.MeshStandardMaterial({ color: '#2a8f4a', emissive: '#3ee07
 const plantGroup = new THREE.Group();
 let buildPlants = () => {};
 const heatMat = new THREE.MeshStandardMaterial({ color: '#3a2a22', emissive: '#ff6a2a', emissiveIntensity: 0 });
+const heatPipeMat = new THREE.MeshStandardMaterial({ color: '#5b5f5c', metalness: 0.6, roughness: 0.4, emissive: '#ff5a1f', emissiveIntensity: 0 });
+const heatGlows = [];   // warm light spread along the house while heating
 const lampMat = new THREE.MeshStandardMaterial({ color: '#f4f2ee', emissive: '#ffd9a0', emissiveIntensity: 0 });
 const LAMP_COLORS = { warm: C('#ffd9a0'), grow: C('#d68cff') };
 // fake volumetric light: an open cone, brightest at the lamp and fading towards the plants
@@ -1301,14 +1300,32 @@ const sensorMat = new THREE.MeshStandardMaterial({ color: '#dfe9e2', emissive: '
   const fixMat = new THREE.MeshStandardMaterial({ color: '#3b4240', metalness: 0.6, roughness: 0.4 });
   const wireGeo = new THREE.CylinderGeometry(0.005, 0.005, 0.4, 4);
   const coneGeo = new THREE.ConeGeometry(0.75, 2.4, 24, 1, true);
-  // heaters at the back gable: dark box with a glowing grille
-  for (const hx of [-1.35, 1.35]) {
-    const box = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.55, 0.28), new THREE.MeshStandardMaterial({ color: '#d9ddd9', metalness: 0.4, roughness: 0.5 }));
-    box.position.set(hx, 0.95, -HL + 0.3); box.castShadow = true;
-    const grille = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.36, 0.02), heatMat);
-    grille.position.z = 0.145;
+  // heating spread evenly through the house: six heaters low on both side walls (front, middle, back),
+  // facing inwards, plus heating pipes along every bed so warmth rises evenly from the floor
+  const heaterGeo = new THREE.BoxGeometry(0.7, 0.5, 0.26);
+  const heaterMat = new THREE.MeshStandardMaterial({ color: '#d9ddd9', metalness: 0.4, roughness: 0.5 });
+  const grilleGeo = new THREE.BoxGeometry(0.56, 0.32, 0.02);
+  for (const sx of [-1, 1]) for (const z of [-4.5, 0, 4.5]) {
+    const box = new THREE.Mesh(heaterGeo, heaterMat);
+    box.position.set(sx * (HW - 0.32), 0.42, z);
+    box.rotation.y = -sx * Math.PI / 2;   // grille (local +z) faces the middle of the house
+    box.castShadow = true;
+    const grille = new THREE.Mesh(grilleGeo, heatMat);
+    grille.position.z = 0.135;
     box.add(grille);
     gh.add(box);
+  }
+  for (const z of [-4, 0, 4]) {
+    const glow = new THREE.PointLight('#ffb070', 0, 7, 1.6);
+    glow.position.set(0, 0.9, z);
+    gh.add(glow);
+    heatGlows.push(glow);
+  }
+  const pipeGeo = new THREE.CylinderGeometry(0.035, 0.035, 10.2, 10); pipeGeo.rotateX(Math.PI / 2);
+  for (const bx of BEDS) for (const off of [-0.86, 0.86]) {
+    const pipe = new THREE.Mesh(pipeGeo, heatPipeMat);
+    pipe.position.set(bx + off, 0.09, 0);
+    gh.add(pipe);
   }
   for (const bx of BEDS) {
     const bed = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.32, 10.6), wood);
@@ -2011,10 +2028,10 @@ function frame() {
   scene.environmentIntensity = 0.35 * (1 - n * .7);
 
   // devices
-  // heating: glowing heater grilles + a warm glow at the back; lighting: LED fixtures, cones and two lamps
+  // heating: glowing grilles and pipes, warm glow spread evenly along the house; lighting: LED fixtures, cones and two lamps
   heatMat.emissiveIntensity = cur.light * 3.5;
-  inside.intensity = cur.light * 6;
-  inside.position.set(0, 1.2, -HL + 1);
+  heatPipeMat.emissiveIntensity = cur.light * 1.4;
+  for (const g of heatGlows) g.intensity = cur.light * 2.6;
   const lc = LAMP_COLORS[lampColor];
   lampMat.emissive.copy(lc); lampMat.emissiveIntensity = cur.lamp * 3;
   coneMat.uniforms.uColor.value.copy(lc);
