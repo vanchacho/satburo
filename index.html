@@ -1539,7 +1539,7 @@ const level = key => manual[key] ?? auto[key];
 let heatSet = null;   // manual heating setpoint in °C; null = follow the crop template; HEAT_OFF = switched off
 const HEAT_OFF = 4;  // far-left slider position
 function applyHeat() {
-  manual.light = heatSet === null ? null : heatSet <= HEAT_OFF ? 0 : Math.round(Math.min(1, Math.max(0, (heatSet - temp - 0.3) / 3)) * 20) / 20;
+  manual.light = heatSet === null ? null : heatSet <= HEAT_OFF ? 0 : Math.round(Math.min(1, Math.max(0, (heatSet - temp + 0.3) / 1.2)) * 20) / 20;
 }
 for (const [key, id] of DEVS) {
   $('rg' + id).addEventListener('input', e => {
@@ -1562,7 +1562,8 @@ function renderDevices() {
     if (key === 'light') {
       const isAuto = heatSet === null, val = isAuto ? targetT() : heatSet;
       if (isAuto || document.activeElement !== $('rgLight')) $('rgLight').value = val;
-      $('lvLight').textContent = val <= HEAT_OFF ? L('გამორთულია', 'Off') : `${val} °C` + (level('light') > 0 ? L(' · მუშაობს', ' · on') : '');
+      const hp = Math.round(level('light') * 100);
+      $('lvLight').textContent = val <= HEAT_OFF ? L('გამორთულია', 'Off') : `${val} °C` + (hp > 0 ? ` · ${hp} %` : '');
       $('mdLight').setAttribute('aria-pressed', String(isAuto));
       $('mdLight').textContent = isAuto ? L('ავტო', 'Auto') : L('ხელით', 'Manual');
       continue;
@@ -1593,7 +1594,7 @@ function computeAuto() {
   const tT = targetT();   // day or night target of the chosen crop
   auto.fan = snap((temp - tT - 0.3) / 3 + (wet ? 0.15 : 0));   // in rain the fans take over from the closed windows
   auto.vent = wet ? 0 : snap(Math.max((temp - tT - 0.8) / 4, (hum - settings.h - 3) / 10));
-  auto.light = snap((tT - temp - 0.3) / 3);
+  auto.light = snap((tT - temp + 0.3) / 1.2);
   // lights come on in the dark: at night fully, under heavy cloud partly
   const dark = exploring ? (env.time === 'night' ? 1 : WEATHER[env.weather].cloud >= 0.85 ? 0.5 : 0) : (cur.night > 0.5 ? 1 : 0);
   auto.lamp = snap(dark * 0.85);
@@ -1605,7 +1606,7 @@ function tick() {
   const fanL = level('fan'), ventL = level('vent'), heatL = level('light');
   // without 360° weather the house drifts gently around the target; with it, toward what the outside allows
   const amb = exploring ? insideAmbient() : targetT() + 1;
-  temp += -0.2 * fanL - 0.1 * ventL + 0.45 * heatL + (amb - temp) * 0.012 + (Math.random() - .5) * .08;
+  temp += -0.2 * fanL - 0.1 * ventL + 0.9 * heatL + (amb - temp) * 0.012 + (Math.random() - .5) * .08;
   hum += -0.9 * ventL - 0.3 * fanL + (settings.h - hum) * 0.08 + (Math.random() - .5) * .4;
   soilV += (auto.pump ? 1.6 : -0.15) + (Math.random() - .5) * .2;
   temp = Math.min(40, Math.max(0, temp)); hum = Math.min(98, Math.max(30, hum)); soilV = Math.min(100, Math.max(20, soilV));
