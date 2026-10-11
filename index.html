@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>სათბურო</title>
-<meta name="description" content="სათბურო — ჭკვიანი სათბური, რომელიც თავად აკონტროლებს სითბოს, ტენიანობასა და მორწყვას">
+<title>სათბურია</title>
+<meta name="description" content="სათბურია · ჭკვიანი სათბური, რომელიც თავად ინარჩუნებს საჭირო ტემპერატურას, ტენიანობასა და მორწყვას">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;700&family=Noto+Serif+Georgian:wght@600;800&display=swap">
@@ -343,6 +343,11 @@
   .mnav a { opacity: 1; }
   .mnav a.btn { color: #f4f8ef; border: 1px solid var(--leaf); margin-top: 8px; justify-content: center; font-size: 15px; }
 
+  /* mid-size screens: the six links no longer fit beside the logo, use the menu */
+  @media (max-width: 1040px) {
+    nav:not(.mnav) { display: none; }
+    .menu-btn { display: grid; }
+  }
   @media (max-width: 860px) {
     :root { --blur: blur(12px) saturate(1.4); }
     nav:not(.mnav), .dots, .head-r > .btn { display: none; }
@@ -383,12 +388,12 @@
 </style>
 
 <canvas id="stage" aria-hidden="true"></canvas>
-<div class="loader" aria-hidden="true">სათბურო</div>
+<div class="loader" aria-hidden="true">სათბურია</div>
 
 <header class="glass">
-  <a class="logo" href="#top" aria-label="სათბურო">
+  <a class="logo" href="#top" aria-label="სათბურია">
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11 12 4l9 7v9H3z" stroke="#2f6b3a" stroke-width="2" stroke-linejoin="round"/><path d="M12 19c0-4 2-6 5-6-0 3-2 6-5 6Zm0 0c0-3-1.5-5-4-5 0 2.5 1.5 5 4 5Z" fill="#6f9a48"/></svg>
-    სათბურო
+    სათბურია
   </a>
   <nav aria-label="მთავარი">
     <a href="#climate">კლიმატი</a>
@@ -396,6 +401,7 @@
     <a href="#soil">მორწყვა</a>
     <a href="#frost">განგაში</a>
     <a href="#app">აპლიკაცია</a>
+    <a href="#about">ჩვენ შესახებ</a>
   </nav>
   <div class="head-r">
     <a class="btn" href="#contact">დაკავშირება</a>
@@ -410,6 +416,7 @@
   <a href="#soil">მორწყვა და კვება</a>
   <a href="#frost">განგაში</a>
   <a href="#app">აპლიკაცია</a>
+  <a href="#about">ჩვენ შესახებ</a>
   <a class="btn" href="#contact">დაკავშირება</a>
 </nav>
 
@@ -514,15 +521,15 @@
 </div>
 
 <div class="dots" aria-hidden="true">
-  <a href="#top"></a><a href="#climate"></a><a href="#weather"></a><a href="#soil"></a><a href="#frost"></a><a href="#app"></a><a href="#contact"></a>
+  <a href="#top"></a><a href="#climate"></a><a href="#weather"></a><a href="#soil"></a><a href="#frost"></a><a href="#app"></a><a href="#about"></a><a href="#contact"></a>
 </div>
 
 <main>
   <section class="scene hero" id="top" data-scene>
     <div class="hero-inner">
       <span class="eyebrow">ჭკვიანი სათბური საქართველოსთვის</span>
-      <h1>სათბურო</h1>
-      <p class="lead">აირჩიეთ კულტურა აპლიკაციაში და სათბური თავად შეინარჩუნებს მისთვის საჭირო სითბოს, ტენიანობასა და მორწყვას.</p>
+      <h1>სათბურია</h1>
+      <p class="lead">აირჩიეთ კულტურა აპლიკაციაში და სათბური თავად შეინარჩუნებს საჭირო ტემპერატურას, ტენიანობასა და მორწყვას.</p>
       <div class="row">
         <a class="btn" href="#climate">როგორ მუშაობს</a>
         <button class="btn ghost" type="button" data-explore>360° ხედი</button>
@@ -534,16 +541,16 @@
   <section class="scene" id="climate" data-scene>
     <div class="panel glass">
       <span class="eyebrow">ვენტილაცია</span>
-      <h2>სიცხეში სათბური თავად ნიავდება</h2>
-      <p>სისტემამ იცის, რა ტემპერატურა და ტენიანობა სჭირდება თქვენს კულტურას. როცა სათბური გადახურდება, ვენტილატორები და სახურავის ფანჯრები თავად ჩაირთვება, თან იმდენად, რამდენადაც საჭიროა.</p>
+      <h2>სიცხეში სათბური თავად განიავდება</h2>
+      <p>სისტემამ იცის, რა ტემპერატურა და ტენიანობა სჭირდება თქვენს კულტურას. სათბურის გადახურებისას ვენტილატორები თავად ჩაირთვება და ფანჯრები საჭირო ზომით გაიღება.</p>
     </div>
   </section>
 
   <section class="scene" id="weather" data-scene>
     <div class="panel glass">
       <span class="eyebrow">ამინდის სადგური <span class="tag">დამატებითი მოდული</span></span>
-      <h2>ქარი ან წვიმა? ფანჯრები თავად იხურება</h2>
-      <p>ანემომეტრი ზომავს ქარის სიჩქარეს, წვიმის სენსორი კი ნალექს აფიქსირებს. თუ ქარი თქვენს მითითებულ ზღვარს გადააჭარბებს ან წვიმა წამოვა, სისტემა სახურავის ფანჯრებს დახურავს და განგაშს გამოგიგზავნით. ქარი აპკს ვეღარ დახევს, სეტყვა და კოკისპირული წვიმა კი მოსავალს ვეღარ დააზიანებს.</p>
+      <h2>ქარი ან წვიმა? ფანჯრები თავად დაიხურება</h2>
+      <p>ანემომეტრი ზომავს ქარის სიჩქარეს, წვიმის სენსორი კი ნალექს აფიქსირებს. ძლიერი ქარის ან წვიმის დროს სისტემა ფანჯრებს დახურავს და შეტყობინებას გამოგიგზავნის, რომ ქარმა აპკი არ დახიოს და მოსავალი არ დაზიანდეს.</p>
     </div>
   </section>
 
@@ -551,13 +558,13 @@
     <div class="panel glass">
       <span class="eyebrow">ნიადაგი, მორწყვა და კვება</span>
       <h2>მცენარე წყალს მაშინ იღებს, როცა სჭირდება</h2>
-      <p>სენსორები მუდმივად ზომავენ ნიადაგის ტენს. როცა ნიადაგი კულტურისთვის საჭირო დონეზე მეტად გამოშრება, ჩაირთვება ტუმბო და საკმარის დონეზე თავად გამოირთვება.</p>
+      <p>სენსორები მუდმივად ზომავენ ნიადაგის ტენიანობას. ნიადაგის გამოშრობისას ტუმბო ჩაირთვება, საკმარისი ტენიანობის მიღწევისას კი თავად გამოირთვება.</p>
       <div class="pro">
         <span class="eyebrow">პროფესიონალებისთვის <span class="tag">დამატებითი მოდული</span></span>
-        <p>pH და EC სენსორები გაჩვენებთ ნიადაგის მჟავიანობას და სასუქის კონცენტრაციას. ზუსტად გეცოდინებათ, როდის და რა დოზით სჭირდება მცენარეს მინერალები.</p>
+        <p>pH და EC სენსორები აჩვენებენ ნიადაგის მჟავიანობასა და სასუქის კონცენტრაციას, რომ ზუსტად იცოდეთ, როდის და რა დოზით სჭირდება მცენარეს მინერალები.</p>
         <div class="facts">
           <div class="fact"><b>pH 6.4</b><span>მჟავიანობა · მაგალითი</span></div>
-          <div class="fact"><b>1.8 mS/cm</b><span>EC, სასუქი · მაგალითი</span></div>
+          <div class="fact"><b>1.8 mS/cm</b><span>სასუქის კონცენტრაცია · მაგალითი</span></div>
         </div>
       </div>
     </div>
@@ -566,8 +573,8 @@
   <section class="scene night" id="frost" data-scene>
     <div class="panel glass">
       <span class="eyebrow">ყინვა და განგაში</span>
-      <h2>რამე თუ მოხდა, მაშინვე გაიგებთ</h2>
-      <p>თუ სათბური ძალიან აცივდება ან გადახურდება, სენსორი გაფუჭდება ან კავშირი გაწყდება, განგაში მოგივათ აპლიკაციაში, SMS-ით და ზარით, ღამითაც. ზღვრები კულტურის მიხედვით დგება, გათბობა კი მანამდე ჩაირთვება.</p>
+      <h2>რამე თუ მოხდება, მაშინვე გაიგებთ</h2>
+      <p>თუ სათბური ძალიან აცივდება ან გადახურდება, სენსორი გაფუჭდება ან კავშირი გაწყდება, შეტყობინება მოგივათ აპლიკაციაში, SMS-ით და ზარით, ღამითაც.</p>
       <ul class="alerts" aria-label="განგაშის მაგალითები">
         <li class="alert crit"><i></i><div><b>სათბურში ძალიან ცივა</b><span>2 °C · გათბობა ჩართულია</span></div><time>02:14</time></li>
         <li class="alert warn"><i></i><div><b>კავშირი გაწყდა</b><span>მოწყობილობა 10 წუთია არ პასუხობს</span></div><time>02:31</time></li>
@@ -580,25 +587,38 @@
     <div class="panel glass">
       <span class="eyebrow">აპლიკაცია</span>
       <h2>მთელი სათბური თქვენს ტელეფონში</h2>
-      <p>ნახეთ ტემპერატურა, ტენიანობა და ნიადაგის ტენი რეალურ დროში, სადაც არ უნდა იყოთ. აირჩიეთ კულტურა და სათბური თავად მოერგება, ან მართეთ ყველაფერი ხელით.</p>
+      <p>ადევნეთ თვალი ტემპერატურას, ტენიანობასა და ნიადაგის მდგომარეობას რეალურ დროში, სადაც არ უნდა იყოთ.</p>
       <ul class="feat">
         <li>კულტურის შაბლონები: მარწყვი, პომიდორი, კიტრი, წიწაკა, მწვანილი</li>
-        <li>ვენტილატორები, ფანჯრები, გათბობა და განათება ერთი ღილაკით</li>
+        <li>ვენტილატორების, ფანჯრების, გათბობისა და განათების მართვა</li>
         <li>ავტომატური ან ხელით მართვა ნებისმიერ ამინდში</li>
-        <li>განგაში აპლიკაციაში, SMS-ით და ზარით</li>
+        <li>შეტყობინებები აპლიკაციაში, SMS-ით და ზარით</li>
       </ul>
       <button class="btn" type="button" data-explore>სცადეთ 360° ხედში</button>
+    </div>
+  </section>
+
+  <section class="scene" id="about" data-scene>
+    <div class="panel glass">
+      <span class="eyebrow">ჩვენ შესახებ</span>
+      <h2>ქართველი ფერმერებისთვის შექმნილი</h2>
+      <p>სათბურია ქართული კომპანიაა, რომელიც სათბურების ავტომატიზაციით არის დაკავებული. ჩვენი მიზანია, მცირე და საშუალო ფერმერებს ხელმისაწვდომი ტექნოლოგია შევთავაზოთ, რომ სიცხემ, ყინვამ ან გვალვამ მოსავალი აღარ დააზიანოს.</p>
+      <ul class="feat">
+        <li>შუშისა და პარკის სათბურებისთვის</li>
+        <li>მუშაობს მობილური ინტერნეტით, Wi-Fi არ სჭირდება</li>
+        <li>ქართულენოვანი აპლიკაცია და მხარდაჭერა</li>
+      </ul>
     </div>
   </section>
 
   <section class="scene price" id="contact" data-scene>
     <div class="panel glass">
       <span class="eyebrow">დაკავშირება</span>
-      <h2>გაჭკვიანეთ თქვენი სათბური</h2>
+      <h2>გახადეთ თქვენი სათბური ჭკვიანი</h2>
       <div class="plans">
         <div class="plan main">
           <span class="amt">მონტაჟი</span>
-          <ul><li>მოწყობილობა და სენსორები</li><li>მონტაჟი თქვენს სათბურში</li><li>პირველადი გამართვა</li></ul>
+          <ul><li>მოწყობილობა და სენსორები</li><li>დამონტაჟება თქვენს სათბურში</li><li>პირველადი გამართვა</li></ul>
         </div>
         <div class="plan">
           <span class="amt">მომსახურება</span>
@@ -608,12 +628,12 @@
       <div class="steps">
         <div class="step">ვიზიტი და სათბურის შეფასება</div>
         <div class="step">მონტაჟი და გამართვა</div>
-        <div class="step">მონიტორინგი დღე და ღამე</div>
+        <div class="step">დღე-ღამის მონიტორინგი</div>
       </div>
     </div>
   </section>
 </main>
-<footer>© 2026 სათბურო · ჭკვიანი სათბურები საქართველოში</footer>
+<footer>© 2026 სათბურია · ჭკვიანი სათბურები საქართველოში</footer>
 
 <script type="importmap">
 { "imports": {
@@ -1339,7 +1359,8 @@ const KEYS = [
   K(V(-8, 6.2, 14.5), V(-0.5, 3.6, 3.5),  { vent: 0, fan: 0, rain: 1, wind: 1, cloud: 1, my: 0.2, mz: 2.45 }),          // weather station
   K(V(0.15, 1.55, 5.1), V(0, 0.8, -4), { vent: 0.5, fan: 0.4, my: 0.12 }),                       // soil (inside)
   K(V(-13, 4.5, 13),   V(0, 1.6, 0),   { night: 1, fan: 0, light: 1, lamp: 1, my: 0.255, mz: 2 }),                           // frost / alarms
-  K(V(5, 3.6, 13.5),   V(0, 1.7, 4),   { night: 0.1, vent: 0.3, fan: 0.4, shift: 0.3, my: 0.25, mz: 2.85 }),          // app
+  K(V(5, 3.6, 13.5),   V(0, 1.7, 4),   { night: 0.1, vent: 0.3, fan: 0.4, shift: 0.3, my: 0.25, mz: 2.85 }),
+  K(V(-15, 6.5, 16),   V(0, 1.4, 0),   { vent: 0.2, fan: 0.3, my: 0.22, mz: 1.9 }),                  // about          // app
   K(V(21, 11, 23),     V(0, 1.2, 0),   { vent: 0.2, fan: 0.3, shift: 0, my: 0 }),                 // contact
 ];
 const PARAMS = Object.keys(BASE);
@@ -1716,17 +1737,17 @@ document.addEventListener('click', e => {
 /* ================= alarms, driven by the farmer's own settings ================= */
 const ALARMS = [
   { id: 'tLow',  el: 'pT', title: 'ტემპერატურა', out: () => temp < bounds('t')[0],
-    msg: () => `სათბურში ${temp.toFixed(1)} °C-ია, თქვენი ზღვარია ${bounds('t')[0]} °C. გათბობა ჩართულია.` },
+    msg: () => `სათბურში ${temp.toFixed(1)} °C-ია, დასაშვები ზღვარია ${bounds('t')[0]} °C. გათბობა ჩართულია.` },
   { id: 'tHigh', el: 'pT', title: 'ტემპერატურა', out: () => temp > bounds('t')[1],
-    msg: () => `სათბურში ${temp.toFixed(1)} °C-ია, თქვენი ზღვარია ${bounds('t')[1]} °C. ვენტილაცია ჩართულია.` },
+    msg: () => `სათბურში ${temp.toFixed(1)} °C-ია, დასაშვები ზღვარია ${bounds('t')[1]} °C. ვენტილაცია ჩართულია.` },
   { id: 'hHigh', el: 'pH', title: 'ტენიანობა', out: () => hum > bounds('h')[1],
-    msg: () => `ჰაერის ტენიანობა ${Math.round(hum)} %-ია, თქვენი ზღვარია ${bounds('h')[1]} %. ფანჯრები გაიღო.` },
+    msg: () => `ჰაერის ტენიანობა ${Math.round(hum)} %-ია, დასაშვები ზღვარია ${bounds('h')[1]} %. ფანჯრები გაიღო.` },
   { id: 'hLow',  el: 'pH', title: 'ტენიანობა', out: () => hum < bounds('h')[0],
-    msg: () => `ჰაერი ძალიან მშრალია: ${Math.round(hum)} %, თქვენი ზღვარია ${bounds('h')[0]} %.` },
+    msg: () => `ჰაერი ძალიან მშრალია: ${Math.round(hum)} %, დასაშვები ზღვარია ${bounds('h')[0]} %.` },
   { id: 'sDry',  el: 'pS', title: 'ნიადაგი', out: () => soilV < bounds('s')[0],
-    msg: () => `ნიადაგი გამოშრა: ${Math.round(soilV)} %, თქვენი ზღვარია ${bounds('s')[0]} %. ტუმბო ჩართულია.` },
+    msg: () => `ნიადაგი გამოშრა: ${Math.round(soilV)} %, დასაშვები ზღვარია ${bounds('s')[0]} %. ტუმბო ჩართულია.` },
   { id: 'sWet',  el: 'pS', title: 'ნიადაგი', out: () => soilV > bounds('s')[1],
-    msg: () => `ნიადაგი ზედმეტად სველია: ${Math.round(soilV)} %, თქვენი ზღვარია ${bounds('s')[1]} %. შეამოწმეთ ტუმბო.` },
+    msg: () => `ნიადაგი ზედმეტად სველია: ${Math.round(soilV)} %, დასაშვები ზღვარია ${bounds('s')[1]} %. შეამოწმეთ ტუმბო.` },
 ];
 const alarmState = Object.fromEntries(ALARMS.map(a => [a.id, { count: 0, active: false }]));
 let sensorFaultUntil = 0, sensorFaultActive = false;
@@ -1782,7 +1803,7 @@ const INCIDENTS = [
   () => { sensorFaultUntil = Date.now() + 8000; },   // air sensor stops answering
   () => {                                            // storm reported by the weather station
     stormUntil = Date.now() + 12000;
-    showAlarm('განგაში · ამინდი', 'ძლიერი ქარი, 17 მ/წმ (თქვენი ზღვარია 12 მ/წმ), და წვიმა. ' + windowsNote(), 'crit');
+    showAlarm('განგაში · ამინდი', 'ძლიერი ქარი (17 მ/წმ, ზღვარია 12 მ/წმ) და წვიმა. ' + windowsNote(), 'crit');
     computeAuto(); renderDevices();
     setTimeout(() => showAlarm('ნორმა · ამინდი', 'ქარი ჩადგა. სათბური ჩვეულ რეჟიმს დაუბრუნდა.', 'ok'), 12000);
   },
