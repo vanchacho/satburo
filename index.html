@@ -120,6 +120,11 @@
   .read span { font-size: 11px; opacity: .7; }
   .feat { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14px; }
   .feat li { display: flex; gap: 10px; align-items: baseline; }
+  .panel.about { width: min(760px, 100%); }
+  .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .about-item { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; align-content: start; }
+  .about-item h3 { margin: 0; font-family: var(--serif); font-size: 16px; color: var(--leaf); }
+  .about-item p { font-size: 13.5px; line-height: 1.6; }
   .feat li::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--leaf); transform: translateY(-2px); }
   #app .btn { justify-self: start; margin-top: 4px; }
   .app-copy { display: grid; gap: 14px; }
@@ -325,6 +330,11 @@
 
   /* phone menu */
   .head-r { display: flex; align-items: center; gap: 8px; }
+  .lang-btn {
+    height: 42px; min-width: 42px; padding: 0 10px; cursor: pointer; color: var(--ink); font: 700 13px var(--sans);
+    background: rgba(255,255,255,.35); border: 1px solid var(--frost-edge); border-radius: var(--r);
+  }
+  .lang-btn:hover { background: rgba(255,255,255,.6); }
   .menu-btn {
     display: none; width: 42px; height: 42px; padding: 0; place-content: center; gap: 6px; cursor: pointer;
     background: rgba(255,255,255,.35); border: 1px solid var(--frost-edge); border-radius: var(--r);
@@ -371,7 +381,7 @@
     .alarm-test { padding: 8px 0; }
     .alert { padding: 9px 10px; gap: 10px; }
     .toast { top: calc(68px + env(safe-area-inset-top, 0px)); right: 16px; }
-    .explore-btn { z-index: 6; bottom: auto; top: calc(10px + env(safe-area-inset-top, 0px)); right: 66px; height: 42px; box-sizing: border-box; padding: 0 12px; }
+    .explore-btn { z-index: 6; bottom: auto; top: calc(10px + env(safe-area-inset-top, 0px)); right: 116px; height: 42px; box-sizing: border-box; padding: 0 12px; }
     .explore-ui .exit { top: calc(72px + env(safe-area-inset-top, 0px)); right: 16px; }
     .views { left: 16px; right: 16px; transform: none; }
     .views button { flex: 1; min-width: 0; padding: 11px 4px; font-size: 13px; }
@@ -404,6 +414,7 @@
     <a href="#about">ჩვენ შესახებ</a>
   </nav>
   <div class="head-r">
+    <button class="lang-btn" id="langBtn" type="button" aria-label="Switch to English">EN</button>
     <a class="btn" href="#contact">დაკავშირება</a>
     <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav" aria-label="მენიუ"><i></i><i></i></button>
   </div>
@@ -599,14 +610,29 @@
   </section>
 
   <section class="scene" id="about" data-scene>
-    <div class="panel glass">
+    <div class="panel glass about">
       <span class="eyebrow">ჩვენ შესახებ</span>
       <h2>ქართველი ფერმერებისთვის შექმნილი</h2>
-      <p>სათბურია ქართული კომპანიაა, რომელიც სათბურების ავტომატიზაციით არის დაკავებული. ჩვენი მიზანია, მცირე და საშუალო ფერმერებს ხელმისაწვდომი ტექნოლოგია შევთავაზოთ, რომ სიცხემ, ყინვამ ან გვალვამ მოსავალი აღარ დააზიანოს.</p>
+      <p>სათბურია ქართული კომპანიაა, რომელიც სათბურების ავტომატიზაციით არის დაკავებული. ვქმნით სისტემას, რომელიც სათბურის კლიმატს თავად აკონტროლებს, ფერმერს კი ყველაფერს ტელეფონიდან აჩვენებს.</p>
+      <div class="about-grid">
+        <div class="about-item">
+          <h3>რატომ შევქმენით</h3>
+          <p>ყოველ წელს ფერმერები მოსავლის ნაწილს კარგავენ გადახურების, ზედმეტი ტენიანობისა და მოულოდნელი ყინვის გამო. უცხოური სისტემები ძვირია და ქართულ სათბურებს ყოველთვის არ ერგება.</p>
+        </div>
+        <div class="about-item">
+          <h3>რას ვაკეთებთ</h3>
+          <p>ვამონტაჟებთ სენსორებსა და მართვის ბლოკს, რომლებიც სათბურს ავტომატურად მართავს. სისტემა მუშაობს როგორც შუშის, ისე პარკის სათბურებში.</p>
+        </div>
+        <div class="about-item">
+          <h3>ჩვენი მიზანი</h3>
+          <p>მცირე და საშუალო ფერმერებს შევთავაზოთ ხელმისაწვდომი ტექნოლოგია, რომ სიცხემ, ყინვამ ან გვალვამ მოსავალი აღარ დააზიანოს, შრომა კი ნაკლები დასჭირდეს.</p>
+        </div>
+      </div>
       <ul class="feat">
         <li>შუშისა და პარკის სათბურებისთვის</li>
         <li>მუშაობს მობილური ინტერნეტით, Wi-Fi არ სჭირდება</li>
         <li>ქართულენოვანი აპლიკაცია და მხარდაჭერა</li>
+        <li>მონიტორინგი და შეტყობინებები დღე-ღამის განმავლობაში</li>
       </ul>
     </div>
   </section>
@@ -647,6 +673,36 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ================= language: Georgian is the main language, English is optional ================= */
+let lang = 'ka';
+try { if (localStorage.getItem('satburia-lang') === 'en') lang = 'en'; } catch (e) {}
+const L = (ka, en) => (lang === 'en' ? en : ka);
+const EN = { "სათბურია": "Satburia", "მთავარი": "Main", "კლიმატი": "Climate", "ამინდი": "Weather", "მორწყვა": "Irrigation", "განგაში": "Alerts", "აპლიკაცია": "App", "ჩვენ შესახებ": "About", "დაკავშირება": "Contact", "მენიუ": "Menu", "მორწყვა და კვება": "Irrigation & nutrition", "განგაში · სათბური": "Alert · Greenhouse", "სათბურში ტემპერატურა 3 °C-მდე დაეცა. გათბობა ჩართულია.": "The greenhouse temperature dropped to 3 °C. Heating is on.", "დახურვა": "Close", "სათბურის 360° ხედი": "360° greenhouse view", "დახურვა ×": "Close ×", "გადაატრიალეთ მაუსით ან თითით · გაადიდეთ ბორბლით ან ორი თითით · დააჭირეთ მცენარეს": "Drag to rotate · Scroll or pinch to zoom · Tap a plant", "ხედი": "View", "გარედან": "Outside", "შიგნით": "Inside", "გარემო": "Environment", "შაბლონი: პომიდორი": "Template: Tomato", "ავტომატური": "Automatic", "კულტურის შაბლონი": "Crop template", "მარწყვი": "Strawberry", "პომიდორი": "Tomato", "კიტრი": "Cucumber", "წიწაკა": "Pepper", "მწვანილი": "Herbs", "ჰაერი ახლა": "Air now", "ტენი ახლა": "Humidity now", "ნიადაგი ახლა": "Soil now", "ვენტილატორები": "Fans", "ავტომატური რეჟიმი": "Automatic mode", "ავტო": "Auto", "ფანჯრების გაღება": "Window opening", "გათბობა": "Heating", "განათება": "Lighting", "სინათლის ფერი": "Light color", "თბილი თეთრი": "Warm white", "ზრდის (იისფერი)": "Grow (purple)", "ყველაფერი ავტოზე": "All to auto", "განგაშის ტესტი": "Test alert", "გარეთ 22 °C": "Outside 22 °C", "სათბურის ტიპი": "Greenhouse type", "შუშის სათბური": "Glass greenhouse", "პარკის სათბური": "Polytunnel", "დღე და ღამე": "Day and night", "დღე": "Day", "ღამე": "Night", "მზიანი": "Sunny", "ღრუბლიანი": "Cloudy", "წვიმა": "Rain", "თოვლი": "Snow", "ქარიშხალი": "Storm", "ქარი": "Wind", "3 მ/წმ": "3 m/s", "იდეალური გარემო · ახლა სათბურში": "Ideal conditions · now in the greenhouse", "ზოგადი რეკომენდაცია სათბურისთვის. ჯიშის მიხედვით შეიძლება განსხვავდებოდეს.": "General greenhouse guideline. May vary by variety.", "ჭკვიანი სათბური საქართველოსთვის": "A smart greenhouse for Georgia", "აირჩიეთ კულტურა აპლიკაციაში და სათბური თავად შეინარჩუნებს საჭირო ტემპერატურას, ტენიანობასა და მორწყვას.": "Choose a crop in the app and the greenhouse will keep the right temperature, humidity and watering on its own.", "როგორ მუშაობს": "How it works", "360° ხედი": "360° view", "ახლა სათბურში:": "In the greenhouse now:", "ვენტილაცია": "Ventilation", "სიცხეში სათბური თავად განიავდება": "In the heat, the greenhouse ventilates itself", "სისტემამ იცის, რა ტემპერატურა და ტენიანობა სჭირდება თქვენს კულტურას. სათბურის გადახურებისას ვენტილატორები თავად ჩაირთვება და ფანჯრები საჭირო ზომით გაიღება.": "The system knows the temperature and humidity your crop needs. When the greenhouse overheats, the fans switch on by themselves and the windows open as far as needed.", "ამინდის სადგური": "Weather station", "დამატებითი მოდული": "Add-on module", "ქარი ან წვიმა? ფანჯრები თავად დაიხურება": "Wind or rain? The windows close themselves", "ანემომეტრი ზომავს ქარის სიჩქარეს, წვიმის სენსორი კი ნალექს აფიქსირებს. ძლიერი ქარის ან წვიმის დროს სისტემა ფანჯრებს დახურავს და შეტყობინებას გამოგიგზავნის, რომ ქარმა აპკი არ დახიოს და მოსავალი არ დაზიანდეს.": "An anemometer measures wind speed and a rain sensor detects precipitation. In strong wind or rain the system closes the windows and sends you a notification, so the wind can't tear the film and the crop stays safe.", "ნიადაგი, მორწყვა და კვება": "Soil, irrigation and nutrition", "მცენარე წყალს მაშინ იღებს, როცა სჭირდება": "Plants get water exactly when they need it", "სენსორები მუდმივად ზომავენ ნიადაგის ტენიანობას. ნიადაგის გამოშრობისას ტუმბო ჩაირთვება, საკმარისი ტენიანობის მიღწევისას კი თავად გამოირთვება.": "Sensors constantly measure soil moisture. When the soil dries out, the pump switches on, and it turns itself off once the soil is moist enough.", "პროფესიონალებისთვის": "For professionals", "pH და EC სენსორები აჩვენებენ ნიადაგის მჟავიანობასა და სასუქის კონცენტრაციას, რომ ზუსტად იცოდეთ, როდის და რა დოზით სჭირდება მცენარეს მინერალები.": "pH and EC sensors show soil acidity and fertilizer concentration, so you know exactly when and how much nutrient your plants need.", "მჟავიანობა · მაგალითი": "Acidity · example", "სასუქის კონცენტრაცია · მაგალითი": "Fertilizer concentration · example", "ყინვა და განგაში": "Frost and alerts", "რამე თუ მოხდება, მაშინვე გაიგებთ": "If anything happens, you'll know right away", "თუ სათბური ძალიან აცივდება ან გადახურდება, სენსორი გაფუჭდება ან კავშირი გაწყდება, შეტყობინება მოგივათ აპლიკაციაში, SMS-ით და ზარით, ღამითაც.": "If the greenhouse gets too cold or too hot, a sensor fails or the connection drops, you'll get a notification in the app, by SMS and by phone call, even at night.", "განგაშის მაგალითები": "Alert examples", "სათბურში ძალიან ცივა": "It's very cold in the greenhouse", "2 °C · გათბობა ჩართულია": "2 °C · heating is on", "კავშირი გაწყდა": "Connection lost", "მოწყობილობა 10 წუთია არ პასუხობს": "The device hasn't responded for 10 minutes", "ტემპერატურა აღდგა": "Temperature back to normal", "8 °C · ყველაფერი რიგზეა": "8 °C · everything is fine", "მთელი სათბური თქვენს ტელეფონში": "Your whole greenhouse on your phone", "ადევნეთ თვალი ტემპერატურას, ტენიანობასა და ნიადაგის მდგომარეობას რეალურ დროში, სადაც არ უნდა იყოთ.": "Keep an eye on temperature, humidity and soil conditions in real time, wherever you are.", "კულტურის შაბლონები: მარწყვი, პომიდორი, კიტრი, წიწაკა, მწვანილი": "Crop templates: strawberry, tomato, cucumber, pepper, herbs", "ვენტილატორების, ფანჯრების, გათბობისა და განათების მართვა": "Control of fans, windows, heating and lighting", "ავტომატური ან ხელით მართვა ნებისმიერ ამინდში": "Automatic or manual control in any weather", "შეტყობინებები აპლიკაციაში, SMS-ით და ზარით": "Notifications in the app, by SMS and by phone call", "სცადეთ 360° ხედში": "Try it in 360° view", "ქართველი ფერმერებისთვის შექმნილი": "Made for Georgian farmers", "სათბურია ქართული კომპანიაა, რომელიც სათბურების ავტომატიზაციით არის დაკავებული. ვქმნით სისტემას, რომელიც სათბურის კლიმატს თავად აკონტროლებს, ფერმერს კი ყველაფერს ტელეფონიდან აჩვენებს.": "Satburia is a Georgian company focused on greenhouse automation. We build a system that controls the greenhouse climate on its own and shows the farmer everything on their phone.", "რატომ შევქმენით": "Why we built it", "ყოველ წელს ფერმერები მოსავლის ნაწილს კარგავენ გადახურების, ზედმეტი ტენიანობისა და მოულოდნელი ყინვის გამო. უცხოური სისტემები ძვირია და ქართულ სათბურებს ყოველთვის არ ერგება.": "Every year farmers lose part of their harvest to overheating, excess humidity and sudden frost. Foreign systems are expensive and don't always suit Georgian greenhouses.", "რას ვაკეთებთ": "What we do", "ვამონტაჟებთ სენსორებსა და მართვის ბლოკს, რომლებიც სათბურს ავტომატურად მართავს. სისტემა მუშაობს როგორც შუშის, ისე პარკის სათბურებში.": "We install sensors and a control unit that run the greenhouse automatically. The system works in both glass greenhouses and polytunnels.", "ჩვენი მიზანი": "Our goal", "მცირე და საშუალო ფერმერებს შევთავაზოთ ხელმისაწვდომი ტექნოლოგია, რომ სიცხემ, ყინვამ ან გვალვამ მოსავალი აღარ დააზიანოს, შრომა კი ნაკლები დასჭირდეს.": "To give small and medium-sized farmers affordable technology, so heat, frost or drought no longer damage the harvest and the work gets easier.", "შუშისა და პარკის სათბურებისთვის": "For glass greenhouses and polytunnels", "მუშაობს მობილური ინტერნეტით, Wi-Fi არ სჭირდება": "Works over mobile internet, no Wi-Fi needed", "ქართულენოვანი აპლიკაცია და მხარდაჭერა": "App and support in Georgian", "მონიტორინგი და შეტყობინებები დღე-ღამის განმავლობაში": "Round-the-clock monitoring and notifications", "გახადეთ თქვენი სათბური ჭკვიანი": "Make your greenhouse smart", "მონტაჟი": "Installation", "მოწყობილობა და სენსორები": "Device and sensors", "დამონტაჟება თქვენს სათბურში": "Installation in your greenhouse", "პირველადი გამართვა": "Initial setup", "მომსახურება": "Service", "SIM ბარათი და მობილური ინტერნეტი": "SIM card and mobile internet", "აპლიკაცია და მონაცემების შენახვა": "App and data storage", "დისტანციური დახმარება": "Remote support", "ვიზიტი და სათბურის შეფასება": "Site visit and greenhouse assessment", "მონტაჟი და გამართვა": "Installation and setup", "დღე-ღამის მონიტორინგი": "Round-the-clock monitoring", "© 2026 სათბურია · ჭკვიანი სათბურები საქართველოში": "© 2026 Satburia · Smart greenhouses in Georgia" };
+// remember every Georgian text node / label once, so the page can switch back and forth
+const i18nNodes = [], i18nAttrs = [];
+{
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: n => (n.parentElement.closest('script, style') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+  });
+  for (let n; (n = walker.nextNode());) {
+    const key = n.nodeValue.replace(/\s+/g, ' ').trim();
+    if (EN[key]) i18nNodes.push({ n, ka: n.nodeValue, en: n.nodeValue.replace(/\S[\s\S]*\S|\S/, EN[key]) });
+  }
+  document.querySelectorAll('[aria-label], [title]').forEach(el => ['aria-label', 'title'].forEach(a => {
+    const v = el.getAttribute(a); if (v && EN[v]) i18nAttrs.push({ el, a, ka: v, en: EN[v] });
+  }));
+}
+function applyStaticLang() {
+  for (const t of i18nNodes) t.n.nodeValue = lang === 'en' ? t.en : t.ka;
+  for (const t of i18nAttrs) t.el.setAttribute(t.a, lang === 'en' ? t.en : t.ka);
+  document.documentElement.lang = lang;
+  document.title = L('სათბურია', 'Satburia');
+  const b = document.getElementById('langBtn');
+  b.textContent = lang === 'en' ? 'ქა' : 'EN';
+  b.setAttribute('aria-label', lang === 'en' ? 'ქართულზე გადართვა' : 'Switch to English');
+}
+applyStaticLang();
 const isMobile = () => innerWidth < 860;
 
 /* ================= renderer ================= */
@@ -1359,8 +1415,8 @@ const KEYS = [
   K(V(-8, 6.2, 14.5), V(-0.5, 3.6, 3.5),  { vent: 0, fan: 0, rain: 1, wind: 1, cloud: 1, my: 0.2, mz: 2.45 }),          // weather station
   K(V(0.15, 1.55, 5.1), V(0, 0.8, -4), { vent: 0.5, fan: 0.4, my: 0.12 }),                       // soil (inside)
   K(V(-13, 4.5, 13),   V(0, 1.6, 0),   { night: 1, fan: 0, light: 1, lamp: 1, my: 0.255, mz: 2 }),                           // frost / alarms
-  K(V(5, 3.6, 13.5),   V(0, 1.7, 4),   { night: 0.1, vent: 0.3, fan: 0.4, shift: 0.3, my: 0.25, mz: 2.85 }),
-  K(V(-15, 6.5, 16),   V(0, 1.4, 0),   { vent: 0.2, fan: 0.3, my: 0.22, mz: 1.9 }),                  // about          // app
+  K(V(5, 3.6, 13.5),   V(0, 1.7, 4),   { night: 0.1, vent: 0.3, fan: 0.4, shift: 0.3, my: 0.25, mz: 2.85 }), // app
+  K(V(-15, 6.5, 16),   V(0, 1.4, 0),   { vent: 0.2, fan: 0.3, shift: 0.32, my: 0.22, mz: 1.9 }),   // about
   K(V(21, 11, 23),     V(0, 1.2, 0),   { vent: 0.2, fan: 0.3, shift: 0, my: 0 }),                 // contact
 ];
 const PARAMS = Object.keys(BASE);
@@ -1424,11 +1480,11 @@ const $ = id => document.getElementById(id);
 // lo/hi = critical limits that trigger an alarm (chilling / heat sterility, botrytis risk, drought / waterlogging)
 // day/night/rh/soil = ideal ranges shown to the farmer
 const TEMPLATES = {
-  strawberry: { name: 'მარწყვი',  t: 21, h: 65, s: 75, lo: { t: 6,  h: 50, s: 60 }, hi: { t: 30, h: 85, s: 90 }, day: '18–24', night: '8–12',  rh: '60–75', soil: '70–80', light: '12–14', ph: '5.5–6.5', ec: '1.0–1.5' },
-  tomato:     { name: 'პომიდორი', t: 24, h: 65, s: 75, lo: { t: 10, h: 50, s: 60 }, hi: { t: 32, h: 85, s: 90 }, day: '21–27', night: '16–18', rh: '60–70', soil: '70–80', light: '14–16', ph: '6.0–6.8', ec: '2.0–3.5' },
-  cucumber:   { name: 'კიტრი',    t: 26, h: 80, s: 85, lo: { t: 13, h: 60, s: 70 }, hi: { t: 35, h: 92, s: 95 }, day: '24–28', night: '18–20', rh: '70–85', soil: '80–90', light: '12–14', ph: '5.8–6.5', ec: '1.7–2.5' },
-  pepper:     { name: 'წიწაკა',   t: 25, h: 70, s: 75, lo: { t: 12, h: 50, s: 60 }, hi: { t: 32, h: 85, s: 90 }, day: '22–27', night: '16–18', rh: '60–75', soil: '70–80', light: '12–14', ph: '6.0–6.8', ec: '1.8–2.8' },
-  greens:     { name: 'მწვანილი', t: 18, h: 65, s: 70, lo: { t: 4,  h: 50, s: 55 }, hi: { t: 26, h: 85, s: 90 }, day: '15–20', night: '8–12',  rh: '60–70', soil: '65–75', light: '12–14', ph: '6.0–7.0', ec: '1.0–1.6' },
+  strawberry: { name: 'მარწყვი',  en: 'Strawberry',  t: 21, h: 65, s: 75, lo: { t: 6,  h: 50, s: 60 }, hi: { t: 30, h: 85, s: 90 }, day: '18–24', night: '8–12',  rh: '60–75', soil: '70–80', light: '12–14', ph: '5.5–6.5', ec: '1.0–1.5' },
+  tomato:     { name: 'პომიდორი', en: 'Tomato', t: 24, h: 65, s: 75, lo: { t: 10, h: 50, s: 60 }, hi: { t: 32, h: 85, s: 90 }, day: '21–27', night: '16–18', rh: '60–70', soil: '70–80', light: '14–16', ph: '6.0–6.8', ec: '2.0–3.5' },
+  cucumber:   { name: 'კიტრი',    en: 'Cucumber', t: 26, h: 80, s: 85, lo: { t: 13, h: 60, s: 70 }, hi: { t: 35, h: 92, s: 95 }, day: '24–28', night: '18–20', rh: '70–85', soil: '80–90', light: '12–14', ph: '5.8–6.5', ec: '1.7–2.5' },
+  pepper:     { name: 'წიწაკა',   en: 'Pepper', t: 25, h: 70, s: 75, lo: { t: 12, h: 50, s: 60 }, hi: { t: 32, h: 85, s: 90 }, day: '22–27', night: '16–18', rh: '60–75', soil: '70–80', light: '12–14', ph: '6.0–6.8', ec: '1.8–2.8' },
+  greens:     { name: 'მწვანილი', en: 'Herbs', t: 18, h: 65, s: 70, lo: { t: 4,  h: 50, s: 55 }, hi: { t: 26, h: 85, s: 90 }, day: '15–20', night: '8–12',  rh: '60–70', soil: '65–75', light: '12–14', ph: '6.0–7.0', ec: '1.0–1.6' },
 };
 const settings = { crop: 'tomato', t: 24, h: 65, s: 75 };
 const auto = { fan: 0, vent: 0, light: 0, lamp: 0, pump: false };
@@ -1442,13 +1498,13 @@ const bounds = key => {
 };
 function renderIdeal() {
   const tp = TEMPLATES[settings.crop];
-  $('ideal').innerHTML = `<b>იდეალური გარემო · ${tp.name}</b>` +
-    `<span>დღე ${tp.day} °C</span><span>ღამე ${tp.night} °C</span><span>ჰაერი ${tp.rh} %</span><span>ნიადაგი ${tp.soil} %</span>`;
+  $('ideal').innerHTML = `<b>${L('იდეალური გარემო', 'Ideal conditions')} · ${L(tp.name, tp.en)}</b>` +
+    `<span>${L('დღე', 'Day')} ${tp.day} °C</span><span>${L('ღამე', 'Night')} ${tp.night} °C</span><span>${L('ჰაერი', 'Air')} ${tp.rh} %</span><span>${L('ნიადაგი', 'Soil')} ${tp.soil} %</span>`;
 }
 let suppressUntil = 0;   // a freshly changed setting gets time to settle before alarms can fire
 
 function renderSettings() {
-  $('ghName').textContent = 'შაბლონი: ' + TEMPLATES[settings.crop].name;
+  $('ghName').textContent = L('შაბლონი: ', 'Template: ') + L(TEMPLATES[settings.crop].name, TEMPLATES[settings.crop].en);
   renderIdeal();
   document.querySelectorAll('.crop').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.crop === settings.crop)));
 }
@@ -1495,20 +1551,20 @@ function renderDevices() {
     if (key === 'light') {
       const isAuto = heatSet === null, val = isAuto ? settings.t : heatSet;
       if (isAuto || document.activeElement !== $('rgLight')) $('rgLight').value = val;
-      $('lvLight').textContent = val <= HEAT_OFF ? 'გამორთულია' : `${val} °C` + (level('light') > 0 ? ' · მუშაობს' : '');
+      $('lvLight').textContent = val <= HEAT_OFF ? L('გამორთულია', 'Off') : `${val} °C` + (level('light') > 0 ? L(' · მუშაობს', ' · on') : '');
       $('mdLight').setAttribute('aria-pressed', String(isAuto));
-      $('mdLight').textContent = isAuto ? 'ავტო' : 'ხელით';
+      $('mdLight').textContent = isAuto ? L('ავტო', 'Auto') : L('ხელით', 'Manual');
       continue;
     }
     const pct = Math.round(level(key) * 100), isAuto = manual[key] === null;
     if (isAuto || document.activeElement !== $('rg' + id)) $('rg' + id).value = pct;
     $('lv' + id).textContent = key === 'fan' ? `${pct} % · ${Math.round(level(key) * fanCount)}/${fanCount}` : pct + ' %';
     $('md' + id).setAttribute('aria-pressed', String(isAuto));
-    $('md' + id).textContent = isAuto ? 'ავტო' : 'ხელით';
+    $('md' + id).textContent = isAuto ? L('ავტო', 'Auto') : L('ხელით', 'Manual');
   }
   const anyManual = Object.values(manual).some(v => v !== null);
   $('allAuto').disabled = !anyManual;
-  $('mode').textContent = anyManual ? 'ხელით მართვა' : 'ავტომატური';
+  $('mode').textContent = anyManual ? L('ხელით მართვა', 'Manual control') : L('ავტომატური', 'Automatic');
 }
 
 // automatic mode: levels follow the crop's targets and the weather (proportional control, snapped to 5 %).
@@ -1595,16 +1651,16 @@ function renderEnv() {
   document.querySelectorAll('[data-time]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.time === env.time)));
   document.querySelectorAll('[data-weather]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.weather === env.weather)));
   $('windR').value = env.wind;
-  $('windO').textContent = env.wind + ' მ/წმ' + (env.wind > WIND_LIMIT ? ' · ძლიერი' : '');
-  $('outT').textContent = 'გარეთ ' + outsideT() + ' °C';
+  $('windO').textContent = env.wind + L(' მ/წმ', ' m/s') + (env.wind > WIND_LIMIT ? L(' · ძლიერი', ' · strong') : '');
+  $('outT').textContent = L('გარეთ ', 'Outside ') + outsideT() + ' °C';
 }
 const windowsNote = () => manual.vent > 0
-  ? 'ფანჯრები ხელით ღიაა ' + Math.round(manual.vent * 100) + ' %-ზე, გირჩევთ დახუროთ.'
-  : 'სახურავის ფანჯრები დაიხურა.';
+  ? L('ფანჯრები ხელით ღიაა ' + Math.round(manual.vent * 100) + ' %-ზე, გირჩევთ დახუროთ.', 'Windows are open manually at ' + Math.round(manual.vent * 100) + ' %; we recommend closing them.')
+  : L('სახურავის ფანჯრები დაიხურა.', 'The roof windows have closed.');
 function checkWind() {
   const windy = exploring && env.wind > WIND_LIMIT;
-  if (windy && !windAlarm) showAlarm('განგაში · ქარი', 'ქარი ' + env.wind + ' მ/წმ-ია (ზღვარი ' + WIND_LIMIT + ' მ/წმ). ' + windowsNote(), 'crit');
-  else if (!windy && windAlarm && exploring) showAlarm('ნორმა · ქარი', 'ქარი ჩადგა.', 'ok');
+  if (windy && !windAlarm) showAlarm(L('განგაში · ქარი', 'Alert · Wind'), L('ქარი ' + env.wind + ' მ/წმ-ია (ზღვარი ' + WIND_LIMIT + ' მ/წმ). ', 'Wind is ' + env.wind + ' m/s (limit ' + WIND_LIMIT + ' m/s). ') + windowsNote(), 'crit');
+  else if (!windy && windAlarm && exploring) showAlarm(L('ნორმა · ქარი', 'All clear · Wind'), L('ქარი ჩადგა.', 'The wind has died down.'), 'ok');
   windAlarm = windy;
 }
 document.querySelectorAll('[data-time]').forEach(b => b.addEventListener('click', () => { env.time = b.dataset.time; renderEnv(); computeAuto(); renderDevices(); }));
@@ -1681,21 +1737,21 @@ function renderPlantCard() {
   const isNight = exploring ? env.time === 'night' : cur.night > 0.5;
   const row = (label, ideal, unit, now, range) => {
     const nowCell = now === undefined ? '<span class="now"></span>'
-      : `<span class="now ${inRange(now, range) ? 'ok' : 'bad'}">ახლა ${now}${unit}</span>`;
+      : `<span class="now ${inRange(now, range) ? 'ok' : 'bad'}">${L('ახლა', 'now')} ${now}${unit}</span>`;
     return `<dt>${label}</dt><dd>${ideal}${unit}</dd>${nowCell}`;
   };
-  $('pcName').textContent = tp.name;
+  $('pcName').textContent = L(tp.name, tp.en);
   $('pcGrid').innerHTML =
-    row('დღის ტემპერატურა', tp.day, ' °C', isNight ? undefined : +temp.toFixed(1), tp.day) +
-    row('ღამის ტემპერატურა', tp.night, ' °C', isNight ? +temp.toFixed(1) : undefined, tp.night) +
-    row('ჰაერის ტენი', tp.rh, ' %', Math.round(hum), tp.rh) +
-    row('ნიადაგის ტენი', tp.soil, ' %', Math.round(soilV), tp.soil) +
+    row(L('დღის ტემპერატურა', 'Day temperature'), tp.day, ' °C', isNight ? undefined : +temp.toFixed(1), tp.day) +
+    row(L('ღამის ტემპერატურა', 'Night temperature'), tp.night, ' °C', isNight ? +temp.toFixed(1) : undefined, tp.night) +
+    row(L('ჰაერის ტენი', 'Air humidity'), tp.rh, ' %', Math.round(hum), tp.rh) +
+    row(L('ნიადაგის ტენი', 'Soil moisture'), tp.soil, ' %', Math.round(soilV), tp.soil) +
     '<span class="sep"></span>' +
-    row('სინათლე დღეში', tp.light, ' სთ') +
+    row(L('სინათლე დღეში', 'Light per day'), tp.light, L(' სთ', ' h')) +
     row('pH', tp.ph, '') +
-    row('EC (სასუქი)', tp.ec, ' mS/cm') +
+    row(L('EC (სასუქი)', 'EC (fertilizer)'), tp.ec, ' mS/cm') +
     '<span class="sep"></span>' +
-    `<dt>განგაში</dt><dd>&lt;${tp.lo.t} ან &gt;${tp.hi.t} °C</dd><span class="now"></span>`;
+    `<dt>${L('განგაში', 'Alert')}</dt><dd>&lt;${tp.lo.t} ${L('ან', 'or')} &gt;${tp.hi.t} °C</dd><span class="now"></span>`;
 }
 function closePlantCard() { $('pcard').hidden = true; plantMark.visible = false; }
 $('pcX').addEventListener('click', closePlantCard);
@@ -1718,6 +1774,14 @@ document.addEventListener('click', e => {
   card.style.top = Math.min(Hh - ch - 16, Math.max(76, e.clientY - ch / 2)) + 'px';
 });
 
+/* ================= language switch ================= */
+$('langBtn').addEventListener('click', () => {
+  lang = lang === 'en' ? 'ka' : 'en';
+  try { localStorage.setItem('satburia-lang', lang); } catch (e) {}
+  applyStaticLang();
+  renderSettings(); renderDevices(); renderEnv(); renderPlantCard();
+});
+
 /* ================= phone menu & scroll progress ================= */
 {
   const btn = $('menuBtn'), menu = $('mnav');
@@ -1736,18 +1800,18 @@ document.addEventListener('click', e => {
 
 /* ================= alarms, driven by the farmer's own settings ================= */
 const ALARMS = [
-  { id: 'tLow',  el: 'pT', title: 'ტემპერატურა', out: () => temp < bounds('t')[0],
-    msg: () => `სათბურში ${temp.toFixed(1)} °C-ია, დასაშვები ზღვარია ${bounds('t')[0]} °C. გათბობა ჩართულია.` },
-  { id: 'tHigh', el: 'pT', title: 'ტემპერატურა', out: () => temp > bounds('t')[1],
-    msg: () => `სათბურში ${temp.toFixed(1)} °C-ია, დასაშვები ზღვარია ${bounds('t')[1]} °C. ვენტილაცია ჩართულია.` },
-  { id: 'hHigh', el: 'pH', title: 'ტენიანობა', out: () => hum > bounds('h')[1],
-    msg: () => `ჰაერის ტენიანობა ${Math.round(hum)} %-ია, დასაშვები ზღვარია ${bounds('h')[1]} %. ფანჯრები გაიღო.` },
-  { id: 'hLow',  el: 'pH', title: 'ტენიანობა', out: () => hum < bounds('h')[0],
-    msg: () => `ჰაერი ძალიან მშრალია: ${Math.round(hum)} %, დასაშვები ზღვარია ${bounds('h')[0]} %.` },
-  { id: 'sDry',  el: 'pS', title: 'ნიადაგი', out: () => soilV < bounds('s')[0],
-    msg: () => `ნიადაგი გამოშრა: ${Math.round(soilV)} %, დასაშვები ზღვარია ${bounds('s')[0]} %. ტუმბო ჩართულია.` },
-  { id: 'sWet',  el: 'pS', title: 'ნიადაგი', out: () => soilV > bounds('s')[1],
-    msg: () => `ნიადაგი ზედმეტად სველია: ${Math.round(soilV)} %, დასაშვები ზღვარია ${bounds('s')[1]} %. შეამოწმეთ ტუმბო.` },
+  { id: 'tLow',  el: 'pT', title: () => L('ტემპერატურა', 'Temperature'), out: () => temp < bounds('t')[0],
+    msg: () => L(`სათბურში ${temp.toFixed(1)} °C-ია, დასაშვები ზღვარია ${bounds('t')[0]} °C. გათბობა ჩართულია.`, `The greenhouse is at ${temp.toFixed(1)} °C, the limit is ${bounds('t')[0]} °C. Heating is on.`) },
+  { id: 'tHigh', el: 'pT', title: () => L('ტემპერატურა', 'Temperature'), out: () => temp > bounds('t')[1],
+    msg: () => L(`სათბურში ${temp.toFixed(1)} °C-ია, დასაშვები ზღვარია ${bounds('t')[1]} °C. ვენტილაცია ჩართულია.`, `The greenhouse is at ${temp.toFixed(1)} °C, the limit is ${bounds('t')[1]} °C. Ventilation is on.`) },
+  { id: 'hHigh', el: 'pH', title: () => L('ტენიანობა', 'Humidity'), out: () => hum > bounds('h')[1],
+    msg: () => L(`ჰაერის ტენიანობა ${Math.round(hum)} %-ია, დასაშვები ზღვარია ${bounds('h')[1]} %. ფანჯრები გაიღო.`, `Air humidity is ${Math.round(hum)} %, the limit is ${bounds('h')[1]} %. The windows have opened.`) },
+  { id: 'hLow',  el: 'pH', title: () => L('ტენიანობა', 'Humidity'), out: () => hum < bounds('h')[0],
+    msg: () => L(`ჰაერი ძალიან მშრალია: ${Math.round(hum)} %, დასაშვები ზღვარია ${bounds('h')[0]} %.`, `The air is very dry: ${Math.round(hum)} %, the limit is ${bounds('h')[0]} %.`) },
+  { id: 'sDry',  el: 'pS', title: () => L('ნიადაგი', 'Soil'), out: () => soilV < bounds('s')[0],
+    msg: () => L(`ნიადაგი გამოშრა: ${Math.round(soilV)} %, დასაშვები ზღვარია ${bounds('s')[0]} %. ტუმბო ჩართულია.`, `The soil has dried out: ${Math.round(soilV)} %, the limit is ${bounds('s')[0]} %. The pump is on.`) },
+  { id: 'sWet',  el: 'pS', title: () => L('ნიადაგი', 'Soil'), out: () => soilV > bounds('s')[1],
+    msg: () => L(`ნიადაგი ზედმეტად სველია: ${Math.round(soilV)} %, დასაშვები ზღვარია ${bounds('s')[1]} %. შეამოწმეთ ტუმბო.`, `The soil is too wet: ${Math.round(soilV)} %, the limit is ${bounds('s')[1]} %. Check the pump.`) },
 ];
 const alarmState = Object.fromEntries(ALARMS.map(a => [a.id, { count: 0, active: false }]));
 let sensorFaultUntil = 0, sensorFaultActive = false;
@@ -1762,18 +1826,18 @@ function checkAlarms() {
     st.count = out ? st.count + 1 : 0;
     if (out && !st.active && st.count >= 3 && now > suppressUntil) {
       st.active = true;
-      showAlarm('განგაში · ' + a.title, a.msg() + ' SMS და ზარი გაიგზავნა.', 'crit');
+      showAlarm(L('განგაში · ', 'Alert · ') + a.title(), a.msg() + L(' SMS და ზარი გაიგზავნა.', ' SMS and call sent.'), 'crit');
     } else if (!out && st.active) {
       st.active = false;
-      showAlarm('ნორმა · ' + a.title, 'მაჩვენებელი ნორმას დაუბრუნდა.', 'ok');
+      showAlarm(L('ნორმა · ', 'All clear · ') + a.title(), L('მაჩვენებელი ნორმას დაუბრუნდა.', 'The reading is back to normal.'), 'ok');
     }
   }
   if (sensorFaultUntil > now && !sensorFaultActive) {
     sensorFaultActive = true;
-    showAlarm('განგაში · სენსორი', 'ჰაერის სენსორი არ პასუხობს. შეამოწმეთ სენსორი და კაბელი.', 'crit');
+    showAlarm(L('განგაში · სენსორი', 'Alert · Sensor'), L('ჰაერის სენსორი არ პასუხობს. შეამოწმეთ სენსორი და კაბელი.', 'The air sensor is not responding. Check the sensor and its cable.'), 'crit');
   } else if (sensorFaultUntil <= now && sensorFaultActive) {
     sensorFaultActive = false;
-    showAlarm('ნორმა · სენსორი', 'ჰაერის სენსორი ისევ მუშაობს.', 'ok');
+    showAlarm(L('ნორმა · სენსორი', 'All clear · Sensor'), L('ჰაერის სენსორი ისევ მუშაობს.', 'The air sensor is working again.'), 'ok');
   }
   for (const id in bad) $(id).parentElement.classList.toggle('bad', bad[id] || (id !== 'pS' && sensorFaultUntil > now));
 }
@@ -1803,9 +1867,9 @@ const INCIDENTS = [
   () => { sensorFaultUntil = Date.now() + 8000; },   // air sensor stops answering
   () => {                                            // storm reported by the weather station
     stormUntil = Date.now() + 12000;
-    showAlarm('განგაში · ამინდი', 'ძლიერი ქარი (17 მ/წმ, ზღვარია 12 მ/წმ) და წვიმა. ' + windowsNote(), 'crit');
+    showAlarm(L('განგაში · ამინდი', 'Alert · Weather'), L('ძლიერი ქარი (17 მ/წმ, ზღვარია 12 მ/წმ) და წვიმა. ', 'Strong wind (17 m/s, limit 12 m/s) and rain. ') + windowsNote(), 'crit');
     computeAuto(); renderDevices();
-    setTimeout(() => showAlarm('ნორმა · ამინდი', 'ქარი ჩადგა. სათბური ჩვეულ რეჟიმს დაუბრუნდა.', 'ok'), 12000);
+    setTimeout(() => showAlarm(L('ნორმა · ამინდი', 'All clear · Weather'), L('ქარი ჩადგა. სათბური ჩვეულ რეჟიმს დაუბრუნდა.', 'The wind has died down. The greenhouse is back to normal.'), 'ok'), 12000);
   },
 ];
 let incident = 0;
