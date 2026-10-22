@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="ka">
+<script>try { const t = localStorage.getItem('satburia-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -43,13 +44,20 @@
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
       --page: #0b110d; --bg: #101813; --surface: #18231b; --surface-2: #1e2b21; --ink: #e6efe7; --muted: #9aab9d;
       --line: #2a382d; --leaf: #74c283; --leaf-ink: #0d1a10; --leaf-soft: #20352a; --sun: #f0b25a;
       --ok: #6fd18e; --warn: #f0b25a; --crit: #ff7a6b; --band: rgba(116, 194, 131, .14);
       --sky-1: #102035; --sky-2: #1b2d38;
       color-scheme: dark;
     }
+  }
+  :root[data-theme="dark"] {
+      --page: #0b110d; --bg: #101813; --surface: #18231b; --surface-2: #1e2b21; --ink: #e6efe7; --muted: #9aab9d;
+      --line: #2a382d; --leaf: #74c283; --leaf-ink: #0d1a10; --leaf-soft: #20352a; --sun: #f0b25a;
+      --ok: #6fd18e; --warn: #f0b25a; --crit: #ff7a6b; --band: rgba(116, 194, 131, .14);
+      --sky-1: #102035; --sky-2: #1b2d38;
+      color-scheme: dark;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   [hidden] { display: none !important; }
@@ -222,6 +230,15 @@
   .radio { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); flex: none; display: grid; place-items: center; }
   .crop-opt[aria-checked="true"] .radio { border-color: var(--leaf); }
   .crop-opt[aria-checked="true"] .radio::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--leaf); }
+  .pick { appearance: none; -webkit-appearance: none; max-width: 60%; border: 1px solid var(--line); border-radius: 10px; padding: 8px 30px 8px 12px;
+    background: var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a9a8d' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 9px center / 14px;
+    color: var(--ink); font: 500 14px var(--sans); }
+  .crop-norm { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); }
+  .crop-norm div { background: var(--surface); padding: 10px 14px; }
+  .crop-norm span { display: block; font-size: 11.5px; color: var(--muted); }
+  .crop-norm b { font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .crop-norm p { grid-column: 1 / -1; margin: 0; background: var(--surface); padding: 10px 14px; font-size: 12.5px; color: var(--muted); }
+  .crop-emb { font-size: 26px; line-height: 1; }
   .group-h { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .04em; margin: 6px 4px -6px; }
 
   /* ---------- tab bar ---------- */
@@ -293,7 +310,7 @@
 
         <div class="card">
           <div class="crop-card">
-            <span class="crop-emb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="14" r="7" fill="#d6402b"/><path d="M12 7c-1-2-3-3-5-2 2 0 3 1 3 2-1-1-3-1-4 0 2 0 4 1 6 1 2 0 4-1 6-1-1-1-3-1-4 0 0-1 1-2 3-2-2-1-4 0-5 2Z" fill="#3f7d3a"/></svg></span>
+            <span class="crop-emb" aria-hidden="true" id="cropEmb">🍅</span>
             <div class="t"><b id="cropName">პომიდორი</b></div>
             <button class="link" type="button" data-go="settings">შეცვლა</button>
           </div>
@@ -384,7 +401,22 @@
         </div>
 
         <div class="group-h">კულტურა</div>
-        <div class="list" id="cropList" role="radiogroup" aria-label="კულტურა"></div>
+        <div class="list">
+          <label class="row"><div class="k"><b>რა მოგყავთ</b></div>
+            <select class="pick" id="cropSel" aria-label="კულტურა"></select></label>
+          <div class="crop-norm" id="cropNorm"></div>
+        </div>
+
+        <div class="group-h">იერსახე</div>
+        <div class="list">
+          <div class="row"><div class="k"><b>თემა</b></div>
+            <div class="seg" role="group" aria-label="თემა" id="themeSeg">
+              <button type="button" data-theme="auto">ავტო</button>
+              <button type="button" data-theme="light">ნათელი</button>
+              <button type="button" data-theme="dark">მუქი</button>
+            </div>
+          </div>
+        </div>
 
         <div class="group-h">განგაში მოვიდეს</div>
         <div class="list">
@@ -435,12 +467,37 @@
   syncFull(); full.addEventListener?.('change', syncFull);
 
   /* ---------------- demo data ---------------- */
+  // typical greenhouse targets per crop (extension guides): air °C by day / night, air RH %, soil moisture %, daylight hours
+  const CROP_GROUPS = ['ბოსტნეული', 'ბაღჩეული და კენკრა', 'მწვანილი და ფოთლოვანი', 'ყვავილები', 'სხვა'];
   const CROPS = {
-    tomato:     { name: 'პომიდორი', day: [21, 27], night: [16, 18], rh: [60, 70], soil: [70, 80], light: '14–16 სთ' },
-    strawberry: { name: 'მარწყვი',  day: [18, 24], night: [8, 12],  rh: [60, 75], soil: [70, 80], light: '12–14 სთ' },
-    cucumber:   { name: 'კიტრი',    day: [24, 28], night: [18, 20], rh: [70, 85], soil: [80, 90], light: '12–14 სთ' },
-    pepper:     { name: 'წიწაკა',   day: [22, 27], night: [16, 18], rh: [60, 75], soil: [70, 80], light: '12–14 სთ' },
-    greens:     { name: 'მწვანილი', day: [15, 20], night: [8, 12],  rh: [60, 70], soil: [65, 75], light: '12–14 სთ' },
+    tomato:     { g: 0, ico: '🍅', name: 'პომიდორი',          day: [21, 27], night: [16, 18], rh: [60, 75], soil: [70, 80], light: '14–16', note: '30 °C-ზე მაღლა და ღამით 21 °C-ზე მაღლა ყვავილი ცვივა' },
+    cherry:     { g: 0, ico: '🍅', name: 'ჩერი პომიდორი',     day: [21, 26], night: [16, 18], rh: [60, 75], soil: [70, 80], light: '14–16', note: 'ნაყოფი მეტ სინათლეს ითხოვს, ვიდრე ჩვეულებრივი პომიდორი' },
+    cucumber:   { g: 0, ico: '🥒', name: 'კიტრი',             day: [24, 28], night: [18, 20], rh: [70, 85], soil: [80, 90], light: '12–14', note: 'უყვარს სითბო და ტენი; 15 °C-ზე ქვემოთ ზრდა ჩერდება' },
+    pepper:     { g: 0, ico: '🫑', name: 'ბულგარული წიწაკა',  day: [22, 27], night: [16, 18], rh: [60, 75], soil: [70, 80], light: '12–14', note: 'ღამით 21 °C-ზე მაღლა ყვავილი ცვივა' },
+    chili:      { g: 0, ico: '🌶️', name: 'ცხარე წიწაკა',      day: [24, 30], night: [18, 20], rh: [55, 70], soil: [65, 75], light: '12–14', note: 'უფრო მშრალი და თბილი ჰავა უხდება' },
+    eggplant:   { g: 0, ico: '🍆', name: 'ბადრიჯანი',         day: [24, 29], night: [18, 20], rh: [60, 70], soil: [70, 80], light: '12–14', note: 'ყველაზე სითბოს მოყვარული; 16 °C-ზე ქვემოთ არ ისხამს' },
+    zucchini:   { g: 0, ico: '🥒', name: 'ყაბაყი',            day: [20, 25], night: [15, 18], rh: [60, 75], soil: [70, 80], light: '12–14', note: 'მაღალ ტენზე ნაცროვანი ჩნდება — ანიავეთ' },
+    beans:      { g: 0, ico: '🫛', name: 'მწვანე ლობიო',       day: [20, 26], night: [15, 18], rh: [60, 70], soil: [70, 80], light: '12–14', note: '30 °C-ზე მაღლა ყვავილი ცვივა' },
+    radish:     { g: 0, ico: '🌱', name: 'ბოლოკი',            day: [15, 20], night: [8, 12],  rh: [60, 70], soil: [70, 80], light: '10–12', note: 'სითბოში და გრძელ დღეზე ისრად ადის' },
+    strawberry: { g: 1, ico: '🍓', name: 'მარწყვი',           day: [18, 24], night: [8, 12],  rh: [60, 75], soil: [70, 80], light: '12–14', note: 'ყვავილობისას ტენი 80 %-ზე ქვემოთ — ნაცრისფერი სიდამპლე' },
+    melon:      { g: 1, ico: '🍈', name: 'ნესვი',             day: [25, 30], night: [18, 20], rh: [50, 65], soil: [65, 75], light: '12–14', note: 'მწიფობისას მორწყვა შეამცირეთ — ტკბილი იქნება' },
+    watermelon: { g: 1, ico: '🍉', name: 'საზამთრო',          day: [25, 30], night: [18, 20], rh: [50, 65], soil: [65, 75], light: '12–14', note: 'მშრალი ჰაერი და ბევრი მზე' },
+    lettuce:    { g: 2, ico: '🥬', name: 'სალათი',            day: [16, 21], night: [10, 13], rh: [60, 70], soil: [70, 80], light: '12–14', note: '24 °C-ზე მაღლა ისრად ადის და მწარდება' },
+    spinach:    { g: 2, ico: '🥬', name: 'ისპანახი',          day: [15, 20], night: [8, 12],  rh: [60, 70], soil: [70, 80], light: '10–12', note: 'გრილი ჰავა; სითბოში სწრაფად ყვავილობს' },
+    parsley:    { g: 2, ico: '🌿', name: 'ოხრახუში',          day: [16, 22], night: [10, 14], rh: [60, 70], soil: [65, 75], light: '12–14', note: 'სიცივეს უძლებს, ზრდა ნელდება' },
+    dill:       { g: 2, ico: '🌿', name: 'კამა',              day: [16, 22], night: [10, 14], rh: [55, 70], soil: [65, 75], light: '12–14', note: 'სიცხეში ისრად ადის' },
+    cilantro:   { g: 2, ico: '🌿', name: 'ქინძი',             day: [17, 22], night: [10, 14], rh: [55, 70], soil: [65, 75], light: '12–14', note: '25 °C-ზე მაღლა სწრაფად ყვავილობს' },
+    basil:      { g: 2, ico: '🌿', name: 'რეჰანი',            day: [22, 28], night: [16, 20], rh: [50, 65], soil: [60, 70], light: '14–16', note: '13 °C-ზე ქვემოთ ფოთოლი შავდება' },
+    tarragon:   { g: 2, ico: '🌿', name: 'ტარხუნა',           day: [18, 24], night: [10, 14], rh: [50, 65], soil: [60, 70], light: '12–14', note: 'ჭარბ მორწყვას ვერ იტანს' },
+    mint:       { g: 2, ico: '🌿', name: 'პიტნა',             day: [18, 24], night: [12, 16], rh: [60, 70], soil: [70, 80], light: '12–14', note: 'ტენის მოყვარული' },
+    onion:      { g: 2, ico: '🧅', name: 'მწვანე ხახვი',       day: [18, 22], night: [10, 14], rh: [60, 70], soil: [70, 80], light: '12–14', note: 'მაღალ ტენზე ჭრაქი ჩნდება' },
+    rose:       { g: 3, ico: '🌹', name: 'ვარდი',             day: [20, 25], night: [15, 17], rh: [60, 75], soil: [65, 75], light: '12–14', note: 'ზამთარში 16–22 °C საკმარისია უწყვეტი ყვავილობისთვის' },
+    gerbera:    { g: 3, ico: '🌼', name: 'ჟერბერა',           day: [22, 25], night: [12, 16], rh: [65, 75], soil: [65, 75], light: '12–14', note: 'ფესვი ჭარბ წყალს ვერ იტანს' },
+    carnation:  { g: 3, ico: '🌸', name: 'მიხაკი',            day: [18, 22], night: [10, 13], rh: [60, 75], soil: [60, 70], light: '12–14', note: 'სიგრილე უხდება — ღერო მაგარი იქნება' },
+    chrysanth:  { g: 3, ico: '🌼', name: 'ქრიზანთემა',        day: [16, 22], night: [12, 16], rh: [60, 70], soil: [65, 75], light: '10–13', note: 'მოკლე დღეზე ყვავილობს' },
+    tulip:      { g: 3, ico: '🌷', name: 'ტიტა (გამოხდა)',     day: [16, 20], night: [10, 14], rh: [70, 80], soil: [70, 80], light: '10–12', note: 'სიცხეში ყვავილი პატარა და მოკლე ღეროიანია' },
+    seedlings:  { g: 4, ico: '🌱', name: 'ჩითილი',            day: [20, 24], night: [16, 18], rh: [65, 80], soil: [75, 85], light: '14–16', note: 'გადარგვამდე 1 კვირით ადრე სიგრილეს აჩვიეთ' },
+    citrus:     { g: 4, ico: '🍋', name: 'ციტრუსი (ლიმონი)',   day: [18, 26], night: [10, 15], rh: [60, 70], soil: [60, 70], light: '12–14', note: '−3 °C-ზე იყინება — ყინვაზე გათბობა აუცილებელია' },
   };
   const GH = [
     { name: 'სათბური №1', place: 'მარნეული', crop: 'tomato', type: 'glass' },
@@ -542,7 +599,7 @@
     spark($('spO'), DATA.o.slice(-12), getComputedStyle(document.documentElement).getPropertyValue('--muted').trim());
     chart($('homeChart'), T, { band: tempBand, labels: hourLabels });
     $('homeChips').innerHTML = Object.keys(DEV).map(k => `<button class="chip ${isOn(k) ? 'on' : ''}" type="button" data-go="control">${ICON[k]}<div><b>${k === 'vent' ? ventName() : DEV[k].name}</b><span>${devSummary(k)}</span></div></button>`).join('');
-    $('cropName').textContent = cr.name;
+    $('cropName').textContent = cr.name; $('cropEmb').textContent = cr.ico;
   }
 
   /* ---------------- control ---------------- */
@@ -651,14 +708,24 @@
 
   /* ---------------- settings ---------------- */
   function renderSettings() {
-    $('cropList').innerHTML = Object.entries(CROPS).map(([k, c]) => `<button class="row crop-opt" type="button" role="radio" aria-checked="${k === state.crop}" data-crop="${k}"><span class="radio"></span><span class="k"><b>${c.name}</b><span>დღე ${c.day[0]}–${c.day[1]} °C · ღამე ${c.night[0]}–${c.night[1]} °C · ტენი ${c.rh[0]}–${c.rh[1]} %</span></span></button>`).join('');
+    $('cropSel').innerHTML = CROP_GROUPS.map((g, i) => `<optgroup label="${g}">${Object.entries(CROPS).filter(([, c]) => c.g === i).map(([k, c]) => `<option value="${k}">${c.ico} ${c.name}</option>`).join('')}</optgroup>`).join('');
+    $('cropSel').value = state.crop;
+    const c = crop();
+    $('cropNorm').innerHTML = `<div><span>დღე</span><b>${c.day[0]}–${c.day[1]} °C</b></div><div><span>ღამე</span><b>${c.night[0]}–${c.night[1]} °C</b></div>`
+      + `<div><span>ჰაერის ტენი</span><b>${c.rh[0]}–${c.rh[1]} %</b></div><div><span>ნიადაგის ტენი</span><b>${c.soil[0]}–${c.soil[1]} %</b></div>`
+      + `<div style="grid-column:1/-1"><span>სინათლე დღეში</span><b>${c.light} სთ</b></div><p>${c.note}</p>`;
+    $('themeSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === (document.documentElement.dataset.theme || 'auto'))));
     $('typeSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.type === state.type)));
     $('setName').textContent = GH[state.gh].name; $('setPlace').textContent = GH[state.gh].place;
   }
-  $('cropList').addEventListener('click', e => {
-    const b = e.target.closest('[data-crop]'); if (!b) return;
-    state.crop = b.dataset.crop; GH[state.gh].crop = state.crop; DATA = series(crop()); autoLevels(); renderAll();
+  $('cropSel').addEventListener('change', e => {
+    state.crop = e.target.value; GH[state.gh].crop = state.crop; DATA = series(crop()); autoLevels(); renderAll();
     toast(`შაბლონი: ${crop().name} · პარამეტრები ავტომატურად დაყენდა`);
+  });
+  seg('themeSeg', 'theme', v => {
+    if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v;
+    try { localStorage.setItem('satburia-theme', v); } catch (e) {}
+    renderAll();
   });
   seg('typeSeg', 'type', v => { state.type = v; GH[state.gh].type = v; renderAll(); });
   document.querySelectorAll('.switch').forEach(s => s.addEventListener('click', () => s.setAttribute('aria-checked', String(s.getAttribute('aria-checked') !== 'true'))));

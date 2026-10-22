@@ -8,7 +8,8 @@ const box = document.getElementById('hero3d');
 const canvas = document.getElementById('gh3d');
 const home = document.getElementById('s-control');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const dark = matchMedia('(prefers-color-scheme: dark)');
+const sysDark = matchMedia('(prefers-color-scheme: dark)');
+const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : sysDark.matches; };
 
 /* ---------------- renderer, camera, light ---------------- */
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
@@ -189,7 +190,16 @@ const BEDS = [-1.35, 1.35];
   ctrl.position.set(1.45, 1.35, HL + 0.1); scene.add(ctrl);
 }
 const plants = new THREE.Group(); plants.position.y = 0.34; scene.add(plants);
-const SHAPE = { tomato: [1, '#d6402b'], cucumber: [1.25, '#3c6e2a'], pepper: [0.7, '#e8a21f'], strawberry: [0.25, '#d8262f'], greens: [0.2, null] };
+// [plant height, fruit/flower colour or null for leaf crops]
+const SHAPE = {
+  tomato: [1, '#d6402b'], cherry: [1, '#e2452c'], cucumber: [1.25, '#3c6e2a'], pepper: [0.7, '#e8a21f'], chili: [0.6, '#c81e1e'],
+  eggplant: [0.75, '#4b2a5c'], zucchini: [0.45, '#4f7f2e'], beans: [1.1, '#6aa33a'], radish: [0.15, null],
+  strawberry: [0.25, '#d8262f'], melon: [0.3, '#d9c46a'], watermelon: [0.3, '#2f5d2a'],
+  lettuce: [0.2, null], spinach: [0.2, null], parsley: [0.25, null], dill: [0.35, null], cilantro: [0.3, null], basil: [0.35, null],
+  tarragon: [0.45, null], mint: [0.3, null], onion: [0.3, null],
+  rose: [0.8, '#c8243c'], gerbera: [0.4, '#f08a24'], carnation: [0.6, '#e86a9a'], chrysanth: [0.6, '#f2d23c'], tulip: [0.35, '#e0303a'],
+  seedlings: [0.12, null], citrus: [1.1, '#f2d23c'],
+};
 function buildPlants(crop) {
   plants.clear();
   const [hgt, fruitCol] = SHAPE[crop] || SHAPE.tomato;
@@ -213,7 +223,7 @@ function buildPlants(crop) {
     }
     for (let j = 0; j < 2; j++) {
       const s = fruitCol ? 0.05 : 0, a = rnd() * 6.28, y = hgt > 0.4 ? 0.2 + rnd() * h * 0.6 : 0.03;
-      fruit.setMatrixAt(fi++, m.compose(new THREE.Vector3(rx + Math.cos(a) * 0.15, y, z + Math.sin(a) * 0.15), q.identity(), new THREE.Vector3(s, s * (crop === 'cucumber' ? 3 : 1), s)));
+      fruit.setMatrixAt(fi++, m.compose(new THREE.Vector3(rx + Math.cos(a) * 0.15, y, z + Math.sin(a) * 0.15), q.identity(), new THREE.Vector3(s, s * (crop === 'cucumber' || crop === 'zucchini' ? 3 : 1), s)));
     }
   }
   leaves.castShadow = stems.castShadow = true;
@@ -266,7 +276,7 @@ function frame(now) {
   lampMat.emissive.copy(lc); lampMat.emissiveIntensity = cur.lamp * 3;
   dripMat.emissiveIntensity = DEV.water.val ? 0.6 + Math.sin(now / 200) * 0.4 : 0;
 
-  const night = dark.matches;
+  const night = isDark();
   hemi.intensity = night ? 0.95 : 1.4;
   sun.intensity = night ? 0.9 : 2.4;
   if (Math.abs(cur.vent - lastVent) > 0.004) { renderer.shadowMap.needsUpdate = true; lastVent = cur.vent; }
