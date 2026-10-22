@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 const APP = window.APP;
 const box = document.getElementById('hero3d');
 const canvas = document.getElementById('gh3d');
-const home = document.getElementById('s-home');
+const home = document.getElementById('s-control');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const dark = matchMedia('(prefers-color-scheme: dark)');
 

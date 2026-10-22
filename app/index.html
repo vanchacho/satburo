@@ -138,12 +138,12 @@
 
   /* device chips on home */
   .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .chip { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: var(--surface-2); border: 0; text-align: left; min-width: 0; }
+  .chip { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border: 0; text-align: left; min-width: 0; }
   .chip svg { width: 22px; height: 22px; flex: none; color: var(--muted); }
   .chip.on svg { color: var(--leaf); }
-  .chip b { display: block; font-size: 13px; font-weight: 500; }
+  .chip b { display: block; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .chip span { display: block; font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .chip div { min-width: 0; }
+  .chip div { min-width: 0; max-width: 100%; }
 
   .crop-card { display: flex; align-items: center; gap: 12px; }
   .crop-emb { width: 46px; height: 46px; border-radius: 12px; background: var(--leaf-soft); display: grid; place-items: center; flex: none; }
@@ -274,11 +274,6 @@
     <main id="main">
       <!-- ================= HOME ================= -->
       <section class="screen" id="s-home" aria-label="მთავარი">
-        <div class="hero3d" id="hero3d">
-          <canvas id="gh3d" aria-label="სათბურის 3D ხედი"></canvas>
-          <span class="pill"><i></i>ყველაფერი რიგზეა</span>
-        </div>
-
         <div class="tiles">
           <div class="tile"><div class="lbl">ჰაერი <i class="dot"></i></div><div class="val" id="vT">23.4<small>°C</small></div><svg class="spark" id="spT" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
           <div class="tile"><div class="lbl">ტენიანობა <i class="dot"></i></div><div class="val" id="vH">64<small>%</small></div><svg class="spark" id="spH" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
@@ -317,6 +312,10 @@
       <!-- ================= CONTROL ================= -->
       <section class="screen" id="s-control" aria-label="მართვა" hidden>
         <h1>მართვა</h1>
+        <div class="hero3d" id="hero3d">
+          <canvas id="gh3d" aria-label="სათბურის 3D ხედი"></canvas>
+          <span class="pill"><i></i>ყველაფერი რიგზეა</span>
+        </div>
         <div class="card mode-bar">
           <div><b id="modeTitle">ავტომატური რეჟიმი</b></div>
           <button class="btn soft" id="allAuto" type="button" disabled>ყველა ავტოზე</button>
@@ -666,9 +665,10 @@
   $('supportBtn').addEventListener('click', () => toast('მხარდაჭერის ნომერი აქ გამოჩნდება'));
 
   /* ---------------- header / switching greenhouses ---------------- */
+  const LOGO = document.querySelector('.gh-ico').innerHTML;
   function renderHeader() { const g = GH[state.gh]; $('ghName').textContent = g.name; $('ghSub').textContent = `${g.place} · ${crop().name}`; }
   $('ghBtn').addEventListener('click', () => {
-    $('overlay').innerHTML = `<div class="scrim" data-close></div><div class="sheet" role="dialog" aria-label="სათბურის არჩევა"><span class="grab"></span><h2>ჩემი სათბურები</h2>${GH.map((g, i) => `<button class="gh-opt" type="button" role="radio" aria-checked="${i === state.gh}" data-gh="${i}"><span class="gh-ico">${ICON.vent.replace('currentColor', '#f4f8ef')}</span><span><b>${g.name}</b><span>${g.place} · ${CROPS[g.crop].name} · ${g.type === 'film' ? 'პარკის' : 'შუშის'}</span></span></button>`).join('')}<button class="btn soft" type="button" data-close>დახურვა</button></div>`;
+    $('overlay').innerHTML = `<div class="scrim" data-close></div><div class="sheet" role="dialog" aria-label="სათბურის არჩევა"><span class="grab"></span><h2>ჩემი სათბურები</h2>${GH.map((g, i) => `<button class="gh-opt" type="button" role="radio" aria-checked="${i === state.gh}" data-gh="${i}"><span class="gh-ico">${LOGO}</span><span><b>${g.name}</b><span>${g.place} · ${CROPS[g.crop].name} · ${g.type === 'film' ? 'პარკის' : 'შუშის'}</span></span></button>`).join('')}<button class="btn soft" type="button" data-close>დახურვა</button></div>`;
   });
   $('overlay').addEventListener('click', e => {
     const g = e.target.closest('[data-gh]');
