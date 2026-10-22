@@ -17,230 +17,177 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;700&family=Noto+Serif+Georgian:wght@700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;700&family=Noto+Serif+Georgian:wght@800&display=swap">
 <style>
-  /* Layout: a phone app (header, scrolling screen, bottom tab bar); on a desktop it sits in a phone frame for preview. */
+  /* Layout: phone app (slim header, scrolling screen, 4-tab bar). Home = a live drawing of the greenhouse + three readings + device buttons. */
   :root {
-    --page: #e7ede3;        /* desktop backdrop around the phone */
-    --bg: #f4f7f1;          /* app background */
-    --surface: #ffffff;
-    --surface-2: #eef3ea;
-    --ink: #15231a;
-    --muted: #5f6f63;
-    --line: #dde5d8;
-    --leaf: #2f6b3a;        /* brand green */
-    --leaf-ink: #f4f8ef;
-    --leaf-soft: #e1eedc;
-    --sun: #d98f26;
-    --ok: #2f8a4c;
-    --warn: #c6851a;
-    --crit: #c0392b;
-    --band: rgba(47, 107, 58, .12);   /* ideal range band in charts */
+    --page: #e7ede3; --bg: #f4f7f1; --surface: #ffffff; --surface-2: #eef3ea;
+    --ink: #15231a; --muted: #67776b; --line: #dde5d8;
+    --leaf: #2f6b3a; --leaf-ink: #f4f8ef; --leaf-soft: #e1eedc;
+    --sun: #e08b1e; --ok: #2f8a4c; --warn: #c6851a; --crit: #c0392b;
+    --band: rgba(47, 107, 58, .12);
+    /* drawing */
+    --sky-1: #cfe6f2; --sky-2: #eef6ec; --hill: #b9d5a4; --ground: #8fb46a; --soil: #6b4a32;
+    --frame: #9aa7a0; --glass: rgba(220, 240, 235, .45); --plant: #3f8a3c; --plant-2: #5fa646;
     --serif: "Noto Serif Georgian", "Sylfaen", Georgia, serif;
     --sans: "Noto Sans Georgian", "Sylfaen", system-ui, sans-serif;
-    --r: 14px;
+    --r: 16px;
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --page: #0b110d; --bg: #101813; --surface: #18231b; --surface-2: #1e2b21; --ink: #e6efe7; --muted: #9aab9d;
-      --line: #2a382d; --leaf: #74c283; --leaf-ink: #0d1a10; --leaf-soft: #20352a; --sun: #f0b25a;
+      --line: #2a382d; --leaf: #74c283; --leaf-ink: #0d1a10; --leaf-soft: #20352a; --sun: #f0a94a;
       --ok: #6fd18e; --warn: #f0b25a; --crit: #ff7a6b; --band: rgba(116, 194, 131, .14);
+      --sky-1: #12233a; --sky-2: #1c2f3c; --hill: #22382a; --ground: #2b4527; --soil: #4a3426;
+      --frame: #7d8a84; --glass: rgba(170, 210, 200, .14); --plant: #3c7a3a; --plant-2: #4f9441;
       color-scheme: dark;
     }
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   [hidden] { display: none !important; }
   html, body { height: 100%; margin: 0; }
-  body { background: var(--page); color: var(--ink); font: 400 15px/1.45 var(--sans); -webkit-font-smoothing: antialiased; }
+  body { background: var(--page); color: var(--ink); font: 400 15px/1.4 var(--sans); -webkit-font-smoothing: antialiased; }
   button, input { font: inherit; color: inherit; }
   button { cursor: pointer; }
   :focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
 
-  /* ---------- device ---------- */
-  .stage { height: 100%; display: grid; place-items: center; gap: 14px; padding-block: 24px; }
+  /* ---------- device (phone frame only for desktop preview) ---------- */
+  .stage { height: 100%; display: grid; place-items: center; padding-block: 24px; }
   .device {
-    width: 375px; height: min(812px, calc(100vh - 80px)); position: relative; overflow: hidden;
-    background: var(--bg); border-radius: 46px; border: 10px solid #121a15;
-    box-shadow: 0 30px 80px rgba(10, 30, 15, .28);
+    width: 375px; height: min(812px, calc(100vh - 48px)); position: relative; overflow: hidden;
+    background: var(--bg); border-radius: 46px; border: 10px solid #121a15; box-shadow: 0 30px 80px rgba(10, 30, 15, .28);
     display: grid; grid-template-rows: auto 1fr auto;
   }
-  .caption { font-size: 12px; color: var(--muted); text-align: center; }
-  /* on a real phone (or installed) the app fills the screen */
   @media (max-width: 520px), (display-mode: standalone) {
     body { background: var(--bg); }
     .stage { display: block; padding: 0; }
     .device { width: 100%; height: 100%; border: 0; border-radius: 0; box-shadow: none; }
-    .caption { display: none; }
   }
 
   /* ---------- header ---------- */
   .top {
-    padding: calc(env(safe-area-inset-top, 0px) + 10px) max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px));
-    background: var(--surface); border-bottom: 1px solid var(--line);
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px));
     display: flex; align-items: center; gap: 10px;
   }
-  .device:not(.full) .top { padding-top: 34px; }   /* room for the frame's notch */
-  .gh-btn { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 4px 0; text-align: left; }
-  .gh-ico { width: 38px; height: 38px; border-radius: 11px; background: var(--leaf); display: grid; place-items: center; flex: none; }
-  .gh-ico svg { width: 22px; height: 22px; }
-  .gh-txt { min-width: 0; }
-  .gh-txt b { display: flex; align-items: center; gap: 4px; font-size: 16px; }
-  .gh-txt span { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .online { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ok); font-weight: 500; }
-  .online i { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 25%, transparent); }
-  .icon-btn { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); display: grid; place-items: center; position: relative; }
-  .icon-btn svg { width: 20px; height: 20px; }
-  .badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--crit); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+  .device:not(.full) .top { padding-top: 32px; }
+  .gh-btn { display: flex; align-items: center; gap: 6px; background: none; border: 0; padding: 6px 0; font: 800 22px/1.1 var(--serif); }
+  .gh-btn svg { width: 18px; height: 18px; color: var(--muted); }
+  .live { margin-left: auto; width: 10px; height: 10px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 22%, transparent); }
 
   /* ---------- screens ---------- */
   main { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
-  .screen { padding: 16px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 14px; }
-  .screen h1 { margin: 2px 0 0; font: 800 24px/1.2 var(--serif); }
-  .sub { margin: -8px 0 0; font-size: 13px; color: var(--muted); }
+  .screen { padding: 4px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 14px; }
+  .screen h1 { margin: 6px 0 0; font: 800 24px/1.2 var(--serif); }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; }
-  .card-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-  .card-h b { font-size: 15px; }
-  .card-h span, .link { font-size: 12px; color: var(--muted); }
-  .link { color: var(--leaf); font-weight: 500; background: none; border: 0; padding: 0; }
 
-  /* status banner */
-  .status { display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: var(--r); background: var(--leaf); color: var(--leaf-ink); }
-  .status svg { width: 30px; height: 30px; flex: none; }
-  .status b { display: block; font-size: 16px; }
-  .status span { font-size: 12.5px; opacity: .85; }
+  /* the greenhouse drawing */
+  .scene { position: relative; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); }
+  .scene svg { display: block; width: 100%; height: auto; }
+  .pill { position: absolute; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: 999px;
+    background: color-mix(in srgb, var(--surface) 88%, transparent); font-size: 13px; font-weight: 500; }
+  .pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+  .pill.alarm i { background: var(--crit); }
+  .hot { cursor: pointer; }
+  .blades { transform-box: fill-box; transform-origin: center; animation: spin var(--spd, 0s) linear infinite; }
+  .blades.off { animation: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .drop { animation: fall 1s linear infinite; }
+  @keyframes fall { from { transform: translateY(-4px); opacity: 0; } 30% { opacity: 1; } to { transform: translateY(14px); opacity: 0; } }
+  .wave { animation: rise 2.4s ease-in-out infinite; }
+  @keyframes rise { from { transform: translateY(6px); opacity: 0; } 40% { opacity: .9; } to { transform: translateY(-16px); opacity: 0; } }
+  .air { animation: out 1.6s ease-out infinite; }
+  @keyframes out { from { transform: translateY(0); opacity: 0; } 30% { opacity: .9; } to { transform: translateY(-12px); opacity: 0; } }
+  .vent-g, .roll { transition: transform .6s ease; }
 
-  /* readings */
-  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; display: grid; gap: 2px; min-width: 0; }
-  .tile .lbl { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--muted); }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
-  .dot.warn { background: var(--warn); } .dot.crit { background: var(--crit); }
-  .tile .val { font: 700 26px/1.1 var(--sans); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
-  .tile .val small { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 2px; }
-  .tile .ideal { font-size: 11.5px; color: var(--muted); }
-  .spark { width: 100%; height: 26px; margin-top: 4px; }
+  /* three readings */
+  .reads { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .read { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 10px; display: grid; justify-items: center; gap: 2px; text-align: center; }
+  .read svg { width: 22px; height: 22px; color: var(--muted); }
+  .read b { font-size: 24px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .read b small { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .read span { font-size: 12px; color: var(--muted); }
+  .read.bad b { color: var(--crit); }
 
-  /* chart */
-  .chart { width: 100%; height: auto; display: block; }
-  .chart text { fill: var(--muted); font: 10px var(--sans); font-variant-numeric: tabular-nums; }
-  .legend { display: flex; gap: 14px; font-size: 11.5px; color: var(--muted); margin-top: 6px; flex-wrap: wrap; }
-  .legend i { display: inline-block; width: 14px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: 0; }
-
-  /* device chips on home */
-  .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .chip { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: var(--surface-2); border: 0; text-align: left; min-width: 0; }
-  .chip svg { width: 22px; height: 22px; flex: none; color: var(--muted); }
-  .chip.on svg { color: var(--leaf); }
-  .chip b { display: block; font-size: 13px; font-weight: 500; }
-  .chip span { display: block; font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .chip div { min-width: 0; }
-
-  .crop-card { display: flex; align-items: center; gap: 12px; }
-  .crop-emb { width: 46px; height: 46px; border-radius: 12px; background: var(--leaf-soft); display: grid; place-items: center; flex: none; }
-  .crop-emb svg { width: 26px; height: 26px; }
-  .crop-card .t { flex: 1; min-width: 0; }
-  .crop-card b { display: block; font-size: 15px; }
-  .crop-card span { font-size: 12px; color: var(--muted); }
-  .kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; margin-top: 10px; }
-  .kv dt { color: var(--muted); } .kv dd { margin: 0; font-weight: 500; font-variant-numeric: tabular-nums; text-align: right; }
-  .health { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
-  .health div { background: var(--surface-2); border-radius: 10px; padding: 8px 4px; }
-  .health b { display: block; font-size: 13px; }
-  .health span { font-size: 11px; color: var(--muted); }
-
-  /* ---------- control ---------- */
-  .mode-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .mode-bar b { font-size: 14px; }
-  .mode-bar span { display: block; font-size: 12px; color: var(--muted); }
-  .btn { border: 0; border-radius: 12px; padding: 11px 16px; font-weight: 500; font-size: 14px; background: var(--leaf); color: var(--leaf-ink); white-space: nowrap; }
-  .mode-bar > div { min-width: 0; }
-  .btn.soft { background: var(--leaf-soft); color: var(--leaf); }
-  .btn:disabled { opacity: .45; }
-  .dev { display: grid; gap: 10px; }
-  .dev-top { display: flex; align-items: center; gap: 12px; }
-  .dev-ico { width: 40px; height: 40px; border-radius: 12px; background: var(--surface-2); display: grid; place-items: center; flex: none; color: var(--muted); }
-  .dev-ico svg { width: 22px; height: 22px; }
-  .dev.active .dev-ico { background: var(--leaf-soft); color: var(--leaf); }
-  .dev-name { flex: 1; min-width: 0; }
-  .dev-name b { display: block; font-size: 15px; }
-  .dev-name span { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .seg { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--surface-2); gap: 2px; }
-  .seg button { border: 0; background: transparent; padding: 6px 9px; border-radius: 8px; font-size: 12px; color: var(--muted); white-space: nowrap; }
-  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
-  .seg.wide { display: flex; } .seg.wide button { flex: 1; }
-  input[type="range"] { width: 100%; height: 30px; margin: 0; accent-color: var(--leaf); }
-  .range-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: -6px; font-variant-numeric: tabular-nums; }
+  /* device buttons */
+  .devs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .dv { border: 1px solid var(--line); background: var(--surface); border-radius: 16px; padding: 10px 2px 8px; display: grid; justify-items: center; gap: 4px; }
+  .dv svg { width: 26px; height: 26px; color: var(--muted); }
+  .dv b { font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .dv.on { background: var(--leaf-soft); border-color: transparent; }
+  .dv.on svg, .dv.on b { color: var(--leaf); }
+  .dv .m { width: 6px; height: 6px; border-radius: 50%; background: transparent; }
+  .dv .m.man { background: var(--sun); }   /* manual control marker */
+  .hint { font-size: 12px; color: var(--muted); text-align: center; margin: -6px 0 0; }
 
   /* ---------- history ---------- */
+  .seg { display: flex; padding: 3px; border-radius: 12px; background: var(--surface-2); gap: 2px; }
+  .seg button { flex: 1; border: 0; background: transparent; padding: 8px 6px; border-radius: 9px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .chart { width: 100%; height: auto; display: block; }
+  .chart text { fill: var(--muted); font: 10px var(--sans); font-variant-numeric: tabular-nums; }
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-  .stats div { background: var(--surface-2); border-radius: 10px; padding: 8px; text-align: center; }
+  .stats div { background: var(--surface-2); border-radius: 12px; padding: 8px; text-align: center; }
   .stats b { display: block; font-size: 16px; font-variant-numeric: tabular-nums; }
   .stats span { font-size: 11px; color: var(--muted); }
-  .timeline { display: grid; gap: 0; }
-  .ev { display: grid; grid-template-columns: 44px 14px 1fr; gap: 8px; align-items: start; padding: 8px 0; font-size: 13px; }
-  .ev time { color: var(--muted); font-variant-numeric: tabular-nums; }
-  .ev i { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; background: var(--leaf); }
-  .ev i.sun { background: var(--sun); } .ev i.blue { background: #4a90d9; }
 
   /* ---------- alerts ---------- */
-  .alert { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: start; }
-  .sev { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; }
+  .alert { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; }
+  .sev { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; }
   .sev svg { width: 20px; height: 20px; }
   .sev.crit { background: color-mix(in srgb, var(--crit) 15%, transparent); color: var(--crit); }
   .sev.warn { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
   .sev.ok { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); }
-  .sev.info { background: var(--surface-2); color: var(--muted); }
-  .alert b { display: block; font-size: 14px; }
-  .alert p { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
-  .alert time { font-size: 11.5px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .alert.unread b::after { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--crit); margin-left: 6px; vertical-align: 2px; }
-  .day-h { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .04em; margin: 4px 2px -4px; }
+  .alert b { display: block; font-size: 14.5px; }
+  .alert span { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .alert time { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 
   /* ---------- settings ---------- */
+  .group-h { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .04em; margin: 4px 4px -8px; }
   .list { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
-  .row { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--line); min-height: 52px; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border: 0; border-bottom: 1px solid var(--line); min-height: 52px; width: 100%; background: none; text-align: left; }
   .row:last-child { border-bottom: 0; }
-  .row .k { flex: 1; min-width: 0; }
-  .row .k b { display: block; font-weight: 500; font-size: 14.5px; }
-  .row .k span { font-size: 12px; color: var(--muted); }
-  .row .v { font-size: 13.5px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+  .row .k { flex: 1; font-size: 15px; }
+  .row .chk { width: 22px; height: 22px; color: var(--leaf); visibility: hidden; }
+  .row[aria-checked="true"] .chk { visibility: visible; }
   .switch { width: 50px; height: 30px; border-radius: 15px; border: 0; padding: 0; background: var(--line); position: relative; flex: none; transition: background .2s; }
   .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
   .switch[aria-checked="true"] { background: var(--ok); }
   .switch[aria-checked="true"]::after { transform: translateX(20px); }
-  .crop-opt { width: 100%; background: none; border: 0; text-align: left; }
-  .radio { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); flex: none; display: grid; place-items: center; }
-  .crop-opt[aria-checked="true"] .radio { border-color: var(--leaf); }
-  .crop-opt[aria-checked="true"] .radio::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--leaf); }
-  .group-h { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .04em; margin: 6px 4px -6px; }
 
   /* ---------- tab bar ---------- */
   nav.tabs {
-    display: grid; grid-template-columns: repeat(5, 1fr); background: var(--surface); border-top: 1px solid var(--line);
+    display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface); border-top: 1px solid var(--line);
     padding: 6px max(6px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 6px) max(6px, env(safe-area-inset-left, 0px));
   }
   .device:not(.full) nav.tabs { padding-bottom: 22px; }
-  .tab { border: 0; background: none; display: grid; justify-items: center; gap: 3px; padding: 6px 0; color: var(--muted); font-size: 10.5px; position: relative; }
-  .tab svg { width: 24px; height: 24px; }
+  .tab { border: 0; background: none; display: grid; justify-items: center; gap: 3px; padding: 6px 0; color: var(--muted); font-size: 11px; position: relative; }
+  .tab svg { width: 25px; height: 25px; }
   .tab[aria-selected="true"] { color: var(--leaf); font-weight: 500; }
-  .tab .badge { top: 0; right: calc(50% - 22px); }
+  .badge { position: absolute; top: 0; right: calc(50% - 22px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--crit); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
 
   /* ---------- bottom sheet ---------- */
   .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.35); z-index: 20; }
   .sheet {
-    position: absolute; left: 0; right: 0; bottom: 0; z-index: 21; background: var(--surface); border-radius: 22px 22px 0 0;
-    padding: 10px 16px calc(env(safe-area-inset-bottom, 0px) + 18px); display: grid; gap: 10px;
-    animation: up .25s ease;
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 21; background: var(--surface); border-radius: 24px 24px 0 0;
+    padding: 10px 18px calc(env(safe-area-inset-bottom, 0px) + 20px); display: grid; gap: 14px; animation: up .25s ease;
   }
-  .sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); justify-self: center; }
-  .sheet h2 { margin: 0; font-size: 17px; }
-  .gh-opt { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); text-align: left; }
+  .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); justify-self: center; }
+  .sh-top { display: flex; align-items: center; gap: 12px; }
+  .sh-top .ic { width: 44px; height: 44px; border-radius: 14px; background: var(--leaf-soft); color: var(--leaf); display: grid; place-items: center; }
+  .sh-top .ic svg { width: 26px; height: 26px; }
+  .sh-top h2 { margin: 0; flex: 1; font-size: 18px; }
+  .big { font-size: 44px; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; line-height: 1; }
+  .big small { font-size: 20px; color: var(--muted); font-weight: 500; }
+  input[type="range"] { width: 100%; height: 36px; margin: 0; accent-color: var(--leaf); }
+  .btn { border: 0; border-radius: 14px; padding: 14px 16px; font-weight: 500; font-size: 15px; background: var(--leaf); color: var(--leaf-ink); white-space: nowrap; }
+  .btn.soft { background: var(--leaf-soft); color: var(--leaf); }
+  .gh-opt { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); text-align: left; font-weight: 500; }
   .gh-opt[aria-checked="true"] { border-color: var(--leaf); background: var(--leaf-soft); }
-  .gh-opt b { display: block; } .gh-opt span { font-size: 12px; color: var(--muted); }
+  .gh-opt span { margin-left: auto; font-size: 13px; color: var(--muted); font-weight: 400; }
   @keyframes up { from { transform: translateY(100%); } }
-  .toast { position: absolute; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); z-index: 30; background: var(--ink); color: var(--bg); padding: 12px 14px; border-radius: 12px; font-size: 13.5px; animation: up .2s ease; }
-  @media (prefers-reduced-motion: reduce) { .sheet, .toast { animation: none; } }
+  .toast { position: absolute; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); z-index: 30; background: var(--ink); color: var(--bg); padding: 12px 14px; border-radius: 12px; font-size: 14px; text-align: center; animation: up .2s ease; }
+  @media (prefers-reduced-motion: reduce) { .blades, .drop, .wave, .air, .sheet, .toast { animation: none !important; } }
 </style>
 </head>
 <body>
@@ -248,371 +195,311 @@
   <div class="device" id="device">
 
     <header class="top">
-      <button class="gh-btn" id="ghBtn" type="button" aria-haspopup="dialog">
-        <span class="gh-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20V10l8-6 8 6v10z" stroke="#f4f8ef" stroke-width="2" stroke-linejoin="round"/><path d="M12 19c0-4 2-6 5-6 0 3-2 6-5 6Z" fill="#a0d678"/></svg></span>
-        <span class="gh-txt">
-          <b><span id="ghName">სათბური №1</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></b>
-          <span id="ghSub">მარნეული · პომიდორი</span>
-        </span>
-      </button>
-      <span class="online"><i></i>ონლაინ</span>
-      <button class="icon-btn" type="button" aria-label="შეტყობინებები" data-go="alerts">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
-        <span class="badge">2</span>
-      </button>
+      <button class="gh-btn" id="ghBtn" type="button" aria-haspopup="dialog"><span id="ghName">სათბური №1</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <span class="live" title="ონლაინ" aria-label="ონლაინ"></span>
     </header>
 
     <main id="main">
-      <!-- ================= HOME ================= -->
+      <!-- HOME -->
       <section class="screen" id="s-home" aria-label="მთავარი">
-        <div class="status" id="statusBanner">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>
-          <div><b>ყველაფერი რიგზეა</b><span>ავტომატური რეჟიმი · განახლდა 1 წთ წინ</span></div>
+        <div class="scene">
+          <svg id="house" viewBox="0 0 340 220" role="img" aria-label="სათბურის მდგომარეობა"></svg>
+          <span class="pill" id="pill"><i></i><span id="pillTxt">ყველაფერი რიგზეა</span></span>
         </div>
-
-        <div class="tiles">
-          <div class="tile"><div class="lbl">ჰაერი <i class="dot"></i></div><div class="val" id="vT">23.4<small>°C</small></div><div class="ideal">იდეალი 21–27 °C</div><svg class="spark" id="spT" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
-          <div class="tile"><div class="lbl">ტენიანობა <i class="dot"></i></div><div class="val" id="vH">64<small>%</small></div><div class="ideal">იდეალი 60–70 %</div><svg class="spark" id="spH" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
-          <div class="tile"><div class="lbl">ნიადაგი <i class="dot"></i></div><div class="val" id="vS">73<small>%</small></div><div class="ideal">იდეალი 70–80 %</div><svg class="spark" id="spS" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
-          <div class="tile"><div class="lbl">გარეთ <i class="dot warn"></i></div><div class="val">9<small>°C</small></div><div class="ideal">ღრუბლიანი · 4 მ/წმ</div><svg class="spark" id="spO" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
-        </div>
-
-        <div class="card">
-          <div class="card-h"><b>ტემპერატურა · 24 სთ</b><button class="link" type="button" data-go="history">ისტორია</button></div>
-          <svg class="chart" id="homeChart" viewBox="0 0 340 170"></svg>
-          <div class="legend"><span><i style="background:var(--leaf)"></i>სათბური</span><span><i style="background:var(--band)"></i>იდეალური (დღე / ღამე)</span></div>
-        </div>
-
-        <div class="card">
-          <div class="card-h"><b>მოწყობილობები</b><button class="link" type="button" data-go="control">მართვა</button></div>
-          <div class="chips" id="homeChips"></div>
-        </div>
-
-        <div class="card">
-          <div class="crop-card">
-            <span class="crop-emb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="14" r="7" fill="#d6402b"/><path d="M12 7c-1-2-3-3-5-2 2 0 3 1 3 2-1-1-3-1-4 0 2 0 4 1 6 1 2 0 4-1 6-1-1-1-3-1-4 0 0-1 1-2 3-2-2-1-4 0-5 2Z" fill="#3f7d3a"/></svg></span>
-            <div class="t"><b id="cropName">პომიდორი</b><span>კულტურის შაბლონი · ავტომატური პარამეტრები</span></div>
-            <button class="link" type="button" data-go="settings">შეცვლა</button>
-          </div>
-          <dl class="kv" id="cropKv"></dl>
-        </div>
-
-        <div class="card">
-          <div class="card-h"><b>მოწყობილობის მდგომარეობა</b><span>სათბურიას ბლოკი</span></div>
-          <div class="health">
-            <div><b>4G</b><span>სიგნალი კარგი</span></div>
-            <div><b>220 V</b><span>დენი არის</span></div>
-            <div><b>100 %</b><span>ბატარეა</span></div>
-          </div>
-        </div>
+        <div class="reads" id="reads"></div>
+        <div class="devs" id="devs"></div>
+        <p class="hint">შეეხეთ მოწყობილობას სამართავად</p>
       </section>
 
-      <!-- ================= CONTROL ================= -->
-      <section class="screen" id="s-control" aria-label="მართვა" hidden>
-        <h1>მართვა</h1>
-        <div class="card mode-bar">
-          <div><b id="modeTitle">ავტომატური რეჟიმი</b><span id="modeSub">სათბური თავად ინარჩუნებს იდეალურ პირობებს</span></div>
-          <button class="btn soft" id="allAuto" type="button" disabled>ყველა ავტოზე</button>
-        </div>
-        <div id="devList" style="display:grid;gap:12px"></div>
-      </section>
-
-      <!-- ================= HISTORY ================= -->
+      <!-- HISTORY -->
       <section class="screen" id="s-history" aria-label="ისტორია" hidden>
         <h1>ისტორია</h1>
-        <div class="seg wide" role="group" aria-label="მაჩვენებელი" id="metricSeg">
+        <div class="seg" role="group" aria-label="მაჩვენებელი" id="metricSeg">
           <button type="button" data-m="t" aria-pressed="true">ტემპერატურა</button>
-          <button type="button" data-m="h" aria-pressed="false">ტენიანობა</button>
+          <button type="button" data-m="h" aria-pressed="false">ტენი</button>
           <button type="button" data-m="s" aria-pressed="false">ნიადაგი</button>
         </div>
         <div class="card">
-          <div class="card-h"><b id="histTitle">ტემპერატურა</b>
-            <div class="seg" role="group" aria-label="პერიოდი" id="rangeSeg">
-              <button type="button" data-r="24" aria-pressed="true">24 სთ</button>
-              <button type="button" data-r="7" aria-pressed="false">7 დღე</button>
-              <button type="button" data-r="30" aria-pressed="false">30 დღე</button>
-            </div>
-          </div>
           <svg class="chart" id="histChart" viewBox="0 0 340 190"></svg>
           <div class="stats" id="histStats"></div>
         </div>
-        <div class="card">
-          <div class="card-h"><b>დღევანდელი მოვლენები</b></div>
-          <div class="timeline">
-            <div class="ev"><time>03:12</time><i class="sun"></i><span>გათბობა ჩაირთო · სათბურში 15.8 °C</span></div>
-            <div class="ev"><time>05:40</time><i class="sun"></i><span>გათბობა გამოირთო · 17.2 °C</span></div>
-            <div class="ev"><time>07:30</time><i class="blue"></i><span>მორწყვა დაიწყო · ნიადაგი 68 %</span></div>
-            <div class="ev"><time>07:52</time><i class="blue"></i><span>მორწყვა დასრულდა · ნიადაგი 78 %</span></div>
-            <div class="ev"><time>11:05</time><i></i><span>ვენტილატორები ჩაირთო · 26.1 °C</span></div>
-            <div class="ev"><time>11:20</time><i></i><span>ფანჯრები გაიღო 40 %-ზე</span></div>
-          </div>
+        <div class="seg" role="group" aria-label="პერიოდი" id="rangeSeg">
+          <button type="button" data-r="24" aria-pressed="true">24 სთ</button>
+          <button type="button" data-r="7" aria-pressed="false">7 დღე</button>
+          <button type="button" data-r="30" aria-pressed="false">30 დღე</button>
         </div>
       </section>
 
-      <!-- ================= ALERTS ================= -->
-      <section class="screen" id="s-alerts" aria-label="შეტყობინებები" hidden>
-        <h1>შეტყობინებები</h1>
-        <div class="seg wide" role="group" aria-label="ფილტრი" id="alertSeg">
-          <button type="button" data-f="all" aria-pressed="true">ყველა</button>
-          <button type="button" data-f="alarm" aria-pressed="false">განგაში</button>
-          <button type="button" data-f="info" aria-pressed="false">ინფორმაცია</button>
-        </div>
+      <!-- ALERTS -->
+      <section class="screen" id="s-alerts" aria-label="განგაში" hidden>
+        <h1>განგაში</h1>
         <div id="alertList" style="display:grid;gap:10px"></div>
       </section>
 
-      <!-- ================= SETTINGS ================= -->
+      <!-- SETTINGS -->
       <section class="screen" id="s-settings" aria-label="პარამეტრები" hidden>
         <h1>პარამეტრები</h1>
-
-        <div class="group-h">სათბური</div>
-        <div class="list">
-          <div class="row"><div class="k"><b>სახელი</b></div><div class="v" id="setName">სათბური №1</div></div>
-          <div class="row"><div class="k"><b>მდებარეობა</b></div><div class="v" id="setPlace">მარნეული</div></div>
-          <div class="row"><div class="k"><b>ფართობი</b></div><div class="v">500 მ²</div></div>
-          <div class="row"><div class="k"><b>ტიპი</b></div>
-            <div class="seg" role="group" aria-label="სათბურის ტიპი" id="typeSeg">
-              <button type="button" data-type="glass" aria-pressed="true">შუშის</button>
-              <button type="button" data-type="film" aria-pressed="false">პარკის</button>
-            </div>
-          </div>
-        </div>
-
         <div class="group-h">კულტურა</div>
         <div class="list" id="cropList" role="radiogroup" aria-label="კულტურა"></div>
-
+        <div class="group-h">სათბური</div>
+        <div class="seg" role="group" aria-label="სათბურის ტიპი" id="typeSeg">
+          <button type="button" data-type="glass" aria-pressed="true">შუშის</button>
+          <button type="button" data-type="film" aria-pressed="false">პარკის</button>
+        </div>
         <div class="group-h">განგაში მოვიდეს</div>
         <div class="list">
-          <div class="row"><div class="k"><b>აპლიკაციაში</b><span>შეტყობინება ტელეფონზე</span></div><button class="switch" type="button" role="switch" aria-checked="true" aria-label="აპლიკაციაში"></button></div>
-          <div class="row"><div class="k"><b>SMS-ით</b><span>ინტერნეტის გარეშეც</span></div><button class="switch" type="button" role="switch" aria-checked="true" aria-label="SMS-ით"></button></div>
-          <div class="row"><div class="k"><b>ზარით</b><span>მხოლოდ საშიში შემთხვევისას</span></div><button class="switch" type="button" role="switch" aria-checked="true" aria-label="ზარით"></button></div>
-          <div class="row"><div class="k"><b>ტელეფონის ნომერი</b></div><div class="v">+995 5•• •• •• 12</div></div>
+          <div class="row"><span class="k">აპლიკაციაში</span><button class="switch" type="button" role="switch" aria-checked="true" aria-label="აპლიკაციაში"></button></div>
+          <div class="row"><span class="k">SMS-ით</span><button class="switch" type="button" role="switch" aria-checked="true" aria-label="SMS-ით"></button></div>
+          <div class="row"><span class="k">ზარით</span><button class="switch" type="button" role="switch" aria-checked="true" aria-label="ზარით"></button></div>
         </div>
-
-        <div class="group-h">მოწყობილობა</div>
-        <div class="list">
-          <div class="row"><div class="k"><b>კავშირი</b></div><div class="v">4G · Magti</div></div>
-          <div class="row"><div class="k"><b>სარეზერვო ბატარეა</b></div><div class="v">100 % · დატენილია</div></div>
-          <div class="row"><div class="k"><b>პროგრამის ვერსია</b></div><div class="v">0.1</div></div>
-          <div class="row"><div class="k"><b>გამოწერა</b></div><div class="v">აქტიურია</div></div>
-        </div>
-
-        <button class="btn soft" type="button" id="supportBtn">დახმარება და მხარდაჭერა</button>
-        <p class="sub" style="margin:0;text-align:center">სათბურია · დემო მონაცემები</p>
       </section>
     </main>
 
     <nav class="tabs" role="tablist" aria-label="მენიუ">
-      <button class="tab" role="tab" data-tab="home" aria-selected="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20V10l8-6 8 6v10h-5v-6H9v6z"/></svg>მთავარი</button>
-      <button class="tab" role="tab" data-tab="control" aria-selected="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>მართვა</button>
-      <button class="tab" role="tab" data-tab="history" aria-selected="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"/><path d="m7 14 4-4 3 3 5-6"/></svg>ისტორია</button>
-      <button class="tab" role="tab" data-tab="alerts" aria-selected="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="badge" id="tabBadge">2</span>განგაში</button>
-      <button class="tab" role="tab" data-tab="settings" aria-selected="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>პარამეტრები</button>
+      <button class="tab" role="tab" data-tab="home" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20V10l8-6 8 6v10h-5v-6H9v6z"/></svg>მთავარი</button>
+      <button class="tab" role="tab" data-tab="history" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"/><path d="m7 14 4-4 3 3 5-6"/></svg>ისტორია</button>
+      <button class="tab" role="tab" data-tab="alerts" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="badge" id="badge">2</span>განგაში</button>
+      <button class="tab" role="tab" data-tab="settings" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>პარამეტრები</button>
     </nav>
 
     <div id="overlay"></div>
   </div>
-  <p class="caption">სათბურიას აპლიკაცია · დიზაინის პროტოტიპი, დემო მონაცემებით</p>
 </div>
 
 <script>
 (() => {
   const $ = id => document.getElementById(id);
   const device = $('device');
-  // a real phone or the installed app uses the full screen (no preview frame)
   const full = matchMedia('(max-width: 520px), (display-mode: standalone)');
   const syncFull = () => device.classList.toggle('full', full.matches || navigator.standalone === true);
   syncFull(); full.addEventListener?.('change', syncFull);
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
-  /* ---------------- demo data ---------------- */
+  /* ---------------- demo state ---------------- */
   const CROPS = {
-    tomato:     { name: 'პომიდორი', day: [21, 27], night: [16, 18], rh: [60, 70], soil: [70, 80], light: '14–16 სთ' },
-    strawberry: { name: 'მარწყვი',  day: [18, 24], night: [8, 12],  rh: [60, 75], soil: [70, 80], light: '12–14 სთ' },
-    cucumber:   { name: 'კიტრი',    day: [24, 28], night: [18, 20], rh: [70, 85], soil: [80, 90], light: '12–14 სთ' },
-    pepper:     { name: 'წიწაკა',   day: [22, 27], night: [16, 18], rh: [60, 75], soil: [70, 80], light: '12–14 სთ' },
-    greens:     { name: 'მწვანილი', day: [15, 20], night: [8, 12],  rh: [60, 70], soil: [65, 75], light: '12–14 სთ' },
+    tomato:     { name: 'პომიდორი', day: [21, 27], night: [16, 18], rh: [60, 70], soil: [70, 80], h: 1, fruit: '#d6402b' },
+    cucumber:   { name: 'კიტრი',    day: [24, 28], night: [18, 20], rh: [70, 85], soil: [80, 90], h: 1.15, fruit: '#3c6e2a' },
+    pepper:     { name: 'წიწაკა',   day: [22, 27], night: [16, 18], rh: [60, 75], soil: [70, 80], h: .75, fruit: '#e8a21f' },
+    strawberry: { name: 'მარწყვი',  day: [18, 24], night: [8, 12],  rh: [60, 75], soil: [70, 80], h: .35, fruit: '#d8262f' },
+    greens:     { name: 'მწვანილი', day: [15, 20], night: [8, 12],  rh: [60, 70], soil: [65, 75], h: .3, fruit: null },
   };
   const GH = [
-    { name: 'სათბური №1', place: 'მარნეული', crop: 'tomato', type: 'glass' },
-    { name: 'სათბური №2', place: 'გარდაბანი', crop: 'strawberry', type: 'film' },
+    { name: 'სათბური №1', crop: 'tomato', type: 'glass' },
+    { name: 'სათბური №2', crop: 'strawberry', type: 'film' },
   ];
-  const state = { gh: 0, crop: 'tomato', type: 'glass' };
-  const isDay = h => h >= 6 && h < 20;
-  const crop = () => CROPS[state.crop];
-  // 24 hourly readings ending at 11:00 today
-  const NOW_H = 11;
-  const hours = Array.from({ length: 24 }, (_, i) => (NOW_H - 23 + i + 24) % 24);
-  function series(cr) {
-    const midN = (cr.night[0] + cr.night[1]) / 2, midD = (cr.day[0] + cr.day[1]) / 2;
-    const t = hours.map((h, i) => {
-      const day = Math.max(0, Math.sin(Math.PI * (h - 6) / 14));
-      const base = isDay(h) ? midN + (midD + 1.5 - midN) * day : midN - 0.4;
-      return +(base + Math.sin(i * 1.7) * 0.4).toFixed(1);
-    });
-    const h = t.map((v, i) => Math.round(cr.rh[1] + 2 - (v - (cr.night[0])) * 0.9 + Math.cos(i) * 1.5));
-    let soil = cr.soil[0] + 4;
-    const s = hours.map(hh => { soil -= 0.45; if (hh === 7 || hh === 15) soil += 9; return Math.round(soil); });
-    const o = hours.map(hh => Math.round(isDay(hh) ? 4 + 6 * Math.sin(Math.PI * (hh - 6) / 14) : 2));
-    return { t, h, s, o };
-  }
-  let DATA = series(crop());
-
-  /* ---------------- charts ---------------- */
-  const NS = 'http://www.w3.org/2000/svg';
-  const el = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
-  function spark(svg, vals, color) {
-    svg.innerHTML = '';
-    const mn = Math.min(...vals), mx = Math.max(...vals), sp = mx - mn || 1;
-    const pts = vals.map((v, i) => `${(i / (vals.length - 1)) * 100},${24 - ((v - mn) / sp) * 22}`).join(' ');
-    svg.append(el('polyline', { points: pts, fill: 'none', stroke: color, 'stroke-width': 1.6, 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round' }));
-  }
-  // line chart with the crop's ideal band (stepped day / night where it applies)
-  function chart(svg, vals, opt) {
-    svg.innerHTML = '';
-    const W = 340, H = +svg.getAttribute('viewBox').split(' ')[3], L = 30, R = 8, T = 10, B = 22;
-    const bands = vals.map((_, i) => opt.band(i));
-    const all = vals.concat(...bands.flat());
-    let mn = Math.floor(Math.min(...all) - 1), mx = Math.ceil(Math.max(...all) + 1);
-    const step = (mx - mn) > 20 ? 10 : (mx - mn) > 8 ? 4 : 2;
-    mn = Math.floor(mn / step) * step; mx = Math.ceil(mx / step) * step;
-    const x = i => L + (i / (vals.length - 1)) * (W - L - R);
-    const y = v => T + (1 - (v - mn) / (mx - mn)) * (H - T - B);
-    const css = getComputedStyle(document.documentElement);
-    const line = css.getPropertyValue('--line').trim(), leaf = css.getPropertyValue('--leaf').trim(), band = css.getPropertyValue('--band').trim();
-    for (let v = mn; v <= mx; v += step) {
-      svg.append(el('line', { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: line, 'stroke-width': 1 }));
-      const t = el('text', { x: L - 6, y: y(v) + 3, 'text-anchor': 'end' }); t.textContent = v; svg.append(t);
-    }
-    // ideal band as a stepped polygon
-    const top = [], bot = [];
-    bands.forEach((b, i) => { const x0 = i === 0 ? x(0) : (x(i - 1) + x(i)) / 2, x1 = i === vals.length - 1 ? x(i) : (x(i) + x(i + 1)) / 2;
-      top.push(`${x0},${y(b[1])}`, `${x1},${y(b[1])}`); bot.unshift(`${x1},${y(b[0])}`, `${x0},${y(b[0])}`); });
-    svg.append(el('polygon', { points: top.concat(bot).join(' '), fill: band }));
-    // area + line
-    const pts = vals.map((v, i) => `${x(i)},${y(v)}`);
-    svg.append(el('polygon', { points: `${x(0)},${y(mn)} ${pts.join(' ')} ${x(vals.length - 1)},${y(mn)}`, fill: leaf, opacity: .08 }));
-    svg.append(el('polyline', { points: pts.join(' '), fill: 'none', stroke: leaf, 'stroke-width': 2.2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
-    const lx = x(vals.length - 1), ly = y(vals[vals.length - 1]);
-    svg.append(el('circle', { cx: lx, cy: ly, r: 4.5, fill: leaf, stroke: css.getPropertyValue('--surface').trim(), 'stroke-width': 2 }));
-    opt.labels.forEach(([i, txt]) => { const t = el('text', { x: x(i), y: H - 6, 'text-anchor': i === 0 ? 'start' : i === vals.length - 1 ? 'end' : 'middle' }); t.textContent = txt; svg.append(t); });
-  }
-  const hourLabels = [[0, `${String(hours[0]).padStart(2, '0')}:00`], [6, `${String(hours[6]).padStart(2, '0')}:00`], [12, `${String(hours[12]).padStart(2, '0')}:00`], [18, `${String(hours[18]).padStart(2, '0')}:00`], [23, 'ახლა']];
-  const tempBand = i => (isDay(hours[i]) ? crop().day : crop().night);
-
-  /* ---------------- home ---------------- */
+  const S = { gh: 0, crop: 'tomato', type: 'glass' };
+  const crop = () => CROPS[S.crop];
   const DEV = {
-    fan:   { name: 'ვენტილატორები', unit: '%',  val: 0,  auto: true, max: 6 },
-    vent:  { name: 'ფანჯრები',       unit: '%',  val: 0,  auto: true },
-    heat:  { name: 'გათბობა',        unit: '°C', val: 24, auto: true, power: 0 },
-    light: { name: 'განათება',       unit: '%',  val: 0,  auto: true, color: 'warm' },
-    water: { name: 'მორწყვა',        unit: '',   val: 0,  auto: true, next: '15:00' },
+    fan:   { name: 'ვენტილატორი', val: 40, auto: true },
+    vent:  { name: 'ფანჯრები',    val: 30, auto: true },
+    heat:  { name: 'გათბობა',     val: 24, auto: true, power: 0 },
+    light: { name: 'განათება',    val: 0,  auto: true, color: 'warm' },
+    water: { name: 'მორწყვა',     val: 0,  auto: true },
   };
+  const reading = { t: 26.4, h: 63, s: 76 };   // a warm midday: fans and windows are working
+  const ventName = () => (S.type === 'film' ? 'გვერდები' : 'ფანჯრები');
+  const on = k => (k === 'heat' ? DEV.heat.power > 0 : DEV[k].val > 0);
+  const short = k => {
+    const d = DEV[k];
+    if (k === 'heat') return d.val <= 4 ? 'გამორთ.' : `${d.val}°`;
+    if (k === 'water') return d.val ? 'ირწყვება' : 'ავტო';
+    return d.val ? `${d.val}%` : 'გამორთ.';
+  };
+
+  /* ---------------- icons ---------------- */
   const ICON = {
     fan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M12 10c0-4 1-7 4-7s3 4-1 7M14 12c4 0 7 1 7 4s-4 3-7-1M12 14c0 4-1 7-4 7s-3-4 1-7M10 12c-4 0-7-1-7-4s4-3 7 1"/></svg>',
-    vent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 20h18M5 20V9l7-5 7 5v11"/><path d="m12 4 6 8"/></svg>',
+    vent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 20h18M5 20V10l7-5 7 5v10"/><path d="m12 5 5-2"/></svg>',
     heat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4 4 0 1 0 4 0Z"/><path d="M12 11v6"/></svg>',
     light: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3Z"/></svg>',
     water: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></svg>',
+    temp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4 4 0 1 0 4 0Z"/></svg>',
+    hum: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5"/></svg>',
+    soil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 17h18M5 21h14M12 17V9M12 12c-3 0-5-2-5-5 3 0 5 2 5 5Zm0-2c0-3 2-5 5-5 0 3-2 5-5 5Z"/></svg>',
   };
-  const ventName = () => (state.type === 'film' ? 'გვერდები' : 'ფანჯრები');
-  function devSummary(k) {
-    const d = DEV[k];
-    if (k === 'fan') return d.val ? `${d.val} % · ${Math.round(d.val / 100 * d.max)}/${d.max}` : 'გამორთულია';
-    if (k === 'vent') return d.val ? `ღიაა ${d.val} %` : 'დახურულია';
-    if (k === 'heat') return d.val <= 4 ? 'გამორთულია' : `${d.val} °C${d.power ? ` · ${d.power} %` : ''}`;
-    if (k === 'light') return d.val ? `${d.val} % · ${d.color === 'grow' ? 'იისფერი' : 'თეთრი'}` : 'გამორთულია';
-    if (k === 'water') return d.val ? 'ირწყვება' : `შემდეგი ${d.next}-ზე`;
-  }
-  const isOn = k => (k === 'heat' ? DEV.heat.power > 0 : DEV[k].val > 0);
-  function renderHome() {
-    const cr = crop(), T = DATA.t, Hm = DATA.h, S = DATA.s;
-    $('vT').innerHTML = `${T[23]}<small>°C</small>`; $('vH').innerHTML = `${Hm[23]}<small>%</small>`; $('vS').innerHTML = `${S[23]}<small>%</small>`;
-    document.querySelectorAll('.tile .ideal')[0].textContent = `იდეალი ${cr.day[0]}–${cr.day[1]} °C`;
-    document.querySelectorAll('.tile .ideal')[1].textContent = `იდეალი ${cr.rh[0]}–${cr.rh[1]} %`;
-    document.querySelectorAll('.tile .ideal')[2].textContent = `იდეალი ${cr.soil[0]}–${cr.soil[1]} %`;
-    const leaf = getComputedStyle(document.documentElement).getPropertyValue('--leaf').trim();
-    spark($('spT'), T.slice(-12), leaf); spark($('spH'), Hm.slice(-12), leaf); spark($('spS'), S.slice(-12), leaf);
-    spark($('spO'), DATA.o.slice(-12), getComputedStyle(document.documentElement).getPropertyValue('--muted').trim());
-    chart($('homeChart'), T, { band: tempBand, labels: hourLabels });
-    $('homeChips').innerHTML = Object.keys(DEV).map(k => `<button class="chip ${isOn(k) ? 'on' : ''}" type="button" data-go="control">${ICON[k]}<div><b>${k === 'vent' ? ventName() : DEV[k].name}</b><span>${devSummary(k)}</span></div></button>`).join('');
-    $('cropName').textContent = cr.name;
-    $('cropKv').innerHTML = `<dt>დღე</dt><dd>${cr.day[0]}–${cr.day[1]} °C</dd><dt>ღამე</dt><dd>${cr.night[0]}–${cr.night[1]} °C</dd><dt>ჰაერის ტენი</dt><dd>${cr.rh[0]}–${cr.rh[1]} %</dd><dt>ნიადაგის ტენი</dt><dd>${cr.soil[0]}–${cr.soil[1]} %</dd><dt>სინათლე</dt><dd>${cr.light}</dd>`;
+
+  /* ---------------- the greenhouse drawing (front view) ---------------- */
+  function drawHouse() {
+    const c = crop(), film = S.type === 'film';
+    const ventA = DEV.vent.val / 100 * 70;                    // roof vents swing up to 70°
+    const fanSpd = DEV.fan.val ? (1.6 - DEV.fan.val / 100 * 1.3).toFixed(2) + 's' : '0s';
+    const heat = DEV.heat.power / 100, lamp = DEV.light.val / 100, water = DEV.water.val > 0;
+    const lampCol = DEV.light.color === 'grow' ? '#d68cff' : '#ffd9a0';
+    const ridgeY = film ? 72 : 58;
+    const shell = film ? 'M40 190 V140 C40 52, 300 52, 300 140 V190 Z' : 'M40 190 V118 L170 58 L300 118 V190 Z';
+    // plants: two beds, three plants each; height depends on the crop
+    const plants = [];
+    for (const bx of [118, 222]) for (const dx of [-26, 0, 26]) {
+      const x = bx + dx, top = 178 - 62 * c.h;
+      if (c.h >= .5) plants.push(`<path d="M${x} 180 V${top + 4}" stroke="var(--plant)" stroke-width="2.4"/>`);
+      const n = Math.max(2, Math.round(4 * c.h));
+      for (let i = 0; i < n; i++) {
+        const y = 178 - (i + 1) * (62 * c.h) / (n + .3), s = 7 + (i % 2) * 2;
+        plants.push(`<ellipse cx="${x + (i % 2 ? 6 : -6)}" cy="${y}" rx="${s}" ry="${s * .62}" fill="${i % 2 ? 'var(--plant-2)' : 'var(--plant)'}"/>`);
+      }
+      if (c.h < .5) plants.push(`<ellipse cx="${x}" cy="174" rx="12" ry="6" fill="var(--plant)"/>`);
+      if (c.fruit) plants.push(`<circle cx="${x + 4}" cy="${178 - 30 * c.h}" r="3.4" fill="${c.fruit}"/><circle cx="${x - 5}" cy="${178 - 18 * c.h}" r="3" fill="${c.fruit}"/>`);
+    }
+    const drops = water ? [100, 130, 205, 235].map((x, i) => `<circle class="drop" style="animation-delay:${i * .25}s" cx="${x}" cy="168" r="1.8" fill="#4aa8ff"/>`).join('') : '';
+    const waves = heat ? [80, 170, 260].map((x, i) => `<path class="wave" style="animation-delay:${i * .6}s" d="M${x} 176 q4 -5 0 -10 q-4 -5 0 -10" fill="none" stroke="#ff7a3c" stroke-width="2" stroke-linecap="round" opacity="${.4 + heat * .6}"/>`).join('') : '';
+    const lamps = [130, 210].map(x => `<line x1="${x}" y1="${ridgeY + 14}" x2="${x}" y2="${ridgeY + 30}" stroke="var(--frame)" stroke-width="1.2"/>
+        <rect x="${x - 22}" y="${ridgeY + 30}" width="44" height="5" rx="2" fill="${lamp ? lampCol : '#55605a'}"/>
+        <path d="M${x - 22} ${ridgeY + 35} L${x - 38} 168 H${x + 38} L${x + 22} ${ridgeY + 35} Z" fill="${lampCol}" opacity="${lamp * .28}"/>`).join('');
+    const fan = (x, y) => `<g class="hot" data-dev="fan"><circle cx="${x}" cy="${y}" r="15" fill="var(--surface-2)" stroke="var(--frame)" stroke-width="2"/>
+        <g class="blades ${DEV.fan.val ? '' : 'off'}" style="--spd:${fanSpd}"><path d="M${x} ${y} l0 -11 a5 5 0 0 1 5 5 Z M${x} ${y} l11 0 a5 5 0 0 1 -5 5 Z M${x} ${y} l0 11 a5 5 0 0 1 -5 -5 Z M${x} ${y} l-11 0 a5 5 0 0 1 5 -5 Z" fill="var(--muted)"/></g>
+        <circle cx="${x}" cy="${y}" r="2.5" fill="var(--frame)"/></g>`;
+    // glass: two roof vents hinged at the ridge; film: roll-up side curtains
+    const vents = film
+      ? [40, 300].map(x => { const up = DEV.vent.val / 100 * 40;
+          return `<g class="hot" data-dev="vent"><rect x="${x - 4}" y="140" width="8" height="${Math.max(2, 46 - up)}" fill="var(--glass)" stroke="var(--frame)" stroke-width="1"/>
+            <circle class="roll" cx="${x}" cy="${186 - up}" r="5" fill="var(--frame)"/><rect x="${x - 12}" y="136" width="24" height="54" fill="transparent"/></g>`; }).join('')
+      : `<g class="hot" data-dev="vent">
+          <g class="vent-g" style="transform: rotate(${-ventA}deg); transform-origin: 168px 59px"><path d="M168 59 L118 82" stroke="var(--leaf)" stroke-width="6" stroke-linecap="round" opacity=".85"/></g>
+          <g class="vent-g" style="transform: rotate(${ventA}deg); transform-origin: 172px 59px"><path d="M172 59 L222 82" stroke="var(--leaf)" stroke-width="6" stroke-linecap="round" opacity=".85"/></g>
+          <rect x="105" y="36" width="130" height="50" fill="transparent"/></g>`;
+    const air = DEV.vent.val && !film ? [140, 200].map((x, i) => `<path class="air" style="animation-delay:${i * .5}s" d="M${x} 50 q4 -6 0 -12" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round"/>`).join('') : '';
+    $('house').innerHTML = `
+      <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--sky-1)"/><stop offset="1" stop-color="var(--sky-2)"/></linearGradient></defs>
+      <rect width="340" height="220" fill="url(#sky)"/>
+      <path d="M0 160 C60 130 120 140 170 150 C230 135 290 128 340 150 V220 H0 Z" fill="var(--hill)"/>
+      <rect y="188" width="340" height="32" fill="var(--ground)"/>
+      ${air}
+      <path d="${shell}" fill="var(--glass)" stroke="var(--frame)" stroke-width="3" stroke-linejoin="round"/>
+      ${film ? '' : '<path d="M105 88 V190 M235 88 V190 M170 58 V190" stroke="var(--frame)" stroke-width="1.4" opacity=".7"/>'}
+      ${lamps}
+      <g class="hot" data-dev="light"><rect x="100" y="${ridgeY + 26}" width="140" height="14" fill="transparent"/></g>
+      <rect x="88" y="178" width="60" height="10" rx="2" fill="var(--soil)"/><rect x="192" y="178" width="60" height="10" rx="2" fill="var(--soil)"/>
+      <g class="hot" data-dev="water">${plants.join('')}<rect x="85" y="110" width="170" height="66" fill="transparent"/></g>
+      ${drops}
+      <g class="hot" data-dev="heat">
+        <path d="M70 186 H272" stroke="${heat ? '#ff7a3c' : 'var(--frame)'}" stroke-width="4" stroke-linecap="round" opacity="${heat ? .5 + heat * .5 : .6}"/>
+        ${waves}<rect x="60" y="178" width="220" height="12" fill="transparent"/></g>
+      ${fan(62, film ? 158 : 136)}${fan(278, film ? 158 : 136)}
+      ${vents}`;
   }
 
-  /* ---------------- control ---------------- */
-  function devCard(k) {
-    const d = DEV[k], name = k === 'vent' ? (state.type === 'film' ? 'გვერდების ახვევა' : 'ფანჯრების გაღება') : d.name;
+  /* ---------------- home ---------------- */
+  function renderHome() {
+    const c = crop();
+    const items = [
+      ['temp', reading.t.toFixed(1), '°C', 'ჰაერი', reading.t < c.night[0] || reading.t > c.day[1]],
+      ['hum', reading.h, '%', 'ტენი', reading.h < c.rh[0] - 5 || reading.h > c.rh[1] + 10],
+      ['soil', reading.s, '%', 'ნიადაგი', reading.s < c.soil[0] - 5 || reading.s > c.soil[1] + 5],
+    ];
+    $('reads').innerHTML = items.map(([ic, v, u, l, bad]) => `<button class="read ${bad ? 'bad' : ''}" type="button" data-go="history">${ICON[ic]}<b>${v}<small>${u}</small></b><span>${l}</span></button>`).join('');
+    $('devs').innerHTML = Object.keys(DEV).map(k => `<button class="dv ${on(k) ? 'on' : ''}" type="button" data-dev="${k}" aria-label="${k === 'vent' ? ventName() : DEV[k].name}">${ICON[k]}<b>${short(k)}</b><i class="m ${DEV[k].auto ? '' : 'man'}"></i></button>`).join('');
+    const bad = items.some(i => i[4]);
+    $('pill').classList.toggle('alarm', bad);
+    $('pillTxt').textContent = bad ? 'ყურადღება' : 'ყველაფერი რიგზეა';
+    $('ghName').textContent = GH[S.gh].name;
+    drawHouse();
+  }
+
+  /* ---------------- device sheet ---------------- */
+  let sheetKey = null;
+  function openDev(k) {
+    const d = DEV[k], name = k === 'vent' ? ventName() : d.name;
     let body = '';
-    if (k === 'fan' || k === 'vent' || k === 'light') {
-      body = `<input type="range" id="r-${k}" min="0" max="100" step="5" value="${d.val}" aria-label="${name}"><div class="range-scale"><span>0 %</span><span>50 %</span><span>100 %</span></div>`;
-      if (k === 'light') body += `<div class="seg wide" role="group" aria-label="სინათლის ფერი"><button type="button" data-color="warm" aria-pressed="${d.color === 'warm'}">თბილი თეთრი</button><button type="button" data-color="grow" aria-pressed="${d.color === 'grow'}">ზრდის (იისფერი)</button></div>`;
-    } else if (k === 'heat') {
-      body = `<input type="range" id="r-heat" min="4" max="35" step="1" value="${d.val}" aria-label="გათბობა"><div class="range-scale"><span>გამორთ.</span><span>20 °C</span><span>35 °C</span></div>`;
-    } else if (k === 'water') {
-      body = `<button class="btn" type="button" id="waterNow">${d.val ? 'მორწყვის შეჩერება' : 'მორწყვა ახლა · 10 წთ'}</button>`;
+    if (k === 'water') body = `<button class="btn" type="button" id="waterBtn">${d.val ? 'შეჩერება' : 'მორწყვა ახლა · 10 წთ'}</button>`;
+    else {
+      const [mn, mx, st] = k === 'heat' ? [4, 35, 1] : [0, 100, 5];
+      body = `<div class="big" id="big"></div><input type="range" id="rng" min="${mn}" max="${mx}" step="${st}" value="${d.val}" aria-label="${name}">`;
+      if (k === 'light') body += `<div class="seg" role="group" aria-label="ფერი"><button type="button" data-color="warm" aria-pressed="${d.color === 'warm'}">თეთრი</button><button type="button" data-color="grow" aria-pressed="${d.color === 'grow'}">იისფერი</button></div>`;
     }
-    return `<div class="card dev ${isOn(k) ? 'active' : ''}" data-dev="${k}">
-      <div class="dev-top"><span class="dev-ico">${ICON[k]}</span>
-        <div class="dev-name"><b>${name}</b><span>${devSummary(k)}</span></div>
-        <div class="seg" role="group" aria-label="რეჟიმი"><button type="button" data-mode="auto" aria-pressed="${d.auto}">ავტო</button><button type="button" data-mode="manual" aria-pressed="${!d.auto}">ხელით</button></div>
-      </div>${body}</div>`;
+    $('overlay').innerHTML = `<div class="scrim" data-close></div><div class="sheet" role="dialog" aria-label="${name}">
+      <span class="grab"></span>
+      <div class="sh-top"><span class="ic">${ICON[k]}</span><h2>${name}</h2></div>
+      <div class="seg" role="group" aria-label="რეჟიმი"><button type="button" data-mode="auto" aria-pressed="${d.auto}">ავტო</button><button type="button" data-mode="manual" aria-pressed="${!d.auto}">ხელით</button></div>
+      ${body}
+      <button class="btn soft" type="button" data-close>მზადაა</button></div>`;
+    sheetKey = k; syncSheet();
   }
-  function renderControl() {
-    $('devList').innerHTML = Object.keys(DEV).map(devCard).join('');
-    const manual = Object.values(DEV).some(d => !d.auto);
-    $('allAuto').disabled = !manual;
-    $('modeTitle').textContent = manual ? 'ხელით მართვა' : 'ავტომატური რეჟიმი';
-    $('modeSub').textContent = manual ? 'ზოგი მოწყობილობა თქვენ მიერ არის დაყენებული' : 'სათბური თავად ინარჩუნებს იდეალურ პირობებს';
+  function syncSheet() {
+    const k = sheetKey; if (!k) return; const d = DEV[k], big = $('big');
+    if (big) big.innerHTML = k === 'heat' ? (d.val <= 4 ? 'გამორთ.' : `${d.val}<small>°C</small>`) : `${d.val}<small>%</small>`;
+    $('overlay').querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.mode === 'auto') === d.auto)));
   }
-  $('devList').addEventListener('input', e => {
-    const k = e.target.closest('[data-dev]')?.dataset.dev; if (!k || e.target.type !== 'range') return;
-    const d = DEV[k]; d.val = +e.target.value; d.auto = false;
-    if (k === 'heat') d.power = d.val <= 4 ? 0 : Math.max(0, Math.min(100, Math.round((d.val - DATA.t[23] + 0.3) / 1.2 * 100 / 5) * 5));
-    const card = e.target.closest('.dev');
-    card.querySelector('.dev-name span').textContent = devSummary(k);
-    card.classList.toggle('active', isOn(k));
-    card.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.mode === 'auto') === d.auto)));
-    $('allAuto').disabled = false; $('modeTitle').textContent = 'ხელით მართვა'; $('modeSub').textContent = 'ზოგი მოწყობილობა თქვენ მიერ არის დაყენებული';
+  $('overlay').addEventListener('input', e => {
+    if (e.target.id !== 'rng') return;
+    const d = DEV[sheetKey]; d.val = +e.target.value; d.auto = false;
+    if (sheetKey === 'heat') d.power = d.val <= 4 ? 0 : Math.max(0, Math.min(100, Math.round((d.val - reading.t + .3) / 1.2 * 20) * 5));
+    syncSheet(); renderHome();
   });
-  $('devList').addEventListener('click', e => {
-    const card = e.target.closest('[data-dev]'); if (!card) return; const k = card.dataset.dev, d = DEV[k];
-    const mode = e.target.closest('[data-mode]');
-    if (mode) { d.auto = mode.dataset.mode === 'auto'; if (d.auto) autoLevels(); renderControl(); return; }
+  $('overlay').addEventListener('click', e => {
+    const m = e.target.closest('[data-mode]');
+    if (m && sheetKey) { DEV[sheetKey].auto = m.dataset.mode === 'auto'; if (DEV[sheetKey].auto) autoLevels(); const r = $('rng'); if (r) r.value = DEV[sheetKey].val; syncSheet(); renderHome(); return; }
     const col = e.target.closest('[data-color]');
-    if (col) { d.color = col.dataset.color; renderControl(); return; }
-    if (e.target.id === 'waterNow') { d.val = d.val ? 0 : 1; d.auto = !d.val; renderControl(); toast(d.val ? 'მორწყვა დაიწყო · 10 წუთი' : 'მორწყვა შეჩერდა'); }
+    if (col) { DEV.light.color = col.dataset.color; $('overlay').querySelectorAll('[data-color]').forEach(b => b.setAttribute('aria-pressed', String(b === col))); renderHome(); return; }
+    if (e.target.id === 'waterBtn') { DEV.water.val = DEV.water.val ? 0 : 1; DEV.water.auto = !DEV.water.val; e.target.textContent = DEV.water.val ? 'შეჩერება' : 'მორწყვა ახლა · 10 წთ'; syncSheet(); renderHome(); return; }
+    const g = e.target.closest('[data-gh]');
+    if (g) { S.gh = +g.dataset.gh; S.crop = GH[S.gh].crop; S.type = GH[S.gh].type; autoLevels(); renderAll(); }
+    if (g || e.target.closest('[data-close]')) { $('overlay').innerHTML = ''; sheetKey = null; }
   });
-  // what automatic mode would choose right now (demo: midday, slightly warm)
+  // what automatic mode does in this demo moment (midday, slightly warm)
   function autoLevels() {
-    const t = DATA.t[23], c = crop(), target = (c.day[0] + c.day[1]) / 2 + 0.5;
-    if (DEV.fan.auto) DEV.fan.val = Math.max(0, Math.min(100, Math.round((t - target - 0.3) / 3 * 20) * 5));
-    if (DEV.vent.auto) DEV.vent.val = Math.max(0, Math.min(100, Math.round((t - target - 0.8) / 4 * 20) * 5));
-    if (DEV.heat.auto) { DEV.heat.val = Math.round(target - 0.5); DEV.heat.power = Math.max(0, Math.min(100, Math.round((DEV.heat.val - t + 0.3) / 1.2 * 20) * 5)); }
+    const c = crop(), target = (c.day[0] + c.day[1]) / 2 + .5, t = reading.t;
+    const lv = v => Math.max(0, Math.min(100, Math.round(v * 20) * 5));
+    if (DEV.fan.auto) DEV.fan.val = lv((t - target - .3) / 3);
+    if (DEV.vent.auto) DEV.vent.val = lv((t - target - .8) / 4);
+    if (DEV.heat.auto) { DEV.heat.val = Math.round(target - .5); DEV.heat.power = lv((DEV.heat.val - t + .3) / 1.2); }
     if (DEV.light.auto) DEV.light.val = 0;
     if (DEV.water.auto) DEV.water.val = 0;
   }
-  $('allAuto').addEventListener('click', () => { Object.values(DEV).forEach(d => (d.auto = true)); autoLevels(); renderControl(); toast('ყველა მოწყობილობა ავტომატურ რეჟიმზეა'); });
+  document.addEventListener('click', e => {
+    const d = e.target.closest('[data-dev]');
+    if (d && !e.target.closest('#overlay')) openDev(d.dataset.dev);
+  });
 
   /* ---------------- history ---------------- */
   const hist = { m: 't', r: '24' };
-  const METRIC = { t: ['ტემპერატურა', '°C'], h: ['ტენიანობა', '%'], s: ['ნიადაგის ტენი', '%'] };
-  function renderHistory() {
-    const cr = crop(); let vals, labels, band;
-    if (hist.r === '24') { vals = DATA[hist.m]; labels = hourLabels; band = hist.m === 't' ? tempBand : () => (hist.m === 'h' ? cr.rh : cr.soil); }
-    else {
-      const n = hist.r === '7' ? 7 : 30, base = hist.m === 't' ? (cr.day[0] + cr.day[1]) / 2 - 1 : hist.m === 'h' ? (cr.rh[0] + cr.rh[1]) / 2 : (cr.soil[0] + cr.soil[1]) / 2;
-      vals = Array.from({ length: n }, (_, i) => +(base + Math.sin(i * 1.3) * 1.6 + Math.cos(i * .7)).toFixed(1));
-      labels = n === 7 ? [[0, '7 დღის წინ'], [6, 'დღეს']] : [[0, '30 დღის წინ'], [15, '15'], [29, 'დღეს']];
-      band = () => (hist.m === 't' ? cr.day : hist.m === 'h' ? cr.rh : cr.soil);
+  const NOW_H = 11, hours = Array.from({ length: 24 }, (_, i) => (NOW_H - 23 + i + 24) % 24);
+  const isDay = h => h >= 6 && h < 20;
+  function series() {
+    const c = crop(), mN = (c.night[0] + c.night[1]) / 2, mD = (c.day[0] + c.day[1]) / 2;
+    const t = hours.map((h, i) => +((isDay(h) ? mN + (mD + 1.5 - mN) * Math.max(0, Math.sin(Math.PI * (h - 6) / 14)) : mN - .4) + Math.sin(i * 1.7) * .4).toFixed(1));
+    const hm = t.map((v, i) => Math.round(c.rh[1] + 2 - (v - c.night[0]) * .9 + Math.cos(i) * 1.5));
+    let so = c.soil[0] + 4; const s = hours.map(h => { so -= .45; if (h === 7 || h === 15) so += 9; return Math.round(so); });
+    return { t, h: hm, s };
+  }
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag, a) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); return e; };
+  function chart(svg, vals, band, labels) {
+    svg.innerHTML = '';
+    const W = 340, H = 190, L = 30, R = 8, T = 10, B = 22;
+    const bands = vals.map((_, i) => band(i)), all = vals.concat(...bands.flat());
+    let mn = Math.floor(Math.min(...all) - 1), mx = Math.ceil(Math.max(...all) + 1);
+    const step = (mx - mn) > 20 ? 10 : (mx - mn) > 8 ? 4 : 2;
+    mn = Math.floor(mn / step) * step; mx = Math.ceil(mx / step) * step;
+    const x = i => L + (i / (vals.length - 1)) * (W - L - R), y = v => T + (1 - (v - mn) / (mx - mn)) * (H - T - B);
+    for (let v = mn; v <= mx; v += step) {
+      svg.append(el('line', { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: css('--line'), 'stroke-width': 1 }));
+      const t = el('text', { x: L - 6, y: y(v) + 3, 'text-anchor': 'end' }); t.textContent = v; svg.append(t);
     }
-    $('histTitle').textContent = METRIC[hist.m][0];
-    chart($('histChart'), vals, { band, labels });
-    const u = METRIC[hist.m][1], avg = vals.reduce((a, b) => a + b, 0) / vals.length;
-    $('histStats').innerHTML = `<div><b>${Math.min(...vals)} ${u}</b><span>მინიმუმი</span></div><div><b>${avg.toFixed(1)} ${u}</b><span>საშუალო</span></div><div><b>${Math.max(...vals)} ${u}</b><span>მაქსიმუმი</span></div>`;
+    const top = [], bot = [];
+    bands.forEach((b, i) => { const x0 = i ? (x(i - 1) + x(i)) / 2 : x(0), x1 = i === vals.length - 1 ? x(i) : (x(i) + x(i + 1)) / 2;
+      top.push(`${x0},${y(b[1])}`, `${x1},${y(b[1])}`); bot.unshift(`${x1},${y(b[0])}`, `${x0},${y(b[0])}`); });
+    svg.append(el('polygon', { points: top.concat(bot).join(' '), fill: css('--band') }));
+    const pts = vals.map((v, i) => `${x(i)},${y(v)}`);
+    svg.append(el('polyline', { points: pts.join(' '), fill: 'none', stroke: css('--leaf'), 'stroke-width': 2.4, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    svg.append(el('circle', { cx: x(vals.length - 1), cy: y(vals[vals.length - 1]), r: 4.5, fill: css('--leaf'), stroke: css('--surface'), 'stroke-width': 2 }));
+    labels.forEach(([i, txt]) => { const t = el('text', { x: x(i), y: H - 6, 'text-anchor': i === 0 ? 'start' : i === vals.length - 1 ? 'end' : 'middle' }); t.textContent = txt; svg.append(t); });
+  }
+  function renderHistory() {
+    const c = crop(), D = series(), U = hist.m === 't' ? '°C' : '%';
+    let vals, labels, band;
+    if (hist.r === '24') {
+      vals = D[hist.m];
+      labels = [[0, `${hours[0]}:00`], [12, `${hours[12]}:00`], [23, 'ახლა']];
+      band = i => (hist.m === 't' ? (isDay(hours[i]) ? c.day : c.night) : hist.m === 'h' ? c.rh : c.soil);
+    } else {
+      const n = hist.r === '7' ? 7 : 30, base = hist.m === 't' ? (c.day[0] + c.day[1]) / 2 - 1 : hist.m === 'h' ? (c.rh[0] + c.rh[1]) / 2 : (c.soil[0] + c.soil[1]) / 2;
+      vals = Array.from({ length: n }, (_, i) => +(base + Math.sin(i * 1.3) * 1.6 + Math.cos(i * .7)).toFixed(1));
+      labels = [[0, n === 7 ? '7 დღის წინ' : '30 დღის წინ'], [n - 1, 'დღეს']];
+      band = () => (hist.m === 't' ? c.day : hist.m === 'h' ? c.rh : c.soil);
+    }
+    chart($('histChart'), vals, band, labels);
+    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+    $('histStats').innerHTML = `<div><b>${Math.min(...vals)}${U}</b><span>მინ.</span></div><div><b>${avg.toFixed(1)}${U}</b><span>საშ.</span></div><div><b>${Math.max(...vals)}${U}</b><span>მაქს.</span></div>`;
   }
   function seg(id, key, fn) {
     $(id).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
@@ -622,56 +509,36 @@
   seg('rangeSeg', 'r', v => { hist.r = v; renderHistory(); });
 
   /* ---------------- alerts ---------------- */
-  const ALERTS = [
-    { day: 'დღეს', t: '03:12', sev: 'crit', kind: 'alarm', unread: true, title: 'ყინვის საფრთხე', text: 'სათბურში 15.8 °C, გარეთ −2 °C. გათბობა ჩაირთო, SMS გაიგზავნა.' },
-    { day: 'დღეს', t: '05:40', sev: 'ok', kind: 'info', unread: true, title: 'ტემპერატურა ნორმაშია', text: 'სათბურში 17.2 °C. გათბობა გამოირთო.' },
-    { day: 'დღეს', t: '07:52', sev: 'info', kind: 'info', title: 'მორწყვა დასრულდა', text: 'ნიადაგის ტენი 78 %. ხანგრძლივობა 22 წუთი.' },
-    { day: 'გუშინ', t: '21:40', sev: 'warn', kind: 'alarm', title: 'ტენიანობა მაღალია', text: 'ჰაერის ტენიანობა 88 %. ფანჯრები გაიღო 30 %-ზე.' },
-    { day: 'გუშინ', t: '14:05', sev: 'ok', kind: 'info', title: 'კავშირი აღდგა', text: 'მოწყობილობა 12 წუთის შემდეგ ისევ ონლაინაა.' },
-    { day: 'გუშინ', t: '13:53', sev: 'warn', kind: 'alarm', title: 'კავშირი გაწყდა', text: 'მოწყობილობა არ პასუხობს. სათბური ავტომატურად მუშაობს.' },
-    { day: '20 ოქტომბერი', t: '16:20', sev: 'crit', kind: 'alarm', title: 'ძლიერი ქარი', text: 'ქარი 14 მ/წმ (ზღვარია 12 მ/წმ). ფანჯრები დაიხურა.' },
-  ];
-  const SEV_ICON = {
-    crit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3 2 20h20Z" stroke-linejoin="round"/><path d="M12 10v4M12 17v.5"/></svg>',
+  const SEV = {
+    crit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20Z"/><path d="M12 10v4M12 17v.5"/></svg>',
     warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16v.5"/></svg>',
     ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16 10"/></svg>',
-    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg>',
   };
-  let alertFilter = 'all';
-  function renderAlerts() {
-    let last = '', html = '';
-    ALERTS.filter(a => alertFilter === 'all' || a.kind === alertFilter).forEach(a => {
-      if (a.day !== last) { html += `<div class="day-h">${a.day}</div>`; last = a.day; }
-      html += `<div class="card alert ${a.unread ? 'unread' : ''}"><span class="sev ${a.sev}">${SEV_ICON[a.sev]}</span><div><b>${a.title}</b><p>${a.text}</p></div><time>${a.t}</time></div>`;
-    });
-    $('alertList').innerHTML = html;
-  }
-  seg('alertSeg', 'f', v => { alertFilter = v; renderAlerts(); });
+  const ALERTS = [
+    ['crit', 'ყინვის საფრთხე', '15.8 °C · გათბობა ჩაირთო', '03:12'],
+    ['ok', 'ტემპერატურა ნორმაშია', '17.2 °C', '05:40'],
+    ['warn', 'ტენიანობა მაღალია', '88 % · ფანჯრები გაიღო', 'გუშინ'],
+    ['warn', 'კავშირი გაწყდა', '12 წუთით', 'გუშინ'],
+    ['crit', 'ძლიერი ქარი', '14 მ/წმ · ფანჯრები დაიხურა', '20 ოქტ.'],
+  ];
+  $('alertList').innerHTML = ALERTS.map(([s, t, d, tm]) => `<div class="card alert"><span class="sev ${s}">${SEV[s]}</span><div><b>${t}</b><span>${d}</span></div><time>${tm}</time></div>`).join('');
 
   /* ---------------- settings ---------------- */
+  const CHECK = '<svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
   function renderSettings() {
-    $('cropList').innerHTML = Object.entries(CROPS).map(([k, c]) => `<button class="row crop-opt" type="button" role="radio" aria-checked="${k === state.crop}" data-crop="${k}"><span class="radio"></span><span class="k"><b>${c.name}</b><span>დღე ${c.day[0]}–${c.day[1]} °C · ღამე ${c.night[0]}–${c.night[1]} °C · ტენი ${c.rh[0]}–${c.rh[1]} %</span></span></button>`).join('');
-    $('typeSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.type === state.type)));
-    $('setName').textContent = GH[state.gh].name; $('setPlace').textContent = GH[state.gh].place;
+    $('cropList').innerHTML = Object.entries(CROPS).map(([k, c]) => `<button class="row" type="button" role="radio" aria-checked="${k === S.crop}" data-crop="${k}"><span class="k">${c.name}</span>${CHECK}</button>`).join('');
+    $('typeSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.type === S.type)));
   }
-  $('cropList').addEventListener('click', e => {
-    const b = e.target.closest('[data-crop]'); if (!b) return;
-    state.crop = b.dataset.crop; GH[state.gh].crop = state.crop; DATA = series(crop()); autoLevels(); renderAll();
-    toast(`შაბლონი: ${crop().name} · პარამეტრები ავტომატურად დაყენდა`);
-  });
-  seg('typeSeg', 'type', v => { state.type = v; GH[state.gh].type = v; renderAll(); });
+  $('cropList').addEventListener('click', e => { const b = e.target.closest('[data-crop]'); if (!b) return;
+    S.crop = b.dataset.crop; GH[S.gh].crop = S.crop; autoLevels(); renderAll(); toast(`${crop().name} · პარამეტრები დაყენდა`); });
+  seg('typeSeg', 'type', v => { S.type = v; GH[S.gh].type = v; renderAll(); });
   document.querySelectorAll('.switch').forEach(s => s.addEventListener('click', () => s.setAttribute('aria-checked', String(s.getAttribute('aria-checked') !== 'true'))));
-  $('supportBtn').addEventListener('click', () => toast('მხარდაჭერის ნომერი აქ გამოჩნდება'));
 
-  /* ---------------- header / switching greenhouses ---------------- */
-  function renderHeader() { const g = GH[state.gh]; $('ghName').textContent = g.name; $('ghSub').textContent = `${g.place} · ${crop().name}`; }
+  /* ---------------- greenhouse switcher ---------------- */
   $('ghBtn').addEventListener('click', () => {
-    $('overlay').innerHTML = `<div class="scrim" data-close></div><div class="sheet" role="dialog" aria-label="სათბურის არჩევა"><span class="grab"></span><h2>ჩემი სათბურები</h2>${GH.map((g, i) => `<button class="gh-opt" type="button" role="radio" aria-checked="${i === state.gh}" data-gh="${i}"><span class="gh-ico">${ICON.vent.replace('currentColor', '#f4f8ef')}</span><span><b>${g.name}</b><span>${g.place} · ${CROPS[g.crop].name} · ${g.type === 'film' ? 'პარკის' : 'შუშის'}</span></span></button>`).join('')}<button class="btn soft" type="button" data-close>დახურვა</button></div>`;
-  });
-  $('overlay').addEventListener('click', e => {
-    const g = e.target.closest('[data-gh]');
-    if (g) { state.gh = +g.dataset.gh; state.crop = GH[state.gh].crop; state.type = GH[state.gh].type; DATA = series(crop()); autoLevels(); renderAll(); }
-    if (g || e.target.closest('[data-close]')) $('overlay').innerHTML = '';
+    $('overlay').innerHTML = `<div class="scrim" data-close></div><div class="sheet" role="dialog" aria-label="სათბურები"><span class="grab"></span>
+      ${GH.map((g, i) => `<button class="gh-opt" type="button" role="radio" aria-checked="${i === S.gh}" data-gh="${i}">${g.name}<span>${CROPS[g.crop].name}</span></button>`).join('')}
+      <button class="btn soft" type="button" data-close>დახურვა</button></div>`;
   });
 
   /* ---------------- tabs ---------------- */
@@ -679,21 +546,20 @@
     document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === tab)));
     document.querySelectorAll('.screen').forEach(s => (s.hidden = s.id !== 's-' + tab));
     $('main').scrollTop = 0;
-    if (tab === 'alerts') { ALERTS.forEach(a => (a.unread = false)); document.querySelectorAll('.badge').forEach(b => (b.hidden = true)); setTimeout(renderAlerts, 1200); }
+    if (tab === 'alerts') $('badge').hidden = true;
     if (tab === 'history') renderHistory();
   }
   document.querySelector('nav.tabs').addEventListener('click', e => { const t = e.target.closest('.tab'); if (t) go(t.dataset.tab); });
   document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go); });
 
-  let toastTimer;
+  let tt;
   function toast(msg) {
-    clearTimeout(toastTimer);
-    const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg;
-    device.querySelectorAll('.toast').forEach(x => x.remove()); device.append(t);
-    toastTimer = setTimeout(() => t.remove(), 2600);
+    clearTimeout(tt); device.querySelectorAll('.toast').forEach(x => x.remove());
+    const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg; device.append(t);
+    tt = setTimeout(() => t.remove(), 2400);
   }
 
-  function renderAll() { renderHeader(); renderHome(); renderControl(); renderHistory(); renderAlerts(); renderSettings(); }
+  function renderAll() { renderHome(); renderHistory(); renderSettings(); }
   autoLevels(); renderAll();
   matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', renderAll);
 })();
