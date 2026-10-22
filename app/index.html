@@ -36,6 +36,7 @@
     --warn: #c6851a;
     --crit: #c0392b;
     --band: rgba(47, 107, 58, .12);   /* ideal range band in charts */
+    --sky-1: #cfe6f2; --sky-2: #eef6ec;   /* behind the 3D greenhouse */
     --serif: "Noto Serif Georgian", "Sylfaen", Georgia, serif;
     --sans: "Noto Sans Georgian", "Sylfaen", system-ui, sans-serif;
     --r: 14px;
@@ -46,6 +47,7 @@
       --page: #0b110d; --bg: #101813; --surface: #18231b; --surface-2: #1e2b21; --ink: #e6efe7; --muted: #9aab9d;
       --line: #2a382d; --leaf: #74c283; --leaf-ink: #0d1a10; --leaf-soft: #20352a; --sun: #f0b25a;
       --ok: #6fd18e; --warn: #f0b25a; --crit: #ff7a6b; --band: rgba(116, 194, 131, .14);
+      --sky-1: #102035; --sky-2: #1b2d38;
       color-scheme: dark;
     }
   }
@@ -104,6 +106,13 @@
   .card-h span, .link { font-size: 12px; color: var(--muted); }
   .link { color: var(--leaf); font-weight: 500; background: none; border: 0; padding: 0; }
 
+  /* 3D greenhouse card */
+  .hero3d { position: relative; height: 250px; border-radius: 20px; overflow: hidden; border: 1px solid var(--line);
+    background: linear-gradient(var(--sky-1), var(--sky-2)); }
+  .hero3d canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
+  .pill { position: absolute; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: 999px;
+    background: color-mix(in srgb, var(--surface) 88%, transparent); font-size: 13px; font-weight: 500; pointer-events: none; }
+  .pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
   /* status banner */
   .status { display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: var(--r); background: var(--leaf); color: var(--leaf-ink); }
   .status svg { width: 30px; height: 30px; flex: none; }
@@ -265,22 +274,21 @@
     <main id="main">
       <!-- ================= HOME ================= -->
       <section class="screen" id="s-home" aria-label="მთავარი">
-        <div class="status" id="statusBanner">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>
-          <div><b>ყველაფერი რიგზეა</b><span>ავტომატური რეჟიმი · განახლდა 1 წთ წინ</span></div>
+        <div class="hero3d" id="hero3d">
+          <canvas id="gh3d" aria-label="სათბურის 3D ხედი"></canvas>
+          <span class="pill"><i></i>ყველაფერი რიგზეა</span>
         </div>
 
         <div class="tiles">
-          <div class="tile"><div class="lbl">ჰაერი <i class="dot"></i></div><div class="val" id="vT">23.4<small>°C</small></div><div class="ideal">იდეალი 21–27 °C</div><svg class="spark" id="spT" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
-          <div class="tile"><div class="lbl">ტენიანობა <i class="dot"></i></div><div class="val" id="vH">64<small>%</small></div><div class="ideal">იდეალი 60–70 %</div><svg class="spark" id="spH" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
-          <div class="tile"><div class="lbl">ნიადაგი <i class="dot"></i></div><div class="val" id="vS">73<small>%</small></div><div class="ideal">იდეალი 70–80 %</div><svg class="spark" id="spS" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
-          <div class="tile"><div class="lbl">გარეთ <i class="dot warn"></i></div><div class="val">9<small>°C</small></div><div class="ideal">ღრუბლიანი · 4 მ/წმ</div><svg class="spark" id="spO" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
+          <div class="tile"><div class="lbl">ჰაერი <i class="dot"></i></div><div class="val" id="vT">23.4<small>°C</small></div><svg class="spark" id="spT" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
+          <div class="tile"><div class="lbl">ტენიანობა <i class="dot"></i></div><div class="val" id="vH">64<small>%</small></div><svg class="spark" id="spH" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
+          <div class="tile"><div class="lbl">ნიადაგი <i class="dot"></i></div><div class="val" id="vS">73<small>%</small></div><svg class="spark" id="spS" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
+          <div class="tile"><div class="lbl">გარეთ <i class="dot warn"></i></div><div class="val">9<small>°C</small></div><svg class="spark" id="spO" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
         </div>
 
         <div class="card">
           <div class="card-h"><b>ტემპერატურა · 24 სთ</b><button class="link" type="button" data-go="history">ისტორია</button></div>
           <svg class="chart" id="homeChart" viewBox="0 0 340 170"></svg>
-          <div class="legend"><span><i style="background:var(--leaf)"></i>სათბური</span><span><i style="background:var(--band)"></i>იდეალური (დღე / ღამე)</span></div>
         </div>
 
         <div class="card">
@@ -291,17 +299,16 @@
         <div class="card">
           <div class="crop-card">
             <span class="crop-emb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="14" r="7" fill="#d6402b"/><path d="M12 7c-1-2-3-3-5-2 2 0 3 1 3 2-1-1-3-1-4 0 2 0 4 1 6 1 2 0 4-1 6-1-1-1-3-1-4 0 0-1 1-2 3-2-2-1-4 0-5 2Z" fill="#3f7d3a"/></svg></span>
-            <div class="t"><b id="cropName">პომიდორი</b><span>კულტურის შაბლონი · ავტომატური პარამეტრები</span></div>
+            <div class="t"><b id="cropName">პომიდორი</b></div>
             <button class="link" type="button" data-go="settings">შეცვლა</button>
           </div>
-          <dl class="kv" id="cropKv"></dl>
         </div>
 
         <div class="card">
-          <div class="card-h"><b>მოწყობილობის მდგომარეობა</b><span>სათბურიას ბლოკი</span></div>
+          <div class="card-h"><b>მოწყობილობა</b></div>
           <div class="health">
-            <div><b>4G</b><span>სიგნალი კარგი</span></div>
-            <div><b>220 V</b><span>დენი არის</span></div>
+            <div><b>4G</b><span>კავშირი</span></div>
+            <div><b>220 V</b><span>დენი</span></div>
             <div><b>100 %</b><span>ბატარეა</span></div>
           </div>
         </div>
@@ -311,7 +318,7 @@
       <section class="screen" id="s-control" aria-label="მართვა" hidden>
         <h1>მართვა</h1>
         <div class="card mode-bar">
-          <div><b id="modeTitle">ავტომატური რეჟიმი</b><span id="modeSub">სათბური თავად ინარჩუნებს იდეალურ პირობებს</span></div>
+          <div><b id="modeTitle">ავტომატური რეჟიმი</b></div>
           <button class="btn soft" id="allAuto" type="button" disabled>ყველა ავტოზე</button>
         </div>
         <div id="devList" style="display:grid;gap:12px"></div>
@@ -382,9 +389,9 @@
 
         <div class="group-h">განგაში მოვიდეს</div>
         <div class="list">
-          <div class="row"><div class="k"><b>აპლიკაციაში</b><span>შეტყობინება ტელეფონზე</span></div><button class="switch" type="button" role="switch" aria-checked="true" aria-label="აპლიკაციაში"></button></div>
-          <div class="row"><div class="k"><b>SMS-ით</b><span>ინტერნეტის გარეშეც</span></div><button class="switch" type="button" role="switch" aria-checked="true" aria-label="SMS-ით"></button></div>
-          <div class="row"><div class="k"><b>ზარით</b><span>მხოლოდ საშიში შემთხვევისას</span></div><button class="switch" type="button" role="switch" aria-checked="true" aria-label="ზარით"></button></div>
+          <div class="row"><div class="k"><b>აპლიკაციაში</b></div><button class="switch" type="button" role="switch" aria-checked="true" aria-label="აპლიკაციაში"></button></div>
+          <div class="row"><div class="k"><b>SMS-ით</b></div><button class="switch" type="button" role="switch" aria-checked="true" aria-label="SMS-ით"></button></div>
+          <div class="row"><div class="k"><b>ზარით</b></div><button class="switch" type="button" role="switch" aria-checked="true" aria-label="ზარით"></button></div>
           <div class="row"><div class="k"><b>ტელეფონის ნომერი</b></div><div class="v">+995 5•• •• •• 12</div></div>
         </div>
 
@@ -531,16 +538,12 @@
   function renderHome() {
     const cr = crop(), T = DATA.t, Hm = DATA.h, S = DATA.s;
     $('vT').innerHTML = `${T[23]}<small>°C</small>`; $('vH').innerHTML = `${Hm[23]}<small>%</small>`; $('vS').innerHTML = `${S[23]}<small>%</small>`;
-    document.querySelectorAll('.tile .ideal')[0].textContent = `იდეალი ${cr.day[0]}–${cr.day[1]} °C`;
-    document.querySelectorAll('.tile .ideal')[1].textContent = `იდეალი ${cr.rh[0]}–${cr.rh[1]} %`;
-    document.querySelectorAll('.tile .ideal')[2].textContent = `იდეალი ${cr.soil[0]}–${cr.soil[1]} %`;
     const leaf = getComputedStyle(document.documentElement).getPropertyValue('--leaf').trim();
     spark($('spT'), T.slice(-12), leaf); spark($('spH'), Hm.slice(-12), leaf); spark($('spS'), S.slice(-12), leaf);
     spark($('spO'), DATA.o.slice(-12), getComputedStyle(document.documentElement).getPropertyValue('--muted').trim());
     chart($('homeChart'), T, { band: tempBand, labels: hourLabels });
     $('homeChips').innerHTML = Object.keys(DEV).map(k => `<button class="chip ${isOn(k) ? 'on' : ''}" type="button" data-go="control">${ICON[k]}<div><b>${k === 'vent' ? ventName() : DEV[k].name}</b><span>${devSummary(k)}</span></div></button>`).join('');
     $('cropName').textContent = cr.name;
-    $('cropKv').innerHTML = `<dt>დღე</dt><dd>${cr.day[0]}–${cr.day[1]} °C</dd><dt>ღამე</dt><dd>${cr.night[0]}–${cr.night[1]} °C</dd><dt>ჰაერის ტენი</dt><dd>${cr.rh[0]}–${cr.rh[1]} %</dd><dt>ნიადაგის ტენი</dt><dd>${cr.soil[0]}–${cr.soil[1]} %</dd><dt>სინათლე</dt><dd>${cr.light}</dd>`;
   }
 
   /* ---------------- control ---------------- */
@@ -548,10 +551,10 @@
     const d = DEV[k], name = k === 'vent' ? (state.type === 'film' ? 'გვერდების ახვევა' : 'ფანჯრების გაღება') : d.name;
     let body = '';
     if (k === 'fan' || k === 'vent' || k === 'light') {
-      body = `<input type="range" id="r-${k}" min="0" max="100" step="5" value="${d.val}" aria-label="${name}"><div class="range-scale"><span>0 %</span><span>50 %</span><span>100 %</span></div>`;
+      body = `<input type="range" id="r-${k}" min="0" max="100" step="5" value="${d.val}" aria-label="${name}">`;
       if (k === 'light') body += `<div class="seg wide" role="group" aria-label="სინათლის ფერი"><button type="button" data-color="warm" aria-pressed="${d.color === 'warm'}">თბილი თეთრი</button><button type="button" data-color="grow" aria-pressed="${d.color === 'grow'}">ზრდის (იისფერი)</button></div>`;
     } else if (k === 'heat') {
-      body = `<input type="range" id="r-heat" min="4" max="35" step="1" value="${d.val}" aria-label="გათბობა"><div class="range-scale"><span>გამორთ.</span><span>20 °C</span><span>35 °C</span></div>`;
+      body = `<input type="range" id="r-heat" min="4" max="35" step="1" value="${d.val}" aria-label="გათბობა">`;
     } else if (k === 'water') {
       body = `<button class="btn" type="button" id="waterNow">${d.val ? 'მორწყვის შეჩერება' : 'მორწყვა ახლა · 10 წთ'}</button>`;
     }
@@ -566,7 +569,6 @@
     const manual = Object.values(DEV).some(d => !d.auto);
     $('allAuto').disabled = !manual;
     $('modeTitle').textContent = manual ? 'ხელით მართვა' : 'ავტომატური რეჟიმი';
-    $('modeSub').textContent = manual ? 'ზოგი მოწყობილობა თქვენ მიერ არის დაყენებული' : 'სათბური თავად ინარჩუნებს იდეალურ პირობებს';
   }
   $('devList').addEventListener('input', e => {
     const k = e.target.closest('[data-dev]')?.dataset.dev; if (!k || e.target.type !== 'range') return;
@@ -576,7 +578,7 @@
     card.querySelector('.dev-name span').textContent = devSummary(k);
     card.classList.toggle('active', isOn(k));
     card.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.mode === 'auto') === d.auto)));
-    $('allAuto').disabled = false; $('modeTitle').textContent = 'ხელით მართვა'; $('modeSub').textContent = 'ზოგი მოწყობილობა თქვენ მიერ არის დაყენებული';
+    $('allAuto').disabled = false; $('modeTitle').textContent = 'ხელით მართვა';
   });
   $('devList').addEventListener('click', e => {
     const card = e.target.closest('[data-dev]'); if (!card) return; const k = card.dataset.dev, d = DEV[k];
@@ -695,8 +697,16 @@
 
   function renderAll() { renderHeader(); renderHome(); renderControl(); renderHistory(); renderAlerts(); renderSettings(); }
   autoLevels(); renderAll();
+  window.APP = { DEV, state, CROPS };   // read by the 3D greenhouse
   matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', renderAll);
 })();
 </script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module" src="greenhouse3d.js"></script>
 </body>
 </html>
