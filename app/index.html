@@ -326,7 +326,7 @@
           </div>
           <div class="w-foot">
             <span class="w-ok" id="homeStatus"><i></i>ყველაფერი რიგზეა</span>
-            <span class="w-out">გარეთ <b>9°</b></span>
+            <span class="w-out">გარეთ <b id="vOut">9°</b></span>
           </div>
         </div>
 
@@ -535,8 +535,8 @@
   const state = { gh: 0, crop: 'tomato', type: 'glass' };
   const isDay = h => h >= 6 && h < 20;
   const crop = () => CROPS[state.crop];
-  // 24 hourly readings ending at 11:00 today
-  const NOW_H = 11;
+  // 24 hourly demo readings ending at the current hour, so night shows night values
+  const NOW_H = new Date().getHours();
   const hours = Array.from({ length: 24 }, (_, i) => (NOW_H - 23 + i + 24) % 24);
   function series(cr) {
     const midN = (cr.night[0] + cr.night[1]) / 2, midD = (cr.day[0] + cr.day[1]) / 2;
@@ -628,12 +628,12 @@
     chart($('homeChart'), T, { band: tempBand, labels: hourLabels });
     $('homeChips').innerHTML = Object.keys(DEV).map(k => `<button class="chip ${isOn(k) ? 'on' : ''}" type="button" data-go="control">${ICON[k]}<div><b>${k === 'vent' ? ventName() : DEV[k].name}</b><span>${devSummary(k)}</span></div></button>`).join('');
     $('cropName').textContent = cr.name; $('cropEmb').textContent = cr.ico;
-    const hr = new Date().getHours();
+    const hr = NOW_H;
     $('hello').textContent = hr < 5 ? 'ღამე მშვიდობისა' : hr < 12 ? 'დილა მშვიდობისა' : hr < 18 ? 'გამარჯობა' : 'საღამო მშვიდობისა';
     const band = tempBand(23), ok = T[23] >= band[0] - 1 && T[23] <= band[1] + 1 && Hm[23] <= cr.rh[1] + 8;
     $('homeStatus').className = 'w-ok' + (ok ? '' : ' warn');
     $('homeStatus').lastChild.textContent = ok ? 'ყველაფერი რიგზეა' : 'ყურადღება';
-    $('homeTip').textContent = cr.note;
+    $('homeTip').textContent = cr.note; $('vOut').textContent = `${DATA.o[23]}°`;
   }
 
   /* ---------------- control ---------------- */
@@ -680,7 +680,7 @@
   });
   // what automatic mode would choose right now (demo: midday, slightly warm)
   function autoLevels() {
-    const t = DATA.t[23], c = crop(), target = (c.day[0] + c.day[1]) / 2 + 0.5;
+    const t = DATA.t[23], band = tempBand(23), target = (band[0] + band[1]) / 2 + 0.5;
     if (DEV.fan.auto) DEV.fan.val = Math.max(0, Math.min(100, Math.round((t - target - 0.3) / 3 * 20) * 5));
     if (DEV.vent.auto) DEV.vent.val = Math.max(0, Math.min(100, Math.round((t - target - 0.8) / 4 * 20) * 5));
     if (DEV.heat.auto) { DEV.heat.val = Math.round(target - 0.5); DEV.heat.power = Math.max(0, Math.min(100, Math.round((DEV.heat.val - t + 0.3) / 1.2 * 20) * 5)); }
