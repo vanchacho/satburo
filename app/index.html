@@ -765,6 +765,15 @@
   function renderAll() { renderHeader(); renderHome(); renderControl(); renderHistory(); renderAlerts(); renderSettings(); }
   autoLevels(); renderAll();
   window.APP = { DEV, state, CROPS };   // read by the 3D greenhouse
+  // iPhone keeps the installed app's old copy: when the server has a newer one, reload past the cache
+  async function checkUpdate() {
+    try {
+      const [cached, fresh] = await Promise.all([fetch('./', { cache: 'force-cache' }), fetch('./', { cache: 'no-store' })].map(r => r.then(x => x.text())));
+      if (cached !== fresh) location.replace('./?v=' + Date.now());
+    } catch (e) {}
+  }
+  checkUpdate();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUpdate(); });
   matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', renderAll);
 })();
 </script>
