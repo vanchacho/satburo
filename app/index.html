@@ -768,8 +768,10 @@
   // iPhone keeps the installed app's old copy: when the server has a newer one, reload past the cache
   async function checkUpdate() {
     try {
-      const [cached, fresh] = await Promise.all([fetch('./', { cache: 'force-cache' }), fetch('./', { cache: 'no-store' })].map(r => r.then(x => x.text())));
-      if (cached !== fresh) location.replace('./?v=' + Date.now());
+      const cached = await fetch('./', { cache: 'force-cache' }).then(r => r.text());
+      const fresh = await fetch('./', { cache: 'reload' }).then(r => r.text());   // 'reload' also refreshes the cache
+      const last = +sessionStorage.getItem('satburia-reload') || 0;
+      if (cached !== fresh && Date.now() - last > 60000) { sessionStorage.setItem('satburia-reload', Date.now()); location.replace('./?v=' + Date.now()); }
     } catch (e) {}
   }
   checkUpdate();
