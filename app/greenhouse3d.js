@@ -1,5 +1,5 @@
 // Light 3D greenhouse for the app's home card. Mirrors the website's model in a simpler form and
-// follows the live device state in window.APP (vents, fans, heating, lights, watering, crop, house type).
+// follows the live device state in window.APP (fans, heating, lights, watering, crop, house type).
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -103,7 +103,6 @@ const rotors = { glass: [], film: [] };
 /* ---------------- glass house ---------------- */
 const glass = new THREE.Group();
 const roofY = x => H + (R - H) * (1 - Math.abs(x) / HW);
-const vents = [];
 {
   const list = [];
   for (let z = -HL; z <= HL + 1e-6; z += 1.5) for (const x of [HW, -HW]) { list.push([[x, 0, z], [x, H, z]]); list.push([[x, H, z], [0, R, z]]); }
@@ -116,17 +115,6 @@ const vents = [];
   for (const z of [HL, -HL]) { quad([-HW, 0, z], [HW, 0, z], [HW, H, z], [-HW, H, z]); tri([-HW, H, z], [HW, H, z], [0, R, z]); }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3)); g.computeVertexNormals();
   const skin = new THREE.Mesh(g, glassMat); skin.renderOrder = 2; glass.add(skin);
-  // roof vents on both slopes, hinged at the ridge
-  const slope = Math.atan2(H - R, HW), len = 1.15;
-  const pg = new THREE.BoxGeometry(len, 0.03, 2.6); pg.translate(len / 2, 0, 0);
-  const ventMat = new THREE.MeshStandardMaterial({ color: '#dff2ea', transparent: true, opacity: 0.4, roughness: 0.05, depthWrite: false });
-  for (const sx of [1, -1]) for (const zc of [-3, 3]) {
-    const holder = new THREE.Group(); holder.scale.x = sx;
-    const pivot = new THREE.Group(); pivot.position.set(0.02, R + 0.04, zc); pivot.rotation.z = slope; pivot.userData.slope = slope;
-    const panel = new THREE.Mesh(pg, ventMat); panel.renderOrder = 3;
-    panel.add(new THREE.LineSegments(new THREE.EdgesGeometry(pg), new THREE.LineBasicMaterial({ color: '#f4f6f3' })));
-    pivot.add(panel); holder.add(pivot); glass.add(holder); vents.push(pivot);
-  }
   // two fans on each side wall
   for (const sx of [1, -1]) for (const z of [-2.25, 2.25]) {
     const { g: f, rotor } = makeFan(); f.position.set(sx * (HW + 0.01), 1.75, z); f.rotation.y = sx * Math.PI / 2; glass.add(f); rotors.glass.push(rotor);
@@ -135,7 +123,6 @@ const vents = [];
 
 /* ---------------- polytunnel ---------------- */
 const film = new THREE.Group();
-const rolls = [];
 {
   const TH0 = 1.3, TR = 3.5, SEG = 20;
   const ty = x => TH0 + (TR - TH0) * Math.sqrt(Math.max(0, 1 - (x / HW) ** 2));
@@ -154,14 +141,9 @@ const rolls = [];
   const arch = new THREE.Mesh(g, filmMat); arch.renderOrder = 2; film.add(arch);
   const shape = new THREE.Shape(); shape.moveTo(-HW, 0); shape.lineTo(HW, 0); for (let i = SEG; i >= 0; i--) shape.lineTo(prof[i][0], prof[i][1]);
   for (const z of [HL, -HL]) { const e = new THREE.Mesh(new THREE.ShapeGeometry(shape), filmMat); e.position.z = z; e.renderOrder = 2; film.add(e); }
-  // roll-up sides
-  const cg = new THREE.PlaneGeometry(2 * HL, 1); cg.translate(0, -0.5, 0); cg.rotateY(Math.PI / 2);
-  const tg = new THREE.CylinderGeometry(0.05, 0.05, 2 * HL, 10); tg.rotateX(Math.PI / 2);
-  for (const sx of [-1, 1]) {
-    const curtain = new THREE.Mesh(cg, filmMat); curtain.position.set(sx * (HW + 0.02), TH0, 0); curtain.renderOrder = 2;
-    const tube = new THREE.Mesh(tg, steel); tube.position.set(sx * (HW + 0.06), 0.25, 0);
-    film.add(curtain, tube); rolls.push({ curtain, tube, TH0 });
-  }
+  // fixed film side walls (ventilation is by the shutter fans only)
+  const sg = new THREE.PlaneGeometry(2 * HL, TH0); sg.translate(0, TH0 / 2, 0); sg.rotateY(Math.PI / 2);
+  for (const sx of [-1, 1]) { const side = new THREE.Mesh(sg, filmMat); side.position.x = sx * (HW + 0.02); side.renderOrder = 2; film.add(side); }
   for (const [x, z, ry] of [[-1.7, HL, 0], [1.7, -HL, Math.PI]]) {
     const { g: f, rotor } = makeFan(); f.position.set(x, 1.8, z + (z > 0 ? 0.01 : -0.01)); f.rotation.y = ry; film.add(f); rotors.film.push(rotor);
   }
@@ -244,8 +226,8 @@ resize();
 let inView = true;
 new IntersectionObserver(([en]) => { inView = en.isIntersecting; }).observe(box);
 
-const cur = { vent: 0, fan: 0, heat: 0, lamp: 0 };
-let lastCrop = null, lastType = null, lastVent = -1, last = performance.now(), acc = 0;
+const cur = { fan: 0, heat: 0, lamp: 0 };
+let lastCrop = null, lastType = null, last = performance.now(), acc = 0;
 const GROW = new THREE.Color('#d68cff'), WARM = new THREE.Color('#ffd9a0');
 
 function frame(now) {
@@ -262,14 +244,10 @@ function frame(now) {
     lastType = state.type; renderer.shadowMap.needsUpdate = true;
   }
   const k = reduce ? 1 : 1 - Math.exp(-step * 4);
-  cur.vent += (DEV.vent.val / 100 - cur.vent) * k;
   cur.fan += (DEV.fan.val / 100 - cur.fan) * k;
   cur.heat += ((DEV.heat.power || 0) / 100 - cur.heat) * k;
   cur.lamp += (DEV.light.val / 100 - cur.lamp) * k;
 
-  for (const v of vents) v.rotation.z = v.userData.slope + cur.vent * 0.75;
-  const edge = 0.25 + cur.vent * 0.95;
-  for (const r of rolls) { r.curtain.scale.y = Math.max(0.02, r.TH0 - edge); r.tube.position.y = edge; }
   if (!reduce) for (const r of rotors[state.type === 'film' ? 'film' : 'glass']) r.rotation.z -= step * cur.fan * 16;
   heatMat.emissiveIntensity = cur.heat * 1.8;
   const lc = DEV.light.color === 'grow' ? GROW : WARM;
@@ -279,7 +257,6 @@ function frame(now) {
   const night = isDark();
   hemi.intensity = night ? 0.95 : 1.4;
   sun.intensity = night ? 0.9 : 2.4;
-  if (Math.abs(cur.vent - lastVent) > 0.004) { renderer.shadowMap.needsUpdate = true; lastVent = cur.vent; }
 
   controls.update(step);
   renderer.render(scene, camera);

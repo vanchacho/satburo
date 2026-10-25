@@ -488,11 +488,6 @@
         <input type="range" id="rgFan" min="0" max="100" step="5" value="0">
       </div>
       <div class="dev">
-        <label class="dev-head" for="rgVent"><span>ფანჯრების გაღება</span><output id="lvVent">0 %</output></label>
-        <button class="mode" id="mdVent" type="button" aria-pressed="true" title="ავტომატური რეჟიმი">ავტო</button>
-        <input type="range" id="rgVent" min="0" max="100" step="5" value="0">
-      </div>
-      <div class="dev">
         <label class="dev-head" for="rgLight"><span>გათბობა</span><output id="lvLight">24 °C</output></label>
         <button class="mode" id="mdLight" type="button" aria-pressed="true" title="ავტომატური რეჟიმი">ავტო</button>
         <input type="range" id="rgLight" min="4" max="35" step="1" value="24">
@@ -564,15 +559,15 @@
     <div class="panel glass">
       <span class="eyebrow">ვენტილაცია</span>
       <h2>სიცხეში სათბური თავად განიავდება</h2>
-      <p>სისტემამ იცის, რა ტემპერატურა და ტენიანობა სჭირდება თქვენს კულტურას. სათბურის გადახურებისას ვენტილატორები თავად ჩაირთვება და ფანჯრები საჭირო ზომით გაიღება.</p>
+      <p>სისტემამ იცის, რა ტემპერატურა და ტენიანობა სჭირდება თქვენს კულტურას. სათბურის გადახურებისას ჟალუზიანი ვენტილატორები თავად ჩაირთვება და ცხელ, ნესტიან ჰაერს სუფთა გარე ჰაერით ცვლის.</p>
     </div>
   </section>
 
   <section class="scene" id="weather" data-scene>
     <div class="panel glass">
-      <span class="eyebrow">ამინდის სადგური <span class="tag">დამატებითი მოდული</span></span>
-      <h2>ქარი ან წვიმა? ფანჯრები თავად დაიხურება</h2>
-      <p>ანემომეტრი ზომავს ქარის სიჩქარეს, წვიმის სენსორი კი ნალექს აფიქსირებს. ძლიერი ქარის ან წვიმის დროს სისტემა ფანჯრებს დახურავს და შეტყობინებას გამოგიგზავნის, რომ ქარმა აპკი არ დახიოს და მოსავალი არ დაზიანდეს.</p>
+      <span class="eyebrow">ამინდი</span>
+      <h2>გარეთ წვიმს ან ყინავს? სისტემამ უკვე იცის</h2>
+      <p>გარე ტემპერატურისა და წვიმის სენსორები ამინდს სათბურის გარედან აკვირდება. აცივებისას გათბობა დროულად ჩაირთვება, წვიმისას კი ვენტილატორები ტენიანობას დაიჭერს, რომ სოკოვანი დაავადება არ გაჩნდეს. ყინვის ან ქარიშხლის დროს შეტყობინებას მაშინვე მიიღებთ.</p>
     </div>
   </section>
 
@@ -612,7 +607,7 @@
       <p>ადევნეთ თვალი ტემპერატურას, ტენიანობასა და ნიადაგის მდგომარეობას რეალურ დროში, სადაც არ უნდა იყოთ.</p>
       <ul class="feat">
         <li>კულტურის შაბლონები: მარწყვი, პომიდორი, კიტრი, წიწაკა, მწვანილი</li>
-        <li>ვენტილატორების, ფანჯრების, გათბობისა და განათების მართვა</li>
+        <li>ვენტილატორების, გათბობის, მორწყვისა და განათების მართვა</li>
         <li>ავტომატური ან ხელით მართვა ნებისმიერ ამინდში</li>
         <li>შეტყობინებები აპლიკაციაში, SMS-ით და ზარით</li>
       </ul>
@@ -689,7 +684,7 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let lang = 'ka';
 try { if (localStorage.getItem('satburia-lang') === 'en') lang = 'en'; } catch (e) {}
 const L = (ka, en) => (lang === 'en' ? en : ka);
-const EN = { "სათბურია": "Satburia", "მთავარი": "Main", "კლიმატი": "Climate", "ამინდი": "Weather", "მორწყვა": "Irrigation", "განგაში": "Alerts", "აპლიკაცია": "App", "ჩვენ შესახებ": "About", "დაკავშირება": "Contact", "მენიუ": "Menu", "მორწყვა და კვება": "Irrigation & nutrition", "განგაში · სათბური": "Alert · Greenhouse", "სათბურში ტემპერატურა 3 °C-მდე დაეცა. გათბობა ჩართულია.": "The greenhouse temperature dropped to 3 °C. Heating is on.", "დახურვა": "Close", "სათბურის 360° ხედი": "360° greenhouse view", "დახურვა ×": "Close ×", "გადაატრიალეთ მაუსით ან თითით · გაადიდეთ ბორბლით ან ორი თითით · დააჭირეთ მცენარეს": "Drag to rotate · Scroll or pinch to zoom · Tap a plant", "ხედი": "View", "გარედან": "Outside", "შიგნით": "Inside", "გარემო": "Environment", "შაბლონი: პომიდორი": "Template: Tomato", "ავტომატური": "Automatic", "კულტურის შაბლონი": "Crop template", "მარწყვი": "Strawberry", "პომიდორი": "Tomato", "კიტრი": "Cucumber", "წიწაკა": "Pepper", "მწვანილი": "Herbs", "ჰაერი ახლა": "Air now", "ტენი ახლა": "Humidity now", "ნიადაგი ახლა": "Soil now", "ვენტილატორები": "Fans", "ავტომატური რეჟიმი": "Automatic mode", "ავტო": "Auto", "ფანჯრების გაღება": "Window opening", "გათბობა": "Heating", "განათება": "Lighting", "სინათლის ფერი": "Light color", "თბილი თეთრი": "Warm white", "ზრდის (იისფერი)": "Grow (purple)", "ყველაფერი ავტოზე": "All to auto", "განგაშის ტესტი": "Test alert", "გარეთ 22 °C": "Outside 22 °C", "სათბურის ტიპი": "Greenhouse type", "შუშის სათბური": "Glass greenhouse", "პარკის სათბური": "Polytunnel", "დღე და ღამე": "Day and night", "დღე": "Day", "ღამე": "Night", "მზიანი": "Sunny", "ღრუბლიანი": "Cloudy", "წვიმა": "Rain", "თოვლი": "Snow", "ქარიშხალი": "Storm", "ქარი": "Wind", "3 მ/წმ": "3 m/s", "იდეალური გარემო · ახლა სათბურში": "Ideal conditions · now in the greenhouse", "ზოგადი რეკომენდაცია სათბურისთვის. ჯიშის მიხედვით შეიძლება განსხვავდებოდეს.": "General greenhouse guideline. May vary by variety.", "ჭკვიანი სათბური საქართველოსთვის": "A smart greenhouse for Georgia", "აირჩიეთ კულტურა აპლიკაციაში და სათბური თავად შეინარჩუნებს საჭირო ტემპერატურას, ტენიანობასა და მორწყვას.": "Choose a crop in the app and the greenhouse will keep the right temperature, humidity and watering on its own.", "როგორ მუშაობს": "How it works", "360° ხედი": "360° view", "ახლა სათბურში:": "In the greenhouse now:", "ვენტილაცია": "Ventilation", "სიცხეში სათბური თავად განიავდება": "In the heat, the greenhouse ventilates itself", "სისტემამ იცის, რა ტემპერატურა და ტენიანობა სჭირდება თქვენს კულტურას. სათბურის გადახურებისას ვენტილატორები თავად ჩაირთვება და ფანჯრები საჭირო ზომით გაიღება.": "The system knows the temperature and humidity your crop needs. When the greenhouse overheats, the fans switch on by themselves and the windows open as far as needed.", "ამინდის სადგური": "Weather station", "დამატებითი მოდული": "Add-on module", "ქარი ან წვიმა? ფანჯრები თავად დაიხურება": "Wind or rain? The windows close themselves", "ანემომეტრი ზომავს ქარის სიჩქარეს, წვიმის სენსორი კი ნალექს აფიქსირებს. ძლიერი ქარის ან წვიმის დროს სისტემა ფანჯრებს დახურავს და შეტყობინებას გამოგიგზავნის, რომ ქარმა აპკი არ დახიოს და მოსავალი არ დაზიანდეს.": "An anemometer measures wind speed and a rain sensor detects precipitation. In strong wind or rain the system closes the windows and sends you a notification, so the wind can't tear the film and the crop stays safe.", "ნიადაგი, მორწყვა და კვება": "Soil, irrigation and nutrition", "მცენარე წყალს მაშინ იღებს, როცა სჭირდება": "Plants get water exactly when they need it", "სენსორები მუდმივად ზომავენ ნიადაგის ტენიანობას. ნიადაგის გამოშრობისას ტუმბო ჩაირთვება, საკმარისი ტენიანობის მიღწევისას კი თავად გამოირთვება.": "Sensors constantly measure soil moisture. When the soil dries out, the pump switches on, and it turns itself off once the soil is moist enough.", "პროფესიონალებისთვის": "For professionals", "pH და EC სენსორები აჩვენებენ ნიადაგის მჟავიანობასა და სასუქის კონცენტრაციას, რომ ზუსტად იცოდეთ, როდის და რა დოზით სჭირდება მცენარეს მინერალები.": "pH and EC sensors show soil acidity and fertilizer concentration, so you know exactly when and how much nutrient your plants need.", "მჟავიანობა · მაგალითი": "Acidity · example", "სასუქის კონცენტრაცია · მაგალითი": "Fertilizer concentration · example", "ყინვა და განგაში": "Frost and alerts", "რამე თუ მოხდება, მაშინვე გაიგებთ": "If anything happens, you'll know right away", "თუ სათბური ძალიან აცივდება ან გადახურდება, სენსორი გაფუჭდება ან კავშირი გაწყდება, შეტყობინება მოგივათ აპლიკაციაში, SMS-ით და ზარით, ღამითაც.": "If the greenhouse gets too cold or too hot, a sensor fails or the connection drops, you'll get a notification in the app, by SMS and by phone call, even at night.", "განგაშის მაგალითები": "Alert examples", "სათბურში ძალიან ცივა": "It's very cold in the greenhouse", "2 °C · გათბობა ჩართულია": "2 °C · heating is on", "კავშირი გაწყდა": "Connection lost", "მოწყობილობა 10 წუთია არ პასუხობს": "The device hasn't responded for 10 minutes", "ტემპერატურა აღდგა": "Temperature back to normal", "8 °C · ყველაფერი რიგზეა": "8 °C · everything is fine", "მთელი სათბური თქვენს ტელეფონში": "Your whole greenhouse on your phone", "ადევნეთ თვალი ტემპერატურას, ტენიანობასა და ნიადაგის მდგომარეობას რეალურ დროში, სადაც არ უნდა იყოთ.": "Keep an eye on temperature, humidity and soil conditions in real time, wherever you are.", "კულტურის შაბლონები: მარწყვი, პომიდორი, კიტრი, წიწაკა, მწვანილი": "Crop templates: strawberry, tomato, cucumber, pepper, herbs", "ვენტილატორების, ფანჯრების, გათბობისა და განათების მართვა": "Control of fans, windows, heating and lighting", "ავტომატური ან ხელით მართვა ნებისმიერ ამინდში": "Automatic or manual control in any weather", "შეტყობინებები აპლიკაციაში, SMS-ით და ზარით": "Notifications in the app, by SMS and by phone call", "სცადეთ 360° ხედში": "Try it in 360° view", "ქართველი ფერმერებისთვის შექმნილი": "Made for Georgian farmers", "სათბურია ქართული კომპანიაა, რომელიც სათბურების ავტომატიზაციით არის დაკავებული. ვქმნით სისტემას, რომელიც სათბურის კლიმატს თავად აკონტროლებს, ფერმერს კი ყველაფერს ტელეფონიდან აჩვენებს.": "Satburia is a Georgian company focused on greenhouse automation. We build a system that controls the greenhouse climate on its own and shows the farmer everything on their phone.", "რატომ შევქმენით": "Why we built it", "ყოველ წელს ფერმერები მოსავლის ნაწილს კარგავენ გადახურების, ზედმეტი ტენიანობისა და მოულოდნელი ყინვის გამო. უცხოური სისტემები ძვირია და ქართულ სათბურებს ყოველთვის არ ერგება.": "Every year farmers lose part of their harvest to overheating, excess humidity and sudden frost. Foreign systems are expensive and don't always suit Georgian greenhouses.", "რას ვაკეთებთ": "What we do", "ვამონტაჟებთ სენსორებსა და მართვის ბლოკს, რომლებიც სათბურს ავტომატურად მართავს. სისტემა მუშაობს როგორც შუშის, ისე პარკის სათბურებში.": "We install sensors and a control unit that run the greenhouse automatically. The system works in both glass greenhouses and polytunnels.", "ჩვენი მიზანი": "Our goal", "მცირე და საშუალო ფერმერებს შევთავაზოთ ხელმისაწვდომი ტექნოლოგია, რომ სიცხემ, ყინვამ ან გვალვამ მოსავალი აღარ დააზიანოს, შრომა კი ნაკლები დასჭირდეს.": "To give small and medium-sized farmers affordable technology, so heat, frost or drought no longer damage the harvest and the work gets easier.", "შუშისა და პარკის სათბურებისთვის": "For glass greenhouses and polytunnels", "მუშაობს მობილური ინტერნეტით, Wi-Fi არ სჭირდება": "Works over mobile internet, no Wi-Fi needed", "ქართულენოვანი აპლიკაცია და მხარდაჭერა": "App and support in Georgian", "მონიტორინგი და შეტყობინებები დღე-ღამის განმავლობაში": "Round-the-clock monitoring and notifications", "გახადეთ თქვენი სათბური ჭკვიანი": "Make your greenhouse smart", "მონტაჟი": "Installation", "მოწყობილობა და სენსორები": "Device and sensors", "დამონტაჟება თქვენს სათბურში": "Installation in your greenhouse", "პირველადი გამართვა": "Initial setup", "მომსახურება": "Service", "SIM ბარათი და მობილური ინტერნეტი": "SIM card and mobile internet", "აპლიკაცია და მონაცემების შენახვა": "App and data storage", "დისტანციური დახმარება": "Remote support", "ვიზიტი და სათბურის შეფასება": "Site visit and greenhouse assessment", "მონტაჟი და გამართვა": "Installation and setup", "დღე-ღამის მონიტორინგი": "Round-the-clock monitoring", "© 2026 სათბურია · ჭკვიანი სათბურები საქართველოში": "© 2026 Satburia · Smart greenhouses in Georgia" };
+const EN = { "სათბურია": "Satburia", "მთავარი": "Main", "კლიმატი": "Climate", "ამინდი": "Weather", "მორწყვა": "Irrigation", "განგაში": "Alerts", "აპლიკაცია": "App", "ჩვენ შესახებ": "About", "დაკავშირება": "Contact", "მენიუ": "Menu", "მორწყვა და კვება": "Irrigation & nutrition", "განგაში · სათბური": "Alert · Greenhouse", "სათბურში ტემპერატურა 3 °C-მდე დაეცა. გათბობა ჩართულია.": "The greenhouse temperature dropped to 3 °C. Heating is on.", "დახურვა": "Close", "სათბურის 360° ხედი": "360° greenhouse view", "დახურვა ×": "Close ×", "გადაატრიალეთ მაუსით ან თითით · გაადიდეთ ბორბლით ან ორი თითით · დააჭირეთ მცენარეს": "Drag to rotate · Scroll or pinch to zoom · Tap a plant", "ხედი": "View", "გარედან": "Outside", "შიგნით": "Inside", "გარემო": "Environment", "შაბლონი: პომიდორი": "Template: Tomato", "ავტომატური": "Automatic", "კულტურის შაბლონი": "Crop template", "მარწყვი": "Strawberry", "პომიდორი": "Tomato", "კიტრი": "Cucumber", "წიწაკა": "Pepper", "მწვანილი": "Herbs", "ჰაერი ახლა": "Air now", "ტენი ახლა": "Humidity now", "ნიადაგი ახლა": "Soil now", "ვენტილატორები": "Fans", "ავტომატური რეჟიმი": "Automatic mode", "ავტო": "Auto", "გათბობა": "Heating", "განათება": "Lighting", "სინათლის ფერი": "Light color", "თბილი თეთრი": "Warm white", "ზრდის (იისფერი)": "Grow (purple)", "ყველაფერი ავტოზე": "All to auto", "განგაშის ტესტი": "Test alert", "გარეთ 22 °C": "Outside 22 °C", "სათბურის ტიპი": "Greenhouse type", "შუშის სათბური": "Glass greenhouse", "პარკის სათბური": "Polytunnel", "დღე და ღამე": "Day and night", "დღე": "Day", "ღამე": "Night", "მზიანი": "Sunny", "ღრუბლიანი": "Cloudy", "წვიმა": "Rain", "თოვლი": "Snow", "ქარიშხალი": "Storm", "ქარი": "Wind", "3 მ/წმ": "3 m/s", "იდეალური გარემო · ახლა სათბურში": "Ideal conditions · now in the greenhouse", "ზოგადი რეკომენდაცია სათბურისთვის. ჯიშის მიხედვით შეიძლება განსხვავდებოდეს.": "General greenhouse guideline. May vary by variety.", "ჭკვიანი სათბური საქართველოსთვის": "A smart greenhouse for Georgia", "აირჩიეთ კულტურა აპლიკაციაში და სათბური თავად შეინარჩუნებს საჭირო ტემპერატურას, ტენიანობასა და მორწყვას.": "Choose a crop in the app and the greenhouse will keep the right temperature, humidity and watering on its own.", "როგორ მუშაობს": "How it works", "360° ხედი": "360° view", "ახლა სათბურში:": "In the greenhouse now:", "ვენტილაცია": "Ventilation", "სიცხეში სათბური თავად განიავდება": "In the heat, the greenhouse ventilates itself", "სისტემამ იცის, რა ტემპერატურა და ტენიანობა სჭირდება თქვენს კულტურას. სათბურის გადახურებისას ჟალუზიანი ვენტილატორები თავად ჩაირთვება და ცხელ, ნესტიან ჰაერს სუფთა გარე ჰაერით ცვლის.": "The system knows the temperature and humidity your crop needs. When the greenhouse overheats, the shutter fans switch on by themselves and swap the hot, humid air for fresh outside air.", "გარეთ წვიმს ან ყინავს? სისტემამ უკვე იცის": "Rain or frost outside? The system already knows", "გარე ტემპერატურისა და წვიმის სენსორები ამინდს სათბურის გარედან აკვირდება. აცივებისას გათბობა დროულად ჩაირთვება, წვიმისას კი ვენტილატორები ტენიანობას დაიჭერს, რომ სოკოვანი დაავადება არ გაჩნდეს. ყინვის ან ქარიშხლის დროს შეტყობინებას მაშინვე მიიღებთ.": "Outside temperature and rain sensors watch the weather from outside the greenhouse. When it gets cold, heating switches on in time; when it rains, the fans hold the humidity down so fungal disease can't start. In frost or a storm you get a notification right away.", "ნიადაგი, მორწყვა და კვება": "Soil, irrigation and nutrition", "მცენარე წყალს მაშინ იღებს, როცა სჭირდება": "Plants get water exactly when they need it", "სენსორები მუდმივად ზომავენ ნიადაგის ტენიანობას. ნიადაგის გამოშრობისას ტუმბო ჩაირთვება, საკმარისი ტენიანობის მიღწევისას კი თავად გამოირთვება.": "Sensors constantly measure soil moisture. When the soil dries out, the pump switches on, and it turns itself off once the soil is moist enough.", "პროფესიონალებისთვის": "For professionals", "pH და EC სენსორები აჩვენებენ ნიადაგის მჟავიანობასა და სასუქის კონცენტრაციას, რომ ზუსტად იცოდეთ, როდის და რა დოზით სჭირდება მცენარეს მინერალები.": "pH and EC sensors show soil acidity and fertilizer concentration, so you know exactly when and how much nutrient your plants need.", "მჟავიანობა · მაგალითი": "Acidity · example", "სასუქის კონცენტრაცია · მაგალითი": "Fertilizer concentration · example", "ყინვა და განგაში": "Frost and alerts", "რამე თუ მოხდება, მაშინვე გაიგებთ": "If anything happens, you'll know right away", "თუ სათბური ძალიან აცივდება ან გადახურდება, სენსორი გაფუჭდება ან კავშირი გაწყდება, შეტყობინება მოგივათ აპლიკაციაში, SMS-ით და ზარით, ღამითაც.": "If the greenhouse gets too cold or too hot, a sensor fails or the connection drops, you'll get a notification in the app, by SMS and by phone call, even at night.", "განგაშის მაგალითები": "Alert examples", "სათბურში ძალიან ცივა": "It's very cold in the greenhouse", "2 °C · გათბობა ჩართულია": "2 °C · heating is on", "კავშირი გაწყდა": "Connection lost", "მოწყობილობა 10 წუთია არ პასუხობს": "The device hasn't responded for 10 minutes", "ტემპერატურა აღდგა": "Temperature back to normal", "8 °C · ყველაფერი რიგზეა": "8 °C · everything is fine", "მთელი სათბური თქვენს ტელეფონში": "Your whole greenhouse on your phone", "ადევნეთ თვალი ტემპერატურას, ტენიანობასა და ნიადაგის მდგომარეობას რეალურ დროში, სადაც არ უნდა იყოთ.": "Keep an eye on temperature, humidity and soil conditions in real time, wherever you are.", "კულტურის შაბლონები: მარწყვი, პომიდორი, კიტრი, წიწაკა, მწვანილი": "Crop templates: strawberry, tomato, cucumber, pepper, herbs", "ვენტილატორების, გათბობის, მორწყვისა და განათების მართვა": "Control of fans, heating, irrigation and lighting", "ავტომატური ან ხელით მართვა ნებისმიერ ამინდში": "Automatic or manual control in any weather", "შეტყობინებები აპლიკაციაში, SMS-ით და ზარით": "Notifications in the app, by SMS and by phone call", "სცადეთ 360° ხედში": "Try it in 360° view", "ქართველი ფერმერებისთვის შექმნილი": "Made for Georgian farmers", "სათბურია ქართული კომპანიაა, რომელიც სათბურების ავტომატიზაციით არის დაკავებული. ვქმნით სისტემას, რომელიც სათბურის კლიმატს თავად აკონტროლებს, ფერმერს კი ყველაფერს ტელეფონიდან აჩვენებს.": "Satburia is a Georgian company focused on greenhouse automation. We build a system that controls the greenhouse climate on its own and shows the farmer everything on their phone.", "რატომ შევქმენით": "Why we built it", "ყოველ წელს ფერმერები მოსავლის ნაწილს კარგავენ გადახურების, ზედმეტი ტენიანობისა და მოულოდნელი ყინვის გამო. უცხოური სისტემები ძვირია და ქართულ სათბურებს ყოველთვის არ ერგება.": "Every year farmers lose part of their harvest to overheating, excess humidity and sudden frost. Foreign systems are expensive and don't always suit Georgian greenhouses.", "რას ვაკეთებთ": "What we do", "ვამონტაჟებთ სენსორებსა და მართვის ბლოკს, რომლებიც სათბურს ავტომატურად მართავს. სისტემა მუშაობს როგორც შუშის, ისე პარკის სათბურებში.": "We install sensors and a control unit that run the greenhouse automatically. The system works in both glass greenhouses and polytunnels.", "ჩვენი მიზანი": "Our goal", "მცირე და საშუალო ფერმერებს შევთავაზოთ ხელმისაწვდომი ტექნოლოგია, რომ სიცხემ, ყინვამ ან გვალვამ მოსავალი აღარ დააზიანოს, შრომა კი ნაკლები დასჭირდეს.": "To give small and medium-sized farmers affordable technology, so heat, frost or drought no longer damage the harvest and the work gets easier.", "შუშისა და პარკის სათბურებისთვის": "For glass greenhouses and polytunnels", "მუშაობს მობილური ინტერნეტით, Wi-Fi არ სჭირდება": "Works over mobile internet, no Wi-Fi needed", "ქართულენოვანი აპლიკაცია და მხარდაჭერა": "App and support in Georgian", "მონიტორინგი და შეტყობინებები დღე-ღამის განმავლობაში": "Round-the-clock monitoring and notifications", "გახადეთ თქვენი სათბური ჭკვიანი": "Make your greenhouse smart", "მონტაჟი": "Installation", "მოწყობილობა და სენსორები": "Device and sensors", "დამონტაჟება თქვენს სათბურში": "Installation in your greenhouse", "პირველადი გამართვა": "Initial setup", "მომსახურება": "Service", "SIM ბარათი და მობილური ინტერნეტი": "SIM card and mobile internet", "აპლიკაცია და მონაცემების შენახვა": "App and data storage", "დისტანციური დახმარება": "Remote support", "ვიზიტი და სათბურის შეფასება": "Site visit and greenhouse assessment", "მონტაჟი და გამართვა": "Installation and setup", "დღე-ღამის მონიტორინგი": "Round-the-clock monitoring", "© 2026 სათბურია · ჭკვიანი სათბურები საქართველოში": "© 2026 Satburia · Smart greenhouses in Georgia" };
 // remember every Georgian text node / label once, so the page can switch back and forth
 const i18nNodes = [], i18nAttrs = [];
 {
@@ -853,8 +848,8 @@ const HW = 3, HL = 6, H = 2.4, R = 3.6;            // half-width, half-length, w
 const roofY = x => H + (R - H) * (1 - Math.abs(x) / HW);
 const gh = new THREE.Group();
 scene.add(gh);
-const glassParts = new THREE.Group();    // frame, glass, roof vents, side fans
-const tunnelParts = new THREE.Group();   // polytunnel: hoops, film, roll-up sides, gable fans
+const glassParts = new THREE.Group();    // frame, glass, side shutter fans
+const tunnelParts = new THREE.Group();   // polytunnel: hoops, film, gable shutter fans
 tunnelParts.visible = false;
 gh.add(glassParts, tunnelParts);
 let fanTemplate = null;
@@ -913,31 +908,6 @@ const glassMat = new THREE.MeshStandardMaterial({
   const skin = new THREE.Mesh(g, glassMat);
   skin.renderOrder = 2;
   glassParts.add(skin);
-}
-
-// roof vents hinged at the ridge (these are the farmer's window actuators, switched by our relay)
-const vents = [];
-{
-  const slope = Math.atan2(H - R, HW);
-  const len = 1.15, wid = 2.6;
-  const g = new THREE.BoxGeometry(len, 0.03, wid); g.translate(len / 2, 0, 0);
-  const ventGlass = new THREE.MeshStandardMaterial({ color: '#dff2ea', transparent: true, opacity: 0.3, roughness: 0.05, metalness: 0.1, envMapIntensity: 2, depthWrite: false });
-  const edge = new THREE.LineBasicMaterial({ color: '#f4f6f3' });
-  for (const sx of [1, -1]) for (const zc of [-3, 3]) {
-    const holder = new THREE.Group();
-    holder.scale.x = sx;
-    const pivot = new THREE.Group();
-    pivot.position.set(0.02, R + 0.04, zc);
-    pivot.rotation.z = slope;
-    const panel = new THREE.Mesh(g, ventGlass);
-    panel.renderOrder = 3;
-    panel.add(new THREE.LineSegments(new THREE.EdgesGeometry(g), edge));
-    pivot.add(panel);
-    pivot.userData.slope = slope;
-    holder.add(pivot);
-    glassParts.add(holder);
-    vents.push(pivot);
-  }
 }
 
 // exhaust fans on both side walls: square box, round shroud, pitched blades, wire guard.
@@ -1022,10 +992,9 @@ const fanBlur = new THREE.MeshBasicMaterial({ color: '#aab4b0', transparent: tru
   fanTemplate = fan;
 }
 
-// ---------- polytunnel ("პარკის სათბური"): steel hoops, milky PE film, roll-up sides, fans in the gable ends
+// ---------- polytunnel ("პარკის სათბური"): steel hoops, milky PE film, shutter fans in the gable ends
 const TH0 = 1.3, TR = 3.5;   // straight side height, arch peak (m)
 const tunnelY = x => TH0 + (TR - TH0) * Math.sqrt(Math.max(0, 1 - (x / HW) ** 2));
-const rollUps = [];
 {
   const steel = new THREE.MeshStandardMaterial({ color: '#c9cfcc', metalness: 0.7, roughness: 0.35 });
   const film = new THREE.MeshStandardMaterial({
@@ -1060,7 +1029,7 @@ const rollUps = [];
   hoops.castShadow = true;
   tunnelParts.add(hoops);
 
-  // film over the arch (fixed part, above the roll-up sides)
+  // film over the arch
   const v = [], uv = [];
   for (let i = 0; i < SEG; i++) {
     const [x0, y0] = prof[i], [x1, y1] = prof[i + 1];
@@ -1085,17 +1054,12 @@ const rollUps = [];
     tunnelParts.add(e);
   }
 
-  // roll-up sides: the film hangs from the side rail and is wound up on a tube by the farmer's motor
-  const rollGeo = new THREE.PlaneGeometry(2 * HL, 1); rollGeo.translate(0, -0.5, 0); rollGeo.rotateY(Math.PI / 2);
-  const tubeMat = new THREE.MeshStandardMaterial({ color: '#8f9895', metalness: 0.6, roughness: 0.35 });
-  const tubeGeo = new THREE.CylinderGeometry(0.05, 0.05, 2 * HL, 12); tubeGeo.rotateX(Math.PI / 2);
+  // side walls: fixed film from the ground to the side rail (ventilation is by the shutter fans only)
+  const sideGeo = new THREE.PlaneGeometry(2 * HL, TH0); sideGeo.translate(0, TH0 / 2, 0); sideGeo.rotateY(Math.PI / 2);
   for (const sx of [-1, 1]) {
-    const curtain = new THREE.Mesh(rollGeo, film);
-    curtain.position.set(sx * (HW + 0.02), TH0, 0); curtain.renderOrder = 2;
-    const tube = new THREE.Mesh(tubeGeo, tubeMat);
-    tube.position.set(sx * (HW + 0.06), 0.25, 0);
-    tunnelParts.add(curtain, tube);
-    rollUps.push({ curtain, tube });
+    const side = new THREE.Mesh(sideGeo, film);
+    side.position.set(sx * (HW + 0.02), 0, 0); side.renderOrder = 2;
+    tunnelParts.add(side);
   }
   // low baseboards along the sides
   const board = new THREE.MeshStandardMaterial({ color: '#8a6a45', roughness: 0.9 });
@@ -1432,20 +1396,20 @@ const sensorMat = new THREE.MeshStandardMaterial({ color: '#dfe9e2', emissive: '
 }
 
 /* ================= story keyframes ================= */
-// per section: camera, look target, night amount, vent opening, fan speed, interior lights, panel-side shift
+// per section: camera, look target, night amount, fan speed, interior lights, panel-side shift
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 // plus weather: rain, wind (0..1), cloud cover; mz = how much further back the camera sits on a phone
-const BASE = { night: 0, vent: 0, fan: 0.25, light: 0, lamp: 0, shift: 0.2, my: 0.2, rain: 0, wind: 0.15, cloud: 0, snow: 0, mz: 1 };
+const BASE = { night: 0, fan: 0.25, light: 0, lamp: 0, shift: 0.2, my: 0.2, rain: 0, wind: 0.15, cloud: 0, snow: 0, mz: 1 };
 const K = (pos, look, o) => ({ ...BASE, pos, look, ...o });
 const KEYS = [
   K(V(13, 5.2, 17),    V(0, 1.6, 0),   { my: -0.25, mz: 1.7 }),                                            // hero
-  K(V(10, 8.5, 9),     V(0, 2.8, 0),   { vent: 1, fan: 1, my: 0.15, mz: 2.5 }),                                      // climate
-  K(V(-8, 6.2, 14.5), V(-0.5, 3.6, 3.5),  { vent: 0, fan: 0, rain: 1, wind: 1, cloud: 1, my: 0.2, mz: 2.45 }),          // weather station
-  K(V(0.15, 1.55, 5.1), V(0, 0.8, -4), { vent: 0.5, fan: 0.4, my: 0.12 }),                       // soil (inside)
+  K(V(10, 8.5, 9),     V(0, 2.8, 0),   { fan: 1, my: 0.15, mz: 2.5 }),                                      // climate
+  K(V(-8, 6.2, 14.5), V(-0.5, 3.6, 3.5),  { fan: 0, rain: 1, wind: 1, cloud: 1, my: 0.2, mz: 2.45 }),          // weather station
+  K(V(0.15, 1.55, 5.1), V(0, 0.8, -4), { fan: 0.4, my: 0.12 }),                       // soil (inside)
   K(V(-13, 4.5, 13),   V(0, 1.6, 0),   { night: 1, fan: 0, light: 1, lamp: 1, my: 0.255, mz: 2 }),                           // frost / alarms
-  K(V(5, 3.6, 13.5),   V(0, 1.7, 4),   { night: 0.1, vent: 0.3, fan: 0.4, shift: 0.3, my: 0.25, mz: 2.85 }), // app
-  K(V(-15, 6.5, 16),   V(0, 1.4, 0),   { vent: 0.2, fan: 0.3, shift: 0.32, my: 0.22, mz: 1.9 }),   // about
-  K(V(21, 11, 23),     V(0, 1.2, 0),   { vent: 0.2, fan: 0.3, shift: 0, my: 0 }),                 // contact
+  K(V(5, 3.6, 13.5),   V(0, 1.7, 4),   { night: 0.1, fan: 0.4, shift: 0.3, my: 0.25, mz: 2.85 }), // app
+  K(V(-15, 6.5, 16),   V(0, 1.4, 0),   { fan: 0.3, shift: 0.32, my: 0.22, mz: 1.9 }),   // about
+  K(V(21, 11, 23),     V(0, 1.2, 0),   { fan: 0.3, shift: 0, my: 0 }),                 // contact
 ];
 const PARAMS = Object.keys(BASE);
 const sections = [...document.querySelectorAll('[data-scene]')];
@@ -1455,7 +1419,7 @@ const APP = sections.findIndex(s => s.id === 'app');
 const cur = { ...KEYS[0], pos: KEYS[0].pos.clone(), look: KEYS[0].look.clone() };
 const tgt = { ...BASE, pos: new THREE.Vector3(), look: new THREE.Vector3() };
 let stormUntil = 0;
-const manual = { fan: null, vent: null, light: null, lamp: null };
+const manual = { fan: null, light: null, lamp: null };
 let lampColor = 'warm';
 const ease = t => t * t * (3 - 2 * t);
 
@@ -1481,22 +1445,17 @@ function computeTarget(t) {
   if (isMobile()) tgt.pos.sub(tgt.look).multiplyScalar(tgt.mz).add(tgt.look);
   // around the app scene the 3D devices follow the simulated automatic controller
   const w = exploring ? 1 : Math.max(0, 1 - Math.abs(t - APP) * 1.5);
-  for (const k of ['fan', 'vent', 'light', 'lamp']) tgt[k] += (auto[k] - tgt[k]) * w;
+  for (const k of ['fan', 'light', 'lamp']) tgt[k] += (auto[k] - tgt[k]) * w;
   if (manual.fan !== null) tgt.fan = manual.fan;
-  if (manual.vent !== null) tgt.vent = manual.vent;
   if (manual.light !== null) tgt.light = manual.light;
   if (manual.lamp !== null) tgt.lamp = manual.lamp;
-  // in 360° the visitor sets the weather; rain, snow or strong wind shut the windows
+  // in 360° the visitor sets the weather
   if (exploring) {
     const wx = WEATHER[env.weather];
     Object.assign(tgt, { night: env.time === 'night' ? 1 : 0, cloud: wx.cloud, rain: wx.rain, snow: wx.snow, wind: Math.min(1, env.wind / 22) });
-    if (weatherShutsWindows() && manual.vent === null) tgt.vent = 0;
   }
-  // a storm (from the weather station) always wins: windows shut to protect the film
-  if (stormUntil > Date.now()) {
-    Object.assign(tgt, { rain: 1, wind: 1, cloud: 0.85 });
-    if (manual.vent === null) tgt.vent = 0;
-  }
+  // a storm reported by the weather sensors
+  if (stormUntil > Date.now()) Object.assign(tgt, { rain: 1, wind: 1, cloud: 0.85 });
   const active = Math.round(t);
   dots.forEach((d, k) => d.classList.toggle('on', k === active));
 }
@@ -1515,7 +1474,7 @@ const TEMPLATES = {
   greens:     { name: 'მწვანილი', en: 'Herbs', t: 18, h: 65, s: 70, lo: { t: 4,  h: 50, s: 55 }, hi: { t: 26, h: 85, s: 90 }, day: '15–20', night: '8–12',  rh: '60–70', soil: '65–75', light: '12–14', ph: '6.0–7.0', ec: '1.0–1.6' },
 };
 const settings = { crop: 'tomato', t: 24, h: 65, s: 75 };
-const auto = { fan: 0, vent: 0, light: 0, lamp: 0, pump: false };
+const auto = { fan: 0, light: 0, lamp: 0, pump: false };
 const growth = { value: 1, target: 1, pending: null };
 let temp = 24.3, hum = 66, soilV = 74;
 
@@ -1540,13 +1499,13 @@ document.querySelectorAll('.crop').forEach(btn => btn.addEventListener('click', 
   const key = btn.dataset.crop, tp = TEMPLATES[key];
   if (key !== settings.crop) { growth.pending = key; growth.target = 0; }
   Object.assign(settings, { crop: key, t: tp.t, h: tp.h, s: tp.s });
-  manual.fan = manual.vent = manual.light = manual.lamp = null; heatSet = null;   // a template hands control back to automatic mode
+  manual.fan = manual.light = manual.lamp = null; heatSet = null;   // a template hands control back to automatic mode
   suppressUntil = Date.now() + 20000;
   renderSettings(); computeAuto(); renderDevices();
 }));
-// each device has a level 0..1: fan speed (how many of the 6 fans run), window opening, heating power.
+// each device has a level 0..1: fan speed (how many of the 6 fans run), heating power.
 // "auto" lets the controller pick the level; moving a slider takes manual control of that device.
-const DEVS = [['fan', 'Fan'], ['vent', 'Vent'], ['light', 'Light'], ['lamp', 'Lamp']];
+const DEVS = [['fan', 'Fan'], ['light', 'Light'], ['lamp', 'Lamp']];
 document.querySelectorAll('[data-lampc]').forEach(b => b.addEventListener('click', () => {
   lampColor = b.dataset.lampc;
   document.querySelectorAll('[data-lampc]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
@@ -1571,7 +1530,7 @@ for (const [key, id] of DEVS) {
   });
 }
 $('allAuto').addEventListener('click', () => {
-  manual.fan = manual.vent = manual.light = manual.lamp = null; heatSet = null;
+  manual.fan = manual.light = manual.lamp = null; heatSet = null;
   computeAuto(); renderDevices();
 });
 function renderDevices() {
@@ -1607,10 +1566,9 @@ function targetT() {
 // Manual mode is never overridden; the farmer can run any device in any weather.
 function computeAuto() {
   const snap = v => Math.round(Math.min(1, Math.max(0, v)) * 20) / 20;
-  const wet = (exploring && weatherShutsWindows()) || stormUntil > Date.now();
   const tT = targetT();   // day or night target of the chosen crop
-  auto.fan = snap((temp - tT - 0.3) / 3 + (wet ? 0.15 : 0));   // in rain the fans take over from the closed windows
-  auto.vent = wet ? 0 : snap(Math.max((temp - tT - 0.8) / 4, (hum - settings.h - 3) / 10));
+  // the shutter fans are the only ventilation: they handle both heat and humidity
+  auto.fan = snap(Math.max((temp - tT - 0.3) / 3, (hum - settings.h - 3) / 10));
   auto.light = snap((tT - temp + 0.3) / 1.2);
   // lights come on in the dark: at night fully, under heavy cloud partly
   const dark = exploring ? (env.time === 'night' ? 1 : WEATHER[env.weather].cloud >= 0.85 ? 0.5 : 0) : (cur.night > 0.5 ? 1 : 0);
@@ -1620,11 +1578,11 @@ function computeAuto() {
 }
 function tick() {
   computeAuto();
-  const fanL = level('fan'), ventL = level('vent'), heatL = level('light');
+  const fanL = level('fan'), heatL = level('light');
   // without 360° weather the house drifts gently around the target; with it, toward what the outside allows
   const amb = exploring ? insideAmbient() : targetT() + 1;
-  temp += -0.2 * fanL - 0.1 * ventL + 0.9 * heatL + (amb - temp) * 0.012 + (Math.random() - .5) * .08;
-  hum += -0.9 * ventL - 0.3 * fanL + (settings.h - hum) * 0.08 + (Math.random() - .5) * .4;
+  temp += -0.3 * fanL + 0.9 * heatL + (amb - temp) * 0.012 + (Math.random() - .5) * .08;
+  hum += -1.1 * fanL + (settings.h - hum) * 0.08 + (Math.random() - .5) * .4;
   soilV += (auto.pump ? 1.6 : -0.15) + (Math.random() - .5) * .2;
   temp = Math.min(40, Math.max(0, temp)); hum = Math.min(98, Math.max(30, hum)); soilV = Math.min(100, Math.max(20, soilV));
 
@@ -1678,12 +1636,11 @@ const WEATHER = {
   snow:  { cloud: 0.85, rain: 0, snow: 1, out: -3 },
   storm: { cloud: 1,    rain: 1, snow: 0, out: 10 },
 };
-const WIND_LIMIT = 12;   // m/s: windows close and an alarm goes out above this
+const WIND_LIMIT = 12;   // m/s: an alarm goes out above this
 const env = { time: 'day', weather: 'sun', wind: 3 };
 let windAlarm = false;
 const outsideT = () => WEATHER[env.weather].out - (env.time === 'night' ? 8 : 0);
 const insideAmbient = () => outsideT() + (env.time === 'night' ? 2 : WEATHER[env.weather].cloud < 0.5 ? 10 : 5);
-const weatherShutsWindows = () => WEATHER[env.weather].rain > 0 || WEATHER[env.weather].snow > 0 || env.wind > WIND_LIMIT;
 function renderEnv() {
   document.querySelectorAll('[data-time]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.time === env.time)));
   document.querySelectorAll('[data-weather]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.weather === env.weather)));
@@ -1691,12 +1648,10 @@ function renderEnv() {
   $('windO').textContent = env.wind + L(' მ/წმ', ' m/s') + (env.wind > WIND_LIMIT ? L(' · ძლიერი', ' · strong') : '');
   $('outT').textContent = L('გარეთ ', 'Outside ') + outsideT() + ' °C';
 }
-const windowsNote = () => manual.vent > 0
-  ? L('ფანჯრები ხელით ღიაა ' + Math.round(manual.vent * 100) + ' %-ზე, გირჩევთ დახუროთ.', 'Windows are open manually at ' + Math.round(manual.vent * 100) + ' %; we recommend closing them.')
-  : L('სახურავის ფანჯრები დაიხურა.', 'The roof windows have closed.');
+const filmNote = () => L('შეამოწმეთ სათბურის აპკი.', 'Check the greenhouse film.');
 function checkWind() {
   const windy = exploring && env.wind > WIND_LIMIT;
-  if (windy && !windAlarm) showAlarm(L('განგაში · ქარი', 'Alert · Wind'), L('ქარი ' + env.wind + ' მ/წმ-ია (ზღვარი ' + WIND_LIMIT + ' მ/წმ). ', 'Wind is ' + env.wind + ' m/s (limit ' + WIND_LIMIT + ' m/s). ') + windowsNote(), 'crit');
+  if (windy && !windAlarm) showAlarm(L('განგაში · ქარი', 'Alert · Wind'), L('ქარი ' + env.wind + ' მ/წმ-ია (ზღვარი ' + WIND_LIMIT + ' მ/წმ). ', 'Wind is ' + env.wind + ' m/s (limit ' + WIND_LIMIT + ' m/s). ') + filmNote(), 'crit');
   else if (!windy && windAlarm && exploring) showAlarm(L('ნორმა · ქარი', 'All clear · Wind'), L('ქარი ჩადგა.', 'The wind has died down.'), 'ok');
   windAlarm = windy;
 }
@@ -1842,7 +1797,7 @@ const ALARMS = [
   { id: 'tHigh', el: 'pT', title: () => L('ტემპერატურა', 'Temperature'), out: () => temp > bounds('t')[1],
     msg: () => L(`სათბურში ${temp.toFixed(1)} °C-ია, დასაშვები ზღვარია ${bounds('t')[1]} °C. ვენტილაცია ჩართულია.`, `The greenhouse is at ${temp.toFixed(1)} °C, the limit is ${bounds('t')[1]} °C. Ventilation is on.`) },
   { id: 'hHigh', el: 'pH', title: () => L('ტენიანობა', 'Humidity'), out: () => hum > bounds('h')[1],
-    msg: () => L(`ჰაერის ტენიანობა ${Math.round(hum)} %-ია, დასაშვები ზღვარია ${bounds('h')[1]} %. ფანჯრები გაიღო.`, `Air humidity is ${Math.round(hum)} %, the limit is ${bounds('h')[1]} %. The windows have opened.`) },
+    msg: () => L(`ჰაერის ტენიანობა ${Math.round(hum)} %-ია, დასაშვები ზღვარია ${bounds('h')[1]} %. ვენტილატორები ჩაირთო.`, `Air humidity is ${Math.round(hum)} %, the limit is ${bounds('h')[1]} %. The fans have switched on.`) },
   { id: 'hLow',  el: 'pH', title: () => L('ტენიანობა', 'Humidity'), out: () => hum < bounds('h')[0],
     msg: () => L(`ჰაერი ძალიან მშრალია: ${Math.round(hum)} %, დასაშვები ზღვარია ${bounds('h')[0]} %.`, `The air is very dry: ${Math.round(hum)} %, the limit is ${bounds('h')[0]} %.`) },
   { id: 'sDry',  el: 'pS', title: () => L('ნიადაგი', 'Soil'), out: () => soilV < bounds('s')[0],
@@ -1904,7 +1859,7 @@ const INCIDENTS = [
   () => { sensorFaultUntil = Date.now() + 8000; },   // air sensor stops answering
   () => {                                            // storm reported by the weather station
     stormUntil = Date.now() + 12000;
-    showAlarm(L('განგაში · ამინდი', 'Alert · Weather'), L('ძლიერი ქარი (17 მ/წმ, ზღვარია 12 მ/წმ) და წვიმა. ', 'Strong wind (17 m/s, limit 12 m/s) and rain. ') + windowsNote(), 'crit');
+    showAlarm(L('განგაში · ამინდი', 'Alert · Weather'), L('ძლიერი ქარი (17 მ/წმ, ზღვარია 12 მ/წმ) და წვიმა. ', 'Strong wind (17 m/s, limit 12 m/s) and rain. ') + filmNote(), 'crit');
     computeAuto(); renderDevices();
     setTimeout(() => showAlarm(L('ნორმა · ამინდი', 'All clear · Weather'), L('ქარი ჩადგა. სათბური ჩვეულ რეჟიმს დაუბრუნდა.', 'The wind has died down. The greenhouse is back to normal.'), 'ok'), 12000);
   },
@@ -1935,7 +1890,7 @@ resize();
 /* ================= loop ================= */
 const clock = new THREE.Clock();
 const tmpC = new THREE.Color();
-let lastVent = -1, lastNight = -1, shadowFrames = 3;
+let lastNight = -1, shadowFrames = 3;
 let frameAcc = 0, frameN = 0;
 const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
 addEventListener('pointermove', e => { pointer.tx = e.clientX / W - .5; pointer.ty = e.clientY / Hh - .5; }, { passive: true });
@@ -2039,10 +1994,6 @@ function frame() {
   for (const l of lampLights) { l.color.copy(lc); l.intensity = cur.lamp * 9; }
   if (!reduce) for (let i = 0; i < fanRotors.length; i++) fanRotors[i].rotation.z -= dt * cur.fan * (17 + i * 0.7);
   fanBlur.opacity = Math.min(0.45, Math.max(0, cur.fan - 0.3) * 0.65);
-  for (const v of vents) v.rotation.z = v.userData.slope + cur.vent * 0.75;
-  // polytunnel: the side film rolls up from the ground to the side rail
-  const rollEdge = 0.25 + cur.vent * 0.95;
-  for (const r of rollUps) { r.curtain.scale.y = Math.max(0.02, TH0 - rollEdge); r.tube.position.y = rollEdge; }
   sensorMat.emissiveIntensity = 0.4 + (reduce ? 0 : (Math.sin(t * 3) * .5 + .5) * 1.2);
   sensorMat.emissive.set(auto.pump ? '#4fb6ff' : '#4fd88a');   // blue while the pump is watering
 
@@ -2054,10 +2005,10 @@ function frame() {
   if (Math.abs(growth.value - before) > 0.002) shadowFrames = Math.max(shadowFrames, 1);
   led.emissiveIntensity = (Math.sin(t * 6) > 0.2) ? 2.5 : 0.4;
 
-  // shadows only when vents or sun actually change
-  if (Math.abs(cur.vent - lastVent) > 0.003 || Math.abs(n - lastNight) > 0.01 || shadowFrames > 0) {
+  // shadows only when the sun or the plants actually change
+  if (Math.abs(n - lastNight) > 0.01 || shadowFrames > 0) {
     renderer.shadowMap.needsUpdate = true;
-    lastVent = cur.vent; lastNight = n; shadowFrames = Math.max(0, shadowFrames - 1);
+    lastNight = n; shadowFrames = Math.max(0, shadowFrames - 1);
   }
 
   renderer.render(scene, camera);

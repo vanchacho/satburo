@@ -394,7 +394,7 @@
             <div class="ev"><time>07:30</time><i class="blue"></i><span>მორწყვა დაიწყო · ნიადაგი 68 %</span></div>
             <div class="ev"><time>07:52</time><i class="blue"></i><span>მორწყვა დასრულდა · ნიადაგი 78 %</span></div>
             <div class="ev"><time>11:05</time><i></i><span>ვენტილატორები ჩაირთო · 26.1 °C</span></div>
-            <div class="ev"><time>11:20</time><i></i><span>ფანჯრები გაიღო 40 %-ზე</span></div>
+            <div class="ev"><time>11:20</time><i></i><span>ვენტილატორები 60 %-ზე</span></div>
           </div>
         </div>
       </section>
@@ -596,23 +596,19 @@
   /* ---------------- home ---------------- */
   const DEV = {
     fan:   { name: 'ვენტილატორები', unit: '%',  val: 0,  auto: true, max: 6 },
-    vent:  { name: 'ფანჯრები',       unit: '%',  val: 0,  auto: true },
     heat:  { name: 'გათბობა',        unit: '°C', val: 24, auto: true, power: 0 },
     light: { name: 'განათება',       unit: '%',  val: 0,  auto: true, color: 'warm' },
     water: { name: 'მორწყვა',        unit: '',   val: 0,  auto: true, next: '15:00' },
   };
   const ICON = {
     fan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M12 10c0-4 1-7 4-7s3 4-1 7M14 12c4 0 7 1 7 4s-4 3-7-1M12 14c0 4-1 7-4 7s-3-4 1-7M10 12c-4 0-7-1-7-4s4-3 7 1"/></svg>',
-    vent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 20h18M5 20V9l7-5 7 5v11"/><path d="m12 4 6 8"/></svg>',
     heat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4 4 0 1 0 4 0Z"/><path d="M12 11v6"/></svg>',
     light: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3Z"/></svg>',
     water: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></svg>',
   };
-  const ventName = () => (state.type === 'film' ? 'გვერდები' : 'ფანჯრები');
   function devSummary(k) {
     const d = DEV[k];
     if (k === 'fan') return d.val ? `${d.val} % · ${Math.round(d.val / 100 * d.max)}/${d.max}` : 'გამორთულია';
-    if (k === 'vent') return d.val ? `ღიაა ${d.val} %` : 'დახურულია';
     if (k === 'heat') return d.val <= 4 ? 'გამორთულია' : `${d.val} °C${d.power ? ` · ${d.power} %` : ''}`;
     if (k === 'light') return d.val ? `${d.val} % · ${d.color === 'grow' ? 'იისფერი' : 'თეთრი'}` : 'გამორთულია';
     if (k === 'water') return d.val ? 'ირწყვება' : `შემდეგი ${d.next}-ზე`;
@@ -624,7 +620,7 @@
     const leaf = getComputedStyle(document.documentElement).getPropertyValue('--leaf').trim();
     spark($('spT'), T.slice(-12), leaf); spark($('spH'), Hm.slice(-12), leaf); spark($('spS'), S.slice(-12), leaf);
     chart($('homeChart'), T, { band: tempBand, labels: hourLabels });
-    $('homeChips').innerHTML = Object.keys(DEV).map(k => `<button class="chip ${isOn(k) ? 'on' : ''}" type="button" data-go="control">${ICON[k]}<div><b>${k === 'vent' ? ventName() : DEV[k].name}</b><span>${devSummary(k)}</span></div></button>`).join('');
+    $('homeChips').innerHTML = Object.keys(DEV).map(k => `<button class="chip ${isOn(k) ? 'on' : ''}" type="button" data-go="control">${ICON[k]}<div><b>${DEV[k].name}</b><span>${devSummary(k)}</span></div></button>`).join('');
     $('cropName').textContent = cr.name;
     const hr = NOW_H;
     $('hello').textContent = hr < 5 ? 'ღამე მშვიდობისა' : hr < 12 ? 'დილა მშვიდობისა' : hr < 18 ? 'გამარჯობა' : 'საღამო მშვიდობისა';
@@ -636,9 +632,9 @@
 
   /* ---------------- control ---------------- */
   function devCard(k) {
-    const d = DEV[k], name = k === 'vent' ? (state.type === 'film' ? 'გვერდების ახვევა' : 'ფანჯრების გაღება') : d.name;
+    const d = DEV[k], name = d.name;
     let body = '';
-    if (k === 'fan' || k === 'vent' || k === 'light') {
+    if (k === 'fan' || k === 'light') {
       body = `<input type="range" id="r-${k}" min="0" max="100" step="5" value="${d.val}" aria-label="${name}">`;
       if (k === 'light') body += `<div class="seg wide" role="group" aria-label="სინათლის ფერი"><button type="button" data-color="warm" aria-pressed="${d.color === 'warm'}">თბილი თეთრი</button><button type="button" data-color="grow" aria-pressed="${d.color === 'grow'}">ზრდის (იისფერი)</button></div>`;
     } else if (k === 'heat') {
@@ -679,8 +675,7 @@
   // what automatic mode would choose right now (demo: midday, slightly warm)
   function autoLevels() {
     const t = DATA.t[23], band = tempBand(23), target = (band[0] + band[1]) / 2 + 0.5;
-    if (DEV.fan.auto) DEV.fan.val = Math.max(0, Math.min(100, Math.round((t - target - 0.3) / 3 * 20) * 5));
-    if (DEV.vent.auto) DEV.vent.val = Math.max(0, Math.min(100, Math.round((t - target - 0.8) / 4 * 20) * 5));
+    if (DEV.fan.auto) DEV.fan.val = Math.max(0, Math.min(100, Math.round((t - target - 0.3) / 3 * 20) * 5));   // shutter fans are the only ventilation
     if (DEV.heat.auto) { DEV.heat.val = Math.round(target - 0.5); DEV.heat.power = Math.max(0, Math.min(100, Math.round((DEV.heat.val - t + 0.3) / 1.2 * 20) * 5)); }
     if (DEV.light.auto) DEV.light.val = 0;
     if (DEV.water.auto) DEV.water.val = 0;
@@ -716,10 +711,10 @@
     { day: 'დღეს', t: '03:12', sev: 'crit', kind: 'alarm', unread: true, title: 'ყინვის საფრთხე', text: 'სათბურში 15.8 °C, გარეთ −2 °C. გათბობა ჩაირთო, SMS გაიგზავნა.' },
     { day: 'დღეს', t: '05:40', sev: 'ok', kind: 'info', unread: true, title: 'ტემპერატურა ნორმაშია', text: 'სათბურში 17.2 °C. გათბობა გამოირთო.' },
     { day: 'დღეს', t: '07:52', sev: 'info', kind: 'info', title: 'მორწყვა დასრულდა', text: 'ნიადაგის ტენი 78 %. ხანგრძლივობა 22 წუთი.' },
-    { day: 'გუშინ', t: '21:40', sev: 'warn', kind: 'alarm', title: 'ტენიანობა მაღალია', text: 'ჰაერის ტენიანობა 88 %. ფანჯრები გაიღო 30 %-ზე.' },
+    { day: 'გუშინ', t: '21:40', sev: 'warn', kind: 'alarm', title: 'ტენიანობა მაღალია', text: 'ჰაერის ტენიანობა 88 %. ვენტილატორები ჩაირთო 60 %-ზე.' },
     { day: 'გუშინ', t: '14:05', sev: 'ok', kind: 'info', title: 'კავშირი აღდგა', text: 'მოწყობილობა 12 წუთის შემდეგ ისევ ონლაინაა.' },
     { day: 'გუშინ', t: '13:53', sev: 'warn', kind: 'alarm', title: 'კავშირი გაწყდა', text: 'მოწყობილობა არ პასუხობს. სათბური ავტომატურად მუშაობს.' },
-    { day: '20 ოქტომბერი', t: '16:20', sev: 'crit', kind: 'alarm', title: 'ძლიერი ქარი', text: 'ქარი 14 მ/წმ (ზღვარია 12 მ/წმ). ფანჯრები დაიხურა.' },
+    { day: '20 ოქტომბერი', t: '16:20', sev: 'crit', kind: 'alarm', title: 'წვიმა დაიწყო', text: 'გარეთ წვიმს. ვენტილატორები ტენიანობას აკონტროლებს.' },
   ];
   const SEV_ICON = {
     crit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3 2 20h20Z" stroke-linejoin="round"/><path d="M12 10v4M12 17v.5"/></svg>',
