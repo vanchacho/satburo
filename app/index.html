@@ -136,8 +136,8 @@
   .welcome { position: relative; overflow: hidden; border-radius: 4px; padding: 18px 18px 16px; color: var(--hero-ink);
     background: var(--hero); display: grid; gap: 12px; }
   .welcome-art { position: absolute; right: -18px; bottom: -14px; width: 190px; color: rgba(244, 248, 239, .09); pointer-events: none; }
-  .hello { font: 500 13px/1.2 var(--sans); opacity: .85; letter-spacing: .02em; }
-  .w-main { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+  .hello { font: 500 13px/1.2 var(--sans); opacity: .85; margin-bottom: 6px; letter-spacing: .02em; }
+  .w-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
   .w-temp { font: 700 48px/1 var(--sans); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
   .w-temp small { font-size: 22px; font-weight: 600; opacity: .8; margin-left: 3px; vertical-align: 22px; }
   .w-crop { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: 3px;
@@ -157,6 +157,15 @@
   .tiles.three .val { font-size: 22px; }
   .tiles.three .lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
   .spark.big { height: 40px; margin-top: 8px; }
+  /* home lists */
+  .read .r-ico, .hdev .r-ico { width: 34px; height: 34px; border-radius: 4px; display: grid; place-items: center; flex: none;
+    background: color-mix(in srgb, var(--c) 14%, var(--surface)); color: var(--c); }
+  .read .r-ico svg, .hdev .r-ico svg { width: 20px; height: 20px; }
+  .read .num { font: 700 20px/1 var(--sans); font-variant-numeric: tabular-nums; }
+  .hdev { width: 100%; border: 0; background: none; text-align: left; font: inherit; color: inherit; }
+  .hdev:not(.on) .r-ico { background: var(--surface-2); color: var(--muted); }
+  .hdev .st { font-size: 13px; color: var(--muted); text-align: right; }
+  .hdev.on .st { color: color-mix(in srgb, var(--c) 80%, var(--ink)); font-weight: 600; }
   /* readings */
   .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; display: grid; gap: 2px; min-width: 0; }
@@ -327,40 +336,26 @@
       <!-- ================= HOME ================= -->
       <section class="screen" id="s-home" aria-label="მთავარი">
         <div class="welcome">
-          <div class="hello" id="hello">დილა მშვიდობისა</div>
           <div class="w-main">
-            <div class="w-temp" id="vT">23.4<small>°C</small></div>
+            <div>
+              <div class="hello">სათბურში ახლა</div>
+              <div class="w-temp" id="vT">23.4<small>°C</small></div>
+            </div>
             <button class="w-crop" type="button" data-go="settings"><b id="cropName">პომიდორი</b><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m3 4.5 3 3 3-3"/></svg></button>
           </div>
-          <div class="w-foot">
-            <span class="w-ok" id="homeStatus"><i></i>ყველაფერი რიგზეა</span>
-            <span class="w-out">გარეთ <b id="vOut">9°</b></span>
-          </div>
+          <span class="w-ok" id="homeStatus"><i></i>ყველაფერი რიგზეა</span>
         </div>
 
-        <div class="tiles three">
-          <div class="tile c-hum"><div class="lbl">ტენი</div><div class="val" id="vH">64<small>%</small></div><svg class="spark" id="spH" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
-          <div class="tile c-soil"><div class="lbl">ნიადაგი</div><div class="val" id="vS">73<small>%</small></div><svg class="spark" id="spS" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
-          <div class="tile c-temp"><div class="lbl">ტემპ. 12 სთ</div><svg class="spark big" id="spT" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
+        <div class="list">
+          <div class="row read c-hum"><span class="r-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></svg></span><div class="k"><b>ჰაერის ტენი</b></div><div class="num" id="vH">64 %</div></div>
+          <div class="row read c-soil"><span class="r-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 18h18M6 14h12M12 14V6M12 9c0-2 1.5-3.5 4-3.5 0 2-1.5 3.5-4 3.5Zm0 0c0-2-1.5-3.5-4-3.5 0 2 1.5 3.5 4 3.5Z"/></svg></span><div class="k"><b>მიწის ტენი</b></div><div class="num" id="vS">73 %</div></div>
+          <div class="row read c-temp"><span class="r-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span><div class="k"><b>გარეთ</b></div><div class="num" id="vOut">9 °C</div></div>
         </div>
 
-        <div class="card">
-          <div class="card-h"><b>მოწყობილობები</b><button class="link" type="button" data-go="control">მართვა</button></div>
-          <div class="chips" id="homeChips"></div>
-        </div>
+        <div class="group-h">მოწყობილობები</div>
+        <div class="list" id="homeDevs"></div>
 
         <div class="tip"><span>რჩევა</span><p id="homeTip"></p></div>
-
-        <div class="card">
-          <div class="card-h"><b>ტემპერატურა · 24 სთ</b><button class="link" type="button" data-go="history">ისტორია</button></div>
-          <svg class="chart" id="homeChart" viewBox="0 0 340 170"></svg>
-        </div>
-
-        <div class="health">
-          <div><b>4G</b><span>კავშირი</span></div>
-          <div><b>220 V</b><span>დენი</span></div>
-          <div><b>100 %</b><span>ბატარეა</span></div>
-        </div>
       </section>
 
       <!-- ================= CONTROL ================= -->
@@ -372,7 +367,7 @@
         </div>
         <div class="card mode-bar">
           <div><b id="modeTitle">ავტომატური რეჟიმი</b></div>
-          <button class="btn soft" id="allAuto" type="button" disabled>ყველა ავტოზე</button>
+          <button class="btn soft" id="allAuto" type="button" disabled>ყველა ავტომატურზე</button>
         </div>
         <div id="devList" style="display:grid;gap:12px"></div>
       </section>
@@ -382,8 +377,8 @@
         <h1>ისტორია</h1>
         <div class="seg wide" role="group" aria-label="მაჩვენებელი" id="metricSeg">
           <button type="button" data-m="t" aria-pressed="true">ტემპერატურა</button>
-          <button type="button" data-m="h" aria-pressed="false">ტენიანობა</button>
-          <button type="button" data-m="s" aria-pressed="false">ნიადაგი</button>
+          <button type="button" data-m="h" aria-pressed="false">ჰაერის ტენი</button>
+          <button type="button" data-m="s" aria-pressed="false">მიწის ტენი</button>
         </div>
         <div class="card">
           <div class="card-h"><b id="histTitle">ტემპერატურა</b>
@@ -401,8 +396,8 @@
           <div class="timeline">
             <div class="ev"><time>03:12</time><i class="sun"></i><span>გათბობა ჩაირთო · სათბურში 15.8 °C</span></div>
             <div class="ev"><time>05:40</time><i class="sun"></i><span>გათბობა გამოირთო · 17.2 °C</span></div>
-            <div class="ev"><time>07:30</time><i class="blue"></i><span>მორწყვა დაიწყო · ნიადაგი 68 %</span></div>
-            <div class="ev"><time>07:52</time><i class="blue"></i><span>მორწყვა დასრულდა · ნიადაგი 78 %</span></div>
+            <div class="ev"><time>07:30</time><i class="blue"></i><span>მორწყვა დაიწყო · მიწის ტენი 68 %</span></div>
+            <div class="ev"><time>07:52</time><i class="blue"></i><span>მორწყვა დასრულდა · მიწის ტენი 78 %</span></div>
             <div class="ev"><time>11:05</time><i></i><span>ვენტილატორები ჩაირთო · 26.1 °C</span></div>
             <div class="ev"><time>11:20</time><i></i><span>ვენტილატორები 60 %-ზე</span></div>
           </div>
@@ -414,7 +409,7 @@
         <h1>შეტყობინებები</h1>
         <div class="seg wide" role="group" aria-label="ფილტრი" id="alertSeg">
           <button type="button" data-f="all" aria-pressed="true">ყველა</button>
-          <button type="button" data-f="alarm" aria-pressed="false">განგაში</button>
+          <button type="button" data-f="alarm" aria-pressed="false">საშიში</button>
           <button type="button" data-f="info" aria-pressed="false">ინფორმაცია</button>
         </div>
         <div id="alertList" style="display:grid;gap:10px"></div>
@@ -437,16 +432,16 @@
           </div>
         </div>
 
-        <div class="group-h">კულტურა</div>
+        <div class="group-h">მცენარე</div>
         <div class="list">
           <label class="row"><div class="k"><b>რა მოგყავთ</b></div>
-            <select class="pick" id="cropSel" aria-label="კულტურა"></select></label>
+            <select class="pick" id="cropSel" aria-label="მცენარე"></select></label>
           <div class="crop-norm" id="cropNorm"></div>
         </div>
 
-        <div class="group-h">იერსახე</div>
+        <div class="group-h">ეკრანი</div>
         <div class="list">
-          <div class="row"><div class="k"><b>თემა</b></div>
+          <div class="row"><div class="k"><b>ფერი</b></div>
             <div class="seg" role="group" aria-label="თემა" id="themeSeg">
               <button type="button" data-theme="auto">ავტო</button>
               <button type="button" data-theme="light">ნათელი</button>
@@ -455,7 +450,7 @@
           </div>
         </div>
 
-        <div class="group-h">განგაში მოვიდეს</div>
+        <div class="group-h">გაფრთხილება მომივიდეს</div>
         <div class="list">
           <div class="row"><div class="k"><b>აპლიკაციაში</b></div><button class="switch" type="button" role="switch" aria-checked="true" aria-label="აპლიკაციაში"></button></div>
           <div class="row"><div class="k"><b>SMS-ით</b></div><button class="switch" type="button" role="switch" aria-checked="true" aria-label="SMS-ით"></button></div>
@@ -618,27 +613,22 @@
   };
   function devSummary(k) {
     const d = DEV[k];
-    if (k === 'fan') return d.val ? `${d.val} % · ${Math.round(d.val / 100 * d.max)}/${d.max}` : 'გამორთულია';
-    if (k === 'heat') return d.val <= 4 ? 'გამორთულია' : `${d.val} °C${d.power ? ` · ${d.power} %` : ''}`;
-    if (k === 'light') return d.val ? `${d.val} % · ${d.color === 'grow' ? 'იისფერი' : 'თეთრი'}` : 'გამორთულია';
-    if (k === 'water') return d.val ? 'ირწყვება' : `შემდეგი ${d.next}-ზე`;
+    if (k === 'fan') return d.val ? `ჩართულია · სიჩქარე ${d.val} %` : 'გამორთულია';
+    if (k === 'heat') return d.val <= 4 ? 'გამორთულია' : d.power ? `ათბობს ${d.val} °C-მდე` : `ჩაირთვება ${d.val} °C-ზე ქვემოთ`;
+    if (k === 'light') return d.val ? `ჩართულია · ${d.val} %` : 'გამორთულია';
+    if (k === 'water') return d.val ? 'ირწყვება' : `შემდეგი მორწყვა ${d.next}-ზე`;
   }
   const DCOL = { fan: 'fan', heat: 'heat', light: 'light', water: 'water' };   // device → its colour class
   const isOn = k => (k === 'heat' ? DEV.heat.power > 0 : DEV[k].val > 0);
   function renderHome() {
     const cr = crop(), T = DATA.t, Hm = DATA.h, S = DATA.s;
-    $('vT').innerHTML = `${T[23]}<small>°C</small>`; $('vH').innerHTML = `${Hm[23]}<small>%</small>`; $('vS').innerHTML = `${S[23]}<small>%</small>`;
-    const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-    spark($('spT'), T.slice(-12), css('--sun')); spark($('spH'), Hm.slice(-12), css('--c-water')); spark($('spS'), S.slice(-12), css('--leaf'));
-    chart($('homeChart'), T, { band: tempBand, labels: hourLabels });
-    $('homeChips').innerHTML = Object.keys(DEV).map(k => `<button class="chip c-${DCOL[k]} ${isOn(k) ? 'on' : ''}" type="button" data-go="control">${ICON[k]}<div><b>${DEV[k].name}</b><span>${devSummary(k)}</span></div></button>`).join('');
+    $('vT').innerHTML = `${T[23]}<small>°C</small>`; $('vH').textContent = `${Hm[23]} %`; $('vS').textContent = `${S[23]} %`;
+    $('homeDevs').innerHTML = Object.keys(DEV).map(k => `<button class="row hdev c-${DCOL[k]} ${isOn(k) ? 'on' : ''}" type="button" data-go="control"><span class="r-ico">${ICON[k]}</span><div class="k"><b>${DEV[k].name}</b></div><div class="st">${isOn(k) ? 'ჩართულია' : 'გამორთულია'}</div></button>`).join('');
     $('cropName').textContent = cr.name;
-    const hr = NOW_H;
-    $('hello').textContent = hr < 5 ? 'ღამე მშვიდობისა' : hr < 12 ? 'დილა მშვიდობისა' : hr < 18 ? 'გამარჯობა' : 'საღამო მშვიდობისა';
     const band = tempBand(23), ok = T[23] >= band[0] - 1 && T[23] <= band[1] + 1 && Hm[23] <= cr.rh[1] + 8;
     $('homeStatus').className = 'w-ok' + (ok ? '' : ' warn');
     $('homeStatus').lastChild.textContent = ok ? 'ყველაფერი რიგზეა' : 'ყურადღება';
-    $('homeTip').textContent = cr.note; $('vOut').textContent = `${DATA.o[23]}°`;
+    $('homeTip').textContent = cr.note; $('vOut').textContent = `${DATA.o[23]} °C`;
   }
 
   /* ---------------- control ---------------- */
@@ -695,7 +685,7 @@
 
   /* ---------------- history ---------------- */
   const hist = { m: 't', r: '24' };
-  const METRIC = { t: ['ტემპერატურა', '°C'], h: ['ტენიანობა', '%'], s: ['ნიადაგის ტენი', '%'] };
+  const METRIC = { t: ['ტემპერატურა', '°C'], h: ['ჰაერის ტენი', '%'], s: ['მიწის ტენი', '%'] };
   function renderHistory() {
     const cr = crop(); let vals, labels, band;
     if (hist.r === '24') { vals = DATA[hist.m]; labels = hourLabels; band = hist.m === 't' ? tempBand : () => (hist.m === 'h' ? cr.rh : cr.soil); }
@@ -721,7 +711,7 @@
   const ALERTS = [
     { day: 'დღეს', t: '03:12', sev: 'crit', kind: 'alarm', unread: true, title: 'ყინვის საფრთხე', text: 'სათბურში 15.8 °C, გარეთ −2 °C. გათბობა ჩაირთო, SMS გაიგზავნა.' },
     { day: 'დღეს', t: '05:40', sev: 'ok', kind: 'info', unread: true, title: 'ტემპერატურა ნორმაშია', text: 'სათბურში 17.2 °C. გათბობა გამოირთო.' },
-    { day: 'დღეს', t: '07:52', sev: 'info', kind: 'info', title: 'მორწყვა დასრულდა', text: 'ნიადაგის ტენი 78 %. ხანგრძლივობა 22 წუთი.' },
+    { day: 'დღეს', t: '07:52', sev: 'info', kind: 'info', title: 'მორწყვა დასრულდა', text: 'მიწის ტენი 78 %. ხანგრძლივობა 22 წუთი.' },
     { day: 'გუშინ', t: '21:40', sev: 'warn', kind: 'alarm', title: 'ტენიანობა მაღალია', text: 'ჰაერის ტენიანობა 88 %. ვენტილატორები ჩაირთო 60 %-ზე.' },
     { day: 'გუშინ', t: '14:05', sev: 'ok', kind: 'info', title: 'კავშირი აღდგა', text: 'მოწყობილობა 12 წუთის შემდეგ ისევ ონლაინაა.' },
     { day: 'გუშინ', t: '13:53', sev: 'warn', kind: 'alarm', title: 'კავშირი გაწყდა', text: 'მოწყობილობა არ პასუხობს. სათბური ავტომატურად მუშაობს.' },
@@ -749,8 +739,8 @@
     $('cropSel').innerHTML = CROP_GROUPS.map((g, i) => `<optgroup label="${g}">${Object.entries(CROPS).filter(([, c]) => c.g === i).map(([k, c]) => `<option value="${k}">${c.name}</option>`).join('')}</optgroup>`).join('');
     $('cropSel').value = state.crop;
     const c = crop();
-    $('cropNorm').innerHTML = `<div><span>დღე</span><b>${c.day[0]}–${c.day[1]} °C</b></div><div><span>ღამე</span><b>${c.night[0]}–${c.night[1]} °C</b></div>`
-      + `<div><span>ჰაერის ტენი</span><b>${c.rh[0]}–${c.rh[1]} %</b></div><div><span>ნიადაგის ტენი</span><b>${c.soil[0]}–${c.soil[1]} %</b></div>`
+    $('cropNorm').innerHTML = `<div><span>დღისით სითბო</span><b>${c.day[0]}–${c.day[1]} °C</b></div><div><span>ღამით სითბო</span><b>${c.night[0]}–${c.night[1]} °C</b></div>`
+      + `<div><span>ჰაერის ტენი</span><b>${c.rh[0]}–${c.rh[1]} %</b></div><div><span>მიწის ტენი</span><b>${c.soil[0]}–${c.soil[1]} %</b></div>`
       + `<div style="grid-column:1/-1"><span>სინათლე დღეში</span><b>${c.light} სთ</b></div><p>${c.note}</p>`;
     $('themeSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === (document.documentElement.dataset.theme || 'auto'))));
     $('typeSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.type === state.type)));
@@ -758,7 +748,7 @@
   }
   $('cropSel').addEventListener('change', e => {
     state.crop = e.target.value; GH[state.gh].crop = state.crop; DATA = series(crop()); autoLevels(); renderAll();
-    toast(`შაბლონი: ${crop().name} · პარამეტრები ავტომატურად დაყენდა`);
+    toast(`${crop().name} · სათბური ამ მცენარეს მოერგო`);
   });
   seg('themeSeg', 'theme', v => {
     if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v;
