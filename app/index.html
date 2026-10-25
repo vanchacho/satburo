@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ka">
-<script>try { const t = localStorage.getItem('satburia-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<script>let t0 = null; try { t0 = localStorage.getItem('satburia-theme'); } catch (e) {} if (t0 !== 'auto') document.documentElement.dataset.theme = t0 === 'dark' ? 'dark' : 'light';</script>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,8 +11,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="სათბურია">
-<meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1c1714" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#fffaf3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1714" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="icon-180.png?v=2">
 <link rel="icon" type="image/png" href="icon-192.png?v=2">
 <link rel="manifest" href="manifest.webmanifest?v=2">
@@ -22,24 +22,25 @@
 <style>
   /* Layout: a phone app (header, scrolling screen, bottom tab bar); on a desktop it sits in a phone frame for preview. */
   :root {
-    /* cosy palette: warm cream, soft sage, honey and wood tones */
-    --page: #efe7dc;        /* desktop backdrop around the phone */
-    --bg: #faf6f0;          /* app background (warm cream) */
-    --surface: #fffdfa;
-    --surface-2: #f4ede3;
-    --ink: #3a2f28;         /* warm cocoa text */
-    --muted: #8a7d72;
-    --line: #ece3d6;
-    --leaf: #6f8f68;        /* soft sage */
-    --leaf-ink: #fffdfa;
-    --leaf-soft: #e9efe2;
-    --sun: #d4a373;         /* honey, second accent */
-    --ok: #6f8f68;
-    --warn: #c99a4e;
-    --crit: #c0675a;
-    --band: rgba(111, 143, 104, .14);   /* ideal range band in charts */
-    --hero: #e9efe2; --hero-ink: #3a2f28;   /* welcome card */
-    --sky-1: #e7ece4; --sky-2: #f8f2e8;   /* behind the 3D greenhouse */
+    /* warm, bright palette: fresh green, sunny orange, sky blue, honey yellow */
+    --page: #f3ece1;        /* desktop backdrop around the phone */
+    --bg: #fffaf3;          /* app background (warm white) */
+    --surface: #ffffff;
+    --surface-2: #f8f2e9;
+    --ink: #2b2420;
+    --muted: #7d7268;
+    --line: #efe6d8;
+    --leaf: #2e9e5b;        /* brand green */
+    --leaf-ink: #ffffff;
+    --leaf-soft: #e2f4e7;
+    --sun: #f28c38;         /* sunny orange */
+    --ok: #2e9e5b;
+    --warn: #f0a032;
+    --crit: #e05545;
+    --band: rgba(46, 158, 91, .14);   /* ideal range band in charts */
+    --hero: #2e9e5b; --hero-ink: #ffffff;   /* welcome card */
+    --c-fan: #3b8fd9; --c-heat: #f28c38; --c-light: #e8b21c; --c-water: #1aa3b8;   /* one colour per device */
+    --sky-1: #cfe8f7; --sky-2: #fdf5e6;   /* behind the 3D greenhouse */
     --serif: "Noto Serif Georgian", "Sylfaen", Georgia, serif;
     --sans: "Noto Sans Georgian", "Sylfaen", system-ui, sans-serif;
     --r: 4px;
@@ -47,18 +48,20 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --page: #15110e; --bg: #1c1714; --surface: #26201b; --surface-2: #2e2721; --ink: #f1e8dd; --muted: #b0a396;
-      --line: #3a3129; --leaf: #a3c29a; --leaf-ink: #1c1714; --leaf-soft: #2f3329; --sun: #e0b07a;
-      --ok: #a3c29a; --warn: #e0b07a; --crit: #e08a7a; --band: rgba(163, 194, 154, .14); --hero: #2f3329; --hero-ink: #f1e8dd;
-      --sky-1: #241f1b; --sky-2: #2c251f;
+      --page: #110f0d; --bg: #1a1714; --surface: #24201c; --surface-2: #2c2722; --ink: #f4ece2; --muted: #b3a698;
+      --line: #3a322a; --leaf: #4cc47a; --leaf-ink: #10241a; --leaf-soft: #1f3327; --sun: #ff9f55;
+      --ok: #4cc47a; --warn: #ffb648; --crit: #ff7a68; --band: rgba(76, 196, 122, .15); --hero: #1f7a45; --hero-ink: #ffffff;
+      --c-fan: #5aa8f0; --c-heat: #ff9f55; --c-light: #ffd04a; --c-water: #3cc3d6;
+      --sky-1: #16263a; --sky-2: #2a241d;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-      --page: #15110e; --bg: #1c1714; --surface: #26201b; --surface-2: #2e2721; --ink: #f1e8dd; --muted: #b0a396;
-      --line: #3a3129; --leaf: #a3c29a; --leaf-ink: #1c1714; --leaf-soft: #2f3329; --sun: #e0b07a;
-      --ok: #a3c29a; --warn: #e0b07a; --crit: #e08a7a; --band: rgba(163, 194, 154, .14); --hero: #2f3329; --hero-ink: #f1e8dd;
-      --sky-1: #241f1b; --sky-2: #2c251f;
+      --page: #110f0d; --bg: #1a1714; --surface: #24201c; --surface-2: #2c2722; --ink: #f4ece2; --muted: #b3a698;
+      --line: #3a322a; --leaf: #4cc47a; --leaf-ink: #10241a; --leaf-soft: #1f3327; --sun: #ff9f55;
+      --ok: #4cc47a; --warn: #ffb648; --crit: #ff7a68; --band: rgba(76, 196, 122, .15); --hero: #1f7a45; --hero-ink: #ffffff;
+      --c-fan: #5aa8f0; --c-heat: #ff9f55; --c-light: #ffd04a; --c-water: #3cc3d6;
+      --sky-1: #16263a; --sky-2: #2a241d;
       color-scheme: dark;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -133,7 +136,7 @@
   .welcome { position: relative; overflow: hidden; border-radius: 4px; padding: 18px 18px 16px; color: var(--hero-ink);
     background: var(--hero); display: grid; gap: 12px; }
   .welcome-art { position: absolute; right: -18px; bottom: -14px; width: 190px; color: rgba(244, 248, 239, .09); pointer-events: none; }
-  .hello { font: 500 13px/1.2 var(--sans); color: var(--muted); letter-spacing: .02em; }
+  .hello { font: 500 13px/1.2 var(--sans); opacity: .85; letter-spacing: .02em; }
   .w-main { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
   .w-temp { font: 700 48px/1 var(--sans); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
   .w-temp small { font-size: 22px; font-weight: 600; opacity: .8; margin-left: 3px; vertical-align: 22px; }
@@ -143,9 +146,9 @@
   .w-crop b { font-weight: 600; }
   .w-foot { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
   .w-ok { display: inline-flex; align-items: center; gap: 7px; font-weight: 500; }
-  .w-ok i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok);  }
-  .w-ok.warn i { background: var(--warn);  }
-  .w-out { color: var(--muted); } .w-out b { font-weight: 700; }
+  .w-ok i { width: 8px; height: 8px; border-radius: 50%; background: #c8f5a8;  }
+  .w-ok.warn i { background: #ffd08a;  }
+  .w-out { opacity: .85; } .w-out b { font-weight: 700; }
   .tip { padding: 12px 14px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--leaf); }
   .tip span { display: block; font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--muted); margin-bottom: 3px; }
   .tip p { margin: 0; font-size: 13.5px; }
@@ -175,7 +178,12 @@
   .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .chip { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px; border-radius: 4px; background: var(--surface-2); border: 0; text-align: left; min-width: 0; }
   .chip svg { width: 22px; height: 22px; flex: none; color: var(--muted); }
-  .chip.on svg { color: var(--leaf); }
+  .chip.on { background: color-mix(in srgb, var(--c) 14%, var(--surface)); }
+  .chip.on svg { color: var(--c); }
+  .c-fan { --c: var(--c-fan); } .c-heat { --c: var(--c-heat); } .c-light { --c: var(--c-light); } .c-water { --c: var(--c-water); }
+  .c-hum { --c: var(--c-water); } .c-soil { --c: var(--leaf); } .c-temp { --c: var(--sun); }
+  .tiles.three .tile { background: color-mix(in srgb, var(--c) 10%, var(--surface)); border-color: color-mix(in srgb, var(--c) 28%, var(--line)); }
+  .tiles.three .lbl { color: color-mix(in srgb, var(--c) 75%, var(--ink)); font-weight: 500; }
   .chip b { display: block; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .chip span { display: block; font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .chip div { min-width: 0; max-width: 100%; }
@@ -205,7 +213,7 @@
   .dev-top { display: flex; align-items: center; gap: 12px; }
   .dev-ico { width: 40px; height: 40px; border-radius: 4px; background: var(--surface-2); display: grid; place-items: center; flex: none; color: var(--muted); }
   .dev-ico svg { width: 22px; height: 22px; }
-  .dev.active .dev-ico { background: var(--leaf-soft); color: var(--leaf); }
+  .dev.active .dev-ico { background: color-mix(in srgb, var(--c) 16%, var(--surface)); color: var(--c); }
   .dev-name { flex: 1; min-width: 0; }
   .dev-name b { display: block; font-size: 15px; }
   .dev-name span { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -213,7 +221,7 @@
   .seg button { border: 0; background: transparent; padding: 6px 9px; border-radius: 3px; font-size: 12px; color: var(--muted); white-space: nowrap; }
   .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
   .seg.wide { display: flex; } .seg.wide button { flex: 1; }
-  input[type="range"] { width: 100%; height: 30px; margin: 0; accent-color: var(--leaf); }
+  input[type="range"] { width: 100%; height: 30px; margin: 0; accent-color: var(--c, var(--leaf)); }
   .range-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: -6px; font-variant-numeric: tabular-nums; }
 
   /* ---------- history ---------- */
@@ -302,7 +310,7 @@
 
     <header class="top">
       <button class="gh-btn" id="ghBtn" type="button" aria-haspopup="dialog">
-        <span class="gh-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11 12 4l9 7v9H3z" stroke="#6f8f68" stroke-width="2" stroke-linejoin="round"/><path d="M12 19c0-4 2-6 5-6-0 3-2 6-5 6Zm0 0c0-3-1.5-5-4-5 0 2.5 1.5 5 4 5Z" fill="#d4a373"/></svg></span>
+        <span class="gh-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11 12 4l9 7v9H3z" stroke="#2e9e5b" stroke-width="2" stroke-linejoin="round"/><path d="M12 19c0-4 2-6 5-6-0 3-2 6-5 6Zm0 0c0-3-1.5-5-4-5 0 2.5 1.5 5 4 5Z" fill="#f28c38"/></svg></span>
         <span class="gh-txt">
           <b><span id="ghName">სათბური №1</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></b>
           <span id="ghSub">მარნეული · პომიდორი</span>
@@ -331,9 +339,9 @@
         </div>
 
         <div class="tiles three">
-          <div class="tile"><div class="lbl">ტენი</div><div class="val" id="vH">64<small>%</small></div><svg class="spark" id="spH" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
-          <div class="tile"><div class="lbl">ნიადაგი</div><div class="val" id="vS">73<small>%</small></div><svg class="spark" id="spS" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
-          <div class="tile"><div class="lbl">ტემპ. 12 სთ</div><svg class="spark big" id="spT" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
+          <div class="tile c-hum"><div class="lbl">ტენი</div><div class="val" id="vH">64<small>%</small></div><svg class="spark" id="spH" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
+          <div class="tile c-soil"><div class="lbl">ნიადაგი</div><div class="val" id="vS">73<small>%</small></div><svg class="spark" id="spS" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
+          <div class="tile c-temp"><div class="lbl">ტემპ. 12 სთ</div><svg class="spark big" id="spT" viewBox="0 0 100 26" preserveAspectRatio="none"></svg></div>
         </div>
 
         <div class="card">
@@ -615,14 +623,15 @@
     if (k === 'light') return d.val ? `${d.val} % · ${d.color === 'grow' ? 'იისფერი' : 'თეთრი'}` : 'გამორთულია';
     if (k === 'water') return d.val ? 'ირწყვება' : `შემდეგი ${d.next}-ზე`;
   }
+  const DCOL = { fan: 'fan', heat: 'heat', light: 'light', water: 'water' };   // device → its colour class
   const isOn = k => (k === 'heat' ? DEV.heat.power > 0 : DEV[k].val > 0);
   function renderHome() {
     const cr = crop(), T = DATA.t, Hm = DATA.h, S = DATA.s;
     $('vT').innerHTML = `${T[23]}<small>°C</small>`; $('vH').innerHTML = `${Hm[23]}<small>%</small>`; $('vS').innerHTML = `${S[23]}<small>%</small>`;
-    const leaf = getComputedStyle(document.documentElement).getPropertyValue('--leaf').trim();
-    spark($('spT'), T.slice(-12), leaf); spark($('spH'), Hm.slice(-12), leaf); spark($('spS'), S.slice(-12), leaf);
+    const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+    spark($('spT'), T.slice(-12), css('--sun')); spark($('spH'), Hm.slice(-12), css('--c-water')); spark($('spS'), S.slice(-12), css('--leaf'));
     chart($('homeChart'), T, { band: tempBand, labels: hourLabels });
-    $('homeChips').innerHTML = Object.keys(DEV).map(k => `<button class="chip ${isOn(k) ? 'on' : ''}" type="button" data-go="control">${ICON[k]}<div><b>${DEV[k].name}</b><span>${devSummary(k)}</span></div></button>`).join('');
+    $('homeChips').innerHTML = Object.keys(DEV).map(k => `<button class="chip c-${DCOL[k]} ${isOn(k) ? 'on' : ''}" type="button" data-go="control">${ICON[k]}<div><b>${DEV[k].name}</b><span>${devSummary(k)}</span></div></button>`).join('');
     $('cropName').textContent = cr.name;
     const hr = NOW_H;
     $('hello').textContent = hr < 5 ? 'ღამე მშვიდობისა' : hr < 12 ? 'დილა მშვიდობისა' : hr < 18 ? 'გამარჯობა' : 'საღამო მშვიდობისა';
@@ -644,7 +653,7 @@
     } else if (k === 'water') {
       body = `<button class="btn" type="button" id="waterNow">${d.val ? 'მორწყვის შეჩერება' : 'მორწყვა ახლა · 10 წთ'}</button>`;
     }
-    return `<div class="card dev ${isOn(k) ? 'active' : ''}" data-dev="${k}">
+    return `<div class="card dev c-${DCOL[k]} ${isOn(k) ? 'active' : ''}" data-dev="${k}">
       <div class="dev-top"><span class="dev-ico">${ICON[k]}</span>
         <div class="dev-name"><b>${name}</b><span>${devSummary(k)}</span></div>
         <div class="seg" role="group" aria-label="რეჟიმი"><button type="button" data-mode="auto" aria-pressed="${d.auto}">ავტო</button><button type="button" data-mode="manual" aria-pressed="${!d.auto}">ხელით</button></div>
@@ -814,6 +823,6 @@
   "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
 } }
 </script>
-<script type="module" src="greenhouse3d.js"></script>
+<script type="module" src="greenhouse3d.js?v=3"></script>
 </body>
 </html>
