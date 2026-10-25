@@ -11,8 +11,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="სათბურია">
-<meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#14130f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1714" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="icon-180.png?v=2">
 <link rel="icon" type="image/png" href="icon-192.png?v=2">
 <link rel="manifest" href="manifest.webmanifest?v=2">
@@ -22,23 +22,24 @@
 <style>
   /* Layout: a phone app (header, scrolling screen, bottom tab bar); on a desktop it sits in a phone frame for preview. */
   :root {
-    --page: #ebe6dd;        /* desktop backdrop around the phone */
-    --bg: #f6f3ee;          /* app background (sand) */
-    --surface: #fffdf9;
-    --surface-2: #f0ebe2;
-    --ink: #1e1e1a;
-    --muted: #77736a;
-    --line: #e4ddd1;
-    --leaf: #4b6b3a;        /* brand olive */
-    --leaf-ink: #fffdf9;
-    --leaf-soft: #e8ecdc;
-    --sun: #c0663a;         /* terracotta, second accent */
-    --ok: #4b7a3a;
-    --warn: #c98a2b;
-    --crit: #b4442f;
-    --band: rgba(75, 107, 58, .12);   /* ideal range band in charts */
-    --hero: #3e5a30;        /* welcome card */
-    --sky-1: #dfe7e6; --sky-2: #f3efe7;   /* behind the 3D greenhouse */
+    /* cosy palette: warm cream, soft sage, honey and wood tones */
+    --page: #efe7dc;        /* desktop backdrop around the phone */
+    --bg: #faf6f0;          /* app background (warm cream) */
+    --surface: #fffdfa;
+    --surface-2: #f4ede3;
+    --ink: #3a2f28;         /* warm cocoa text */
+    --muted: #8a7d72;
+    --line: #ece3d6;
+    --leaf: #6f8f68;        /* soft sage */
+    --leaf-ink: #fffdfa;
+    --leaf-soft: #e9efe2;
+    --sun: #d4a373;         /* honey, second accent */
+    --ok: #6f8f68;
+    --warn: #c99a4e;
+    --crit: #c0675a;
+    --band: rgba(111, 143, 104, .14);   /* ideal range band in charts */
+    --hero: #e9efe2; --hero-ink: #3a2f28;   /* welcome card */
+    --sky-1: #e7ece4; --sky-2: #f8f2e8;   /* behind the 3D greenhouse */
     --serif: "Noto Serif Georgian", "Sylfaen", Georgia, serif;
     --sans: "Noto Sans Georgian", "Sylfaen", system-ui, sans-serif;
     --r: 4px;
@@ -46,18 +47,18 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --page: #0e0d0a; --bg: #14130f; --surface: #1e1c17; --surface-2: #26241e; --ink: #ece8df; --muted: #a39d90;
-      --line: #322f27; --leaf: #8db36b; --leaf-ink: #14130f; --leaf-soft: #2a3022; --sun: #e08a5c;
-      --ok: #8db36b; --warn: #e0a64e; --crit: #e2735c; --band: rgba(141, 179, 107, .14); --hero: #2f4325;
-      --sky-1: #1a1c1e; --sky-2: #24221c;
+      --page: #15110e; --bg: #1c1714; --surface: #26201b; --surface-2: #2e2721; --ink: #f1e8dd; --muted: #b0a396;
+      --line: #3a3129; --leaf: #a3c29a; --leaf-ink: #1c1714; --leaf-soft: #2f3329; --sun: #e0b07a;
+      --ok: #a3c29a; --warn: #e0b07a; --crit: #e08a7a; --band: rgba(163, 194, 154, .14); --hero: #2f3329; --hero-ink: #f1e8dd;
+      --sky-1: #241f1b; --sky-2: #2c251f;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-      --page: #0e0d0a; --bg: #14130f; --surface: #1e1c17; --surface-2: #26241e; --ink: #ece8df; --muted: #a39d90;
-      --line: #322f27; --leaf: #8db36b; --leaf-ink: #14130f; --leaf-soft: #2a3022; --sun: #e08a5c;
-      --ok: #8db36b; --warn: #e0a64e; --crit: #e2735c; --band: rgba(141, 179, 107, .14); --hero: #2f4325;
-      --sky-1: #1a1c1e; --sky-2: #24221c;
+      --page: #15110e; --bg: #1c1714; --surface: #26201b; --surface-2: #2e2721; --ink: #f1e8dd; --muted: #b0a396;
+      --line: #3a3129; --leaf: #a3c29a; --leaf-ink: #1c1714; --leaf-soft: #2f3329; --sun: #e0b07a;
+      --ok: #a3c29a; --warn: #e0b07a; --crit: #e08a7a; --band: rgba(163, 194, 154, .14); --hero: #2f3329; --hero-ink: #f1e8dd;
+      --sky-1: #241f1b; --sky-2: #2c251f;
       color-scheme: dark;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -72,7 +73,7 @@
   .stage { height: 100%; display: grid; place-items: center; gap: 14px; padding-block: 24px; }
   .device {
     width: 375px; height: min(812px, calc(100vh - 80px)); position: relative; overflow: hidden;
-    background: var(--bg); border-radius: 46px; border: 10px solid #1e1c17;
+    background: var(--bg); border-radius: 46px; border: 10px solid #3a2f28;
     box-shadow: 0 30px 80px rgba(40, 30, 15, .25);
     display: grid; grid-template-rows: auto 1fr auto;
   }
@@ -93,7 +94,7 @@
   }
   .device:not(.full) .top { padding-top: 34px; }   /* room for the frame's notch */
   .gh-btn { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 4px 0; text-align: left; }
-  .gh-ico { width: 38px; height: 38px; border-radius: 4px; background: #fffdf9; border: 1px solid var(--line); display: grid; place-items: center; flex: none; }
+  .gh-ico { width: 38px; height: 38px; border-radius: 4px; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; flex: none; }
   .gh-ico svg { width: 22px; height: 22px; }
   .gh-txt { min-width: 0; }
   .gh-txt b { display: flex; align-items: center; gap: 4px; font-size: 16px; }
@@ -129,22 +130,22 @@
   .status span { font-size: 12.5px; opacity: .85; }
 
   /* welcome card on home */
-  .welcome { position: relative; overflow: hidden; border-radius: 4px; padding: 18px 18px 16px; color: #fffdf9;
+  .welcome { position: relative; overflow: hidden; border-radius: 4px; padding: 18px 18px 16px; color: var(--hero-ink);
     background: var(--hero); display: grid; gap: 12px; }
   .welcome-art { position: absolute; right: -18px; bottom: -14px; width: 190px; color: rgba(244, 248, 239, .09); pointer-events: none; }
-  .hello { font: 500 13px/1.2 var(--sans); opacity: .8; letter-spacing: .02em; }
+  .hello { font: 500 13px/1.2 var(--sans); color: var(--muted); letter-spacing: .02em; }
   .w-main { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
   .w-temp { font: 700 48px/1 var(--sans); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
   .w-temp small { font-size: 22px; font-weight: 600; opacity: .8; margin-left: 3px; vertical-align: 22px; }
-  .w-crop { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid rgba(244, 248, 239, .35); border-radius: 3px;
+  .w-crop { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: 3px;
     background: transparent; color: inherit; font-size: 13px; }
   .w-crop svg { width: 12px; height: 12px; opacity: .7; }
   .w-crop b { font-weight: 600; }
   .w-foot { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
   .w-ok { display: inline-flex; align-items: center; gap: 7px; font-weight: 500; }
-  .w-ok i { width: 8px; height: 8px; border-radius: 50%; background: #b9d48f;  }
-  .w-ok.warn i { background: #e9a37c;  }
-  .w-out { opacity: .85; } .w-out b { font-weight: 700; }
+  .w-ok i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok);  }
+  .w-ok.warn i { background: var(--warn);  }
+  .w-out { color: var(--muted); } .w-out b { font-weight: 700; }
   .tip { padding: 12px 14px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--leaf); }
   .tip span { display: block; font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--muted); margin-bottom: 3px; }
   .tip p { margin: 0; font-size: 13.5px; }
@@ -301,7 +302,7 @@
 
     <header class="top">
       <button class="gh-btn" id="ghBtn" type="button" aria-haspopup="dialog">
-        <span class="gh-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11 12 4l9 7v9H3z" stroke="#3e5a30" stroke-width="2" stroke-linejoin="round"/><path d="M12 19c0-4 2-6 5-6-0 3-2 6-5 6Zm0 0c0-3-1.5-5-4-5 0 2.5 1.5 5 4 5Z" fill="#7a9a52"/></svg></span>
+        <span class="gh-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11 12 4l9 7v9H3z" stroke="#6f8f68" stroke-width="2" stroke-linejoin="round"/><path d="M12 19c0-4 2-6 5-6-0 3-2 6-5 6Zm0 0c0-3-1.5-5-4-5 0 2.5 1.5 5 4 5Z" fill="#d4a373"/></svg></span>
         <span class="gh-txt">
           <b><span id="ghName">სათბური №1</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></b>
           <span id="ghSub">მარნეული · პომიდორი</span>
