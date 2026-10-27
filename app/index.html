@@ -11,8 +11,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="სათბურია">
-<meta name="theme-color" content="#fffaf3" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1a1714" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="icon-180.png?v=2">
 <link rel="icon" type="image/png" href="icon-192.png?v=2">
 <link rel="manifest" href="manifest.webmanifest?v=2">
@@ -22,25 +22,26 @@
 <style>
   /* Layout: a phone app (header, scrolling screen, bottom tab bar); on a desktop it sits in a phone frame for preview. */
   :root {
-    /* warm, bright palette: fresh green, sunny orange, sky blue, honey yellow */
-    --page: #f3ece1;        /* desktop backdrop around the phone */
-    --bg: #fffaf3;          /* app background (warm white) */
+    /* palette "sky": light blue background, white cards, blue accent, green = switched on */
+    --page: #dfe9f2;        /* desktop backdrop around the phone */
+    --bg: #eef5fb;          /* app background */
     --surface: #ffffff;
-    --surface-2: #f8f2e9;
-    --ink: #2b2420;
-    --muted: #7d7268;
-    --line: #efe6d8;
-    --leaf: #2e9e5b;        /* brand green */
+    --surface-2: #f3f8fc;
+    --ink: #0f2233;
+    --muted: #5d7183;
+    --line: #dbe7f1;
+    --leaf: #1e88e5;        /* accent: links, buttons, sliders, active tab */
     --leaf-ink: #ffffff;
-    --leaf-soft: #e2f4e7;
-    --sun: #f28c38;         /* sunny orange */
-    --ok: #2e9e5b;
-    --warn: #f0a032;
-    --crit: #e05545;
-    --band: rgba(46, 158, 91, .14);   /* ideal range band in charts */
-    --hero: #2e9e5b; --hero-ink: #ffffff;   /* welcome card */
-    --c-fan: #3b8fd9; --c-heat: #f28c38; --c-light: #e8b21c; --c-water: #1aa3b8;   /* one colour per device */
-    --sky-1: #cfe8f7; --sky-2: #fdf5e6;   /* behind the 3D greenhouse */
+    --leaf-soft: #e6f1fb;
+    --sun: #f08c2e;
+    --ok: #22a45d;
+    --warn: #e9a23b;
+    --crit: #e04f4f;
+    --band: rgba(30, 136, 229, .12);   /* ideal range band in charts */
+    --hero: #1e88e5; --hero-ink: #ffffff;   /* big temperature card */
+    --on: #22a45d; --on-soft: #e9f8ef; --on-line: #9fdcb5;   /* a device that is switched on */
+    --c-fan: var(--on); --c-heat: var(--on); --c-light: var(--on); --c-water: var(--on);
+    --sky-1: #cfe6f7; --sky-2: #eef5fb;   /* behind the 3D greenhouse */
     --serif: "Noto Serif Georgian", "Sylfaen", Georgia, serif;
     --sans: "Noto Sans Georgian", "Sylfaen", system-ui, sans-serif;
     --r: 4px;
@@ -48,20 +49,22 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --page: #110f0d; --bg: #1a1714; --surface: #24201c; --surface-2: #2c2722; --ink: #f4ece2; --muted: #b3a698;
-      --line: #3a322a; --leaf: #4cc47a; --leaf-ink: #10241a; --leaf-soft: #1f3327; --sun: #ff9f55;
-      --ok: #4cc47a; --warn: #ffb648; --crit: #ff7a68; --band: rgba(76, 196, 122, .15); --hero: #1f7a45; --hero-ink: #ffffff;
-      --c-fan: #5aa8f0; --c-heat: #ff9f55; --c-light: #ffd04a; --c-water: #3cc3d6;
-      --sky-1: #16263a; --sky-2: #2a241d;
+      --page: #0a0f1c; --bg: #0f172a; --surface: #16213a; --surface-2: #1b2844; --ink: #e8eef8; --muted: #93a3b8;
+      --line: #24324d; --leaf: #4ea3f5; --leaf-ink: #0b1626; --leaf-soft: #1b2c4a; --sun: #f5a04f;
+      --ok: #34c472; --warn: #f2b34e; --crit: #f26b6b; --band: rgba(78, 163, 245, .14); --hero: #1666b8; --hero-ink: #ffffff;
+      --on: #34c472; --on-soft: #12301f; --on-line: #2f8a55;
+      --c-fan: var(--on); --c-heat: var(--on); --c-light: var(--on); --c-water: var(--on);
+      --sky-1: #12223a; --sky-2: #0f172a;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-      --page: #110f0d; --bg: #1a1714; --surface: #24201c; --surface-2: #2c2722; --ink: #f4ece2; --muted: #b3a698;
-      --line: #3a322a; --leaf: #4cc47a; --leaf-ink: #10241a; --leaf-soft: #1f3327; --sun: #ff9f55;
-      --ok: #4cc47a; --warn: #ffb648; --crit: #ff7a68; --band: rgba(76, 196, 122, .15); --hero: #1f7a45; --hero-ink: #ffffff;
-      --c-fan: #5aa8f0; --c-heat: #ff9f55; --c-light: #ffd04a; --c-water: #3cc3d6;
-      --sky-1: #16263a; --sky-2: #2a241d;
+      --page: #0a0f1c; --bg: #0f172a; --surface: #16213a; --surface-2: #1b2844; --ink: #e8eef8; --muted: #93a3b8;
+      --line: #24324d; --leaf: #4ea3f5; --leaf-ink: #0b1626; --leaf-soft: #1b2c4a; --sun: #f5a04f;
+      --ok: #34c472; --warn: #f2b34e; --crit: #f26b6b; --band: rgba(78, 163, 245, .14); --hero: #1666b8; --hero-ink: #ffffff;
+      --on: #34c472; --on-soft: #12301f; --on-line: #2f8a55;
+      --c-fan: var(--on); --c-heat: var(--on); --c-light: var(--on); --c-water: var(--on);
+      --sky-1: #12223a; --sky-2: #0f172a;
       color-scheme: dark;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -138,7 +141,7 @@
   .welcome-art { position: absolute; right: -18px; bottom: -14px; width: 190px; color: rgba(244, 248, 239, .09); pointer-events: none; }
   .hello { font: 500 13px/1.2 var(--sans); opacity: .85; margin-bottom: 6px; letter-spacing: .02em; }
   .w-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-  .w-temp { font: 700 48px/1 var(--sans); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .w-temp { font: 700 52px/1 var(--sans); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
   .w-temp small { font-size: 22px; font-weight: 600; opacity: .8; margin-left: 3px; vertical-align: 22px; }
   .w-crop { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: 3px;
     background: transparent; color: inherit; font-size: 13px; }
@@ -146,7 +149,7 @@
   .w-crop b { font-weight: 600; }
   .w-foot { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
   .w-ok { display: inline-flex; align-items: center; gap: 7px; font-weight: 500; }
-  .w-ok i { width: 8px; height: 8px; border-radius: 50%; background: #c8f5a8;  }
+  .w-ok i { width: 8px; height: 8px; border-radius: 50%; background: #b6f2c4;  }
   .w-ok.warn i { background: #ffd08a;  }
   .w-out { opacity: .85; } .w-out b { font-weight: 700; }
   .tip { padding: 12px 14px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--leaf); }
@@ -157,6 +160,20 @@
   .tiles.three .val { font-size: 22px; }
   .tiles.three .lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
   .spark.big { height: 40px; margin-top: 8px; }
+  /* home tiles */
+  .tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tl { background: var(--surface); border: 1px solid var(--line); border-radius: 3px; padding: 12px; display: grid; gap: 8px; justify-items: start;
+    text-align: left; font: inherit; color: inherit; min-width: 0; }
+  .tl .ic { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 3px; background: var(--leaf-soft); color: var(--leaf); }
+  .tl .ic svg { width: 20px; height: 20px; }
+  .tl .n { font-size: 13px; color: var(--muted); }
+  .tl .v { font: 700 24px/1 var(--sans); font-variant-numeric: tabular-nums; }
+  .tl b { font-size: 14.5px; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tl .st { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .tl.dev-off .ic { background: var(--surface-2); color: var(--muted); }
+  .tl.on { background: var(--on-soft); border-color: var(--on-line); }
+  .tl.on .ic { background: var(--on); color: #fff; }
+  .tl.on .st { color: var(--on); }
   /* home lists */
   .read .r-ico, .hdev .r-ico { width: 34px; height: 34px; border-radius: 4px; display: grid; place-items: center; flex: none;
     background: color-mix(in srgb, var(--c) 14%, var(--surface)); color: var(--c); }
@@ -319,7 +336,7 @@
 
     <header class="top">
       <button class="gh-btn" id="ghBtn" type="button" aria-haspopup="dialog">
-        <span class="gh-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11 12 4l9 7v9H3z" stroke="#2e9e5b" stroke-width="2" stroke-linejoin="round"/><path d="M12 19c0-4 2-6 5-6-0 3-2 6-5 6Zm0 0c0-3-1.5-5-4-5 0 2.5 1.5 5 4 5Z" fill="#f28c38"/></svg></span>
+        <span class="gh-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11 12 4l9 7v9H3z" stroke="#1e88e5" stroke-width="2" stroke-linejoin="round"/><path d="M12 19c0-4 2-6 5-6-0 3-2 6-5 6Zm0 0c0-3-1.5-5-4-5 0 2.5 1.5 5 4 5Z" fill="#22a45d"/></svg></span>
         <span class="gh-txt">
           <b><span id="ghName">სათბური №1</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></b>
           <span id="ghSub">მარნეული · პომიდორი</span>
@@ -343,17 +360,19 @@
             </div>
             <button class="w-crop" type="button" data-go="settings"><b id="cropName">პომიდორი</b><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m3 4.5 3 3 3-3"/></svg></button>
           </div>
-          <span class="w-ok" id="homeStatus"><i></i>ყველაფერი რიგზეა</span>
+          <div class="w-foot">
+            <span class="w-ok" id="homeStatus"><i></i>ყველაფერი რიგზეა</span>
+            <span class="w-out">გარეთ <b id="vOut">9 °C</b></span>
+          </div>
         </div>
 
-        <div class="list">
-          <div class="row read c-hum"><span class="r-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></svg></span><div class="k"><b>ჰაერის ტენი</b></div><div class="num" id="vH">64 %</div></div>
-          <div class="row read c-soil"><span class="r-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 18h18M6 14h12M12 14V6M12 9c0-2 1.5-3.5 4-3.5 0 2-1.5 3.5-4 3.5Zm0 0c0-2-1.5-3.5-4-3.5 0 2 1.5 3.5 4 3.5Z"/></svg></span><div class="k"><b>მიწის ტენი</b></div><div class="num" id="vS">73 %</div></div>
-          <div class="row read c-temp"><span class="r-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span><div class="k"><b>გარეთ</b></div><div class="num" id="vOut">9 °C</div></div>
+        <div class="tgrid">
+          <div class="tl"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></svg></span><span class="n">ჰაერის ტენი</span><span class="v" id="vH">64 %</span></div>
+          <div class="tl"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 18h18M6 14h12M12 14V6M12 9c0-2 1.5-3.5 4-3.5 0 2-1.5 3.5-4 3.5Zm0 0c0-2-1.5-3.5-4-3.5 0 2 1.5 3.5 4 3.5Z"/></svg></span><span class="n">მიწის ტენი</span><span class="v" id="vS">73 %</span></div>
         </div>
 
         <div class="group-h">მოწყობილობები</div>
-        <div class="list" id="homeDevs"></div>
+        <div class="tgrid" id="homeDevs"></div>
 
         <div class="tip"><span>რჩევა</span><p id="homeTip"></p></div>
       </section>
@@ -623,7 +642,7 @@
   function renderHome() {
     const cr = crop(), T = DATA.t, Hm = DATA.h, S = DATA.s;
     $('vT').innerHTML = `${T[23]}<small>°C</small>`; $('vH').textContent = `${Hm[23]} %`; $('vS').textContent = `${S[23]} %`;
-    $('homeDevs').innerHTML = Object.keys(DEV).map(k => `<button class="row hdev c-${DCOL[k]} ${isOn(k) ? 'on' : ''}" type="button" data-go="control"><span class="r-ico">${ICON[k]}</span><div class="k"><b>${DEV[k].name}</b></div><div class="st">${isOn(k) ? 'ჩართულია' : 'გამორთულია'}</div></button>`).join('');
+    $('homeDevs').innerHTML = Object.keys(DEV).map(k => `<button class="tl ${isOn(k) ? 'on' : 'dev-off'}" type="button" data-go="control"><span class="ic">${ICON[k]}</span><b>${DEV[k].name}</b><span class="st">${isOn(k) ? 'ჩართულია' : 'გამორთულია'}</span></button>`).join('');
     $('cropName').textContent = cr.name;
     const band = tempBand(23), ok = T[23] >= band[0] - 1 && T[23] <= band[1] + 1 && Hm[23] <= cr.rh[1] + 8;
     $('homeStatus').className = 'w-ok' + (ok ? '' : ' warn');
