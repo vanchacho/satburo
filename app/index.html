@@ -602,8 +602,8 @@
       t, rh, vpd: +(svp * (1 - rh / 100)).toFixed(2),
       co2: day ? 430 + Math.round(sun * 40) : 640,
       lux: Math.round(sun * 42000 / 100) * 100,
-      soil: Math.min(DATA.s[23], crop().soil[1] - 2), soilT: +(14 + (t - 14) * 0.45).toFixed(1),
-      ec: 1.6, ph: 6.4, npk: ['ნორმა', 'დაბალი', 'ნორმა'],
+      soil: Math.min(DATA.s[23], crop().soil[1] - 2), soilEnd: Math.min(DATA.s[23], crop().soil[1] - 2) - 3, soilDeep: crop().soil[1] - 1, soilT: +(14 + (t - 14) * 0.45).toFixed(1),
+      ec: 1.6, ph: 6.4,
       out: DATA.o[23],
     };
   }
@@ -622,11 +622,6 @@
       <div class="m-bar"><i style="left:${at(lo)}%;width:${at(hi) - at(lo)}%"></i><b style="left:${at(v)}%"></b></div>
       <div class="m-norm">ნორმა: ${fmt(lo)}–${fmt(hi)}${u}</div>
     </div>`;
-  }
-  // nutrients: plain words only
-  function nrow(name, hint, level) {
-    const ok = level === 'ნორმა';
-    return `<div class="mrow ${ok ? 'ok' : 'low'}"><div class="m-top"><div class="k">${name}<small>${hint}</small></div><div class="val" style="font-size:15px">${ok ? 'საკმარისია' : 'ნაკლებია'}</div><span class="badge-s">${ok ? 'კარგია' : 'დაბალია'}</span></div></div>`;
   }
 
   /* ---------------- charts ---------------- */
@@ -704,11 +699,12 @@
       mrow('სინათლე', '', n.lux.toLocaleString('ka-GE'), 'lux', null) +
       mrow('გარეთ', '', n.out, '°C', null);
     $('secSoil').innerHTML =
-      mrow('მიწის ტენი', '', n.soil, '%', cr.soil) +
-      mrow('მიწის ტემპერატურა', '', n.soilT, '°C', [14, 26]) +
-      mrow('სასუქი მიწაში', 'EC · რამდენი საკვებია მიწაში', n.ec.toFixed(1), 'dS/m', [1, 3]) +
-      mrow('მიწის მჟავიანობა', 'pH', n.ph.toFixed(1), '', [5.5, 7.2]) +
-      nrow('აზოტი', 'N · ფოთლის ზრდა', n.npk[0]) + nrow('ფოსფორი', 'P · ფესვი და ყვავილი', n.npk[1]) + nrow('კალიუმი', 'K · ნაყოფი', n.npk[2]);
+      mrow('მიწის ტენი · შუაში', '15 სმ სიღრმე', n.soil, '%', cr.soil) +
+      mrow('მიწის ტენი · ხაზის ბოლოსკენ', '15 სმ სიღრმე', n.soilEnd, '%', cr.soil) +
+      mrow('მიწის ტენი · ღრმად', '30 სმ · ზედმეტ მორწყვას აჩვენებს', n.soilDeep, '%', [cr.soil[0], cr.soil[1] + 5]) +
+      mrow('მიწის ტემპერატურა', '15 სმ სიღრმე', n.soilT, '°C', [14, 26]) +
+      mrow('სასუქი მიწაში', 'EC · მიახლოებითი, ცვლილებას აჩვენებს', n.ec.toFixed(1), 'dS/m', [1, 3]) +
+      mrow('მიწის მჟავიანობა', 'pH · მიახლოებითი', n.ph.toFixed(1), '', [5.5, 7.2]);
     $('homeDevs').innerHTML = Object.keys(DEV).map(k => `<button class="tl ${isOn(k) ? 'on' : 'dev-off'}" type="button" data-go="control"><span class="ic">${ICON[k]}</span><b>${DEV[k].name}</b><span class="st">${isOn(k) ? 'ჩართულია' : 'გამორთულია'}</span></button>`).join('');
     $('cropName').textContent = cr.name;
     const band = tempBand(23), ok = T[23] >= band[0] - 1 && T[23] <= band[1] + 1 && Hm[23] <= cr.rh[1] + 8;
@@ -797,6 +793,7 @@
   const ALERTS = [
     { day: 'დღეს', t: '03:12', sev: 'crit', kind: 'alarm', unread: true, title: 'ყინვის საფრთხე', text: 'სათბურში 15.8 °C, გარეთ −2 °C. გათბობა ჩაირთო, SMS გაიგზავნა.' },
     { day: 'დღეს', t: '05:40', sev: 'ok', kind: 'info', unread: true, title: 'ტემპერატურა ნორმაშია', text: 'სათბურში 17.2 °C. გათბობა გამოირთო.' },
+    { day: 'დღეს', t: '07:30', sev: 'warn', kind: 'alarm', unread: true, title: 'მიწის სენსორები არ ემთხვევა', text: 'შუაში მიწის ტენი 72 %, ხაზის ბოლოსკენ 41 %. შეამოწმეთ წვეთოვანი ხაზი. მორწყვა დროებით საათით მუშაობს.' },
     { day: 'დღეს', t: '07:52', sev: 'info', kind: 'info', title: 'მორწყვა დასრულდა', text: 'მიწის ტენი 78 %. ხანგრძლივობა 22 წუთი.' },
     { day: 'გუშინ', t: '21:40', sev: 'warn', kind: 'alarm', title: 'სოკოვანი დაავადების საფრთხე', text: 'ჰაერის ტენი 88 %, მეტია 85 %-ზე. ვენტილატორები ჩაირთო 60 %-ზე.' },
     { day: 'გუშინ', t: '16:30', sev: 'crit', kind: 'alarm', title: 'ძრავა გადახურდა', text: 'ვენტილატორის ძრავის დაცვა ამოვარდა. ვენტილატორი გაითიშა. შეამოწმეთ და აღადგინეთ.' },
