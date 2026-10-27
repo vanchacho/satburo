@@ -112,8 +112,9 @@
   .badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 3px; background: var(--crit); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
 
   /* ---------- screens ---------- */
-  main { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
-  .screen { padding: 16px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 14px; }
+  main { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .screen { padding: 16px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .screen > * { min-width: 0; }   /* a wide child (3D canvas, long label) must never widen the page */
   .screen h1 { margin: 2px 0 0; font: 800 24px/1.2 var(--serif); }
   .sub { margin: -8px 0 0; font-size: 13px; color: var(--muted); }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; }
@@ -236,11 +237,11 @@
   .btn.soft { background: var(--leaf-soft); color: var(--leaf); }
   .btn:disabled { opacity: .45; }
   .dev { display: grid; gap: 10px; }
-  .dev-top { display: flex; align-items: center; gap: 12px; }
+  .dev-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }   /* the auto/manual switch drops below the name on narrow phones */
   .dev-ico { width: 40px; height: 40px; border-radius: 4px; background: var(--surface-2); display: grid; place-items: center; flex: none; color: var(--muted); }
   .dev-ico svg { width: 22px; height: 22px; }
   .dev.active .dev-ico { background: color-mix(in srgb, var(--c) 16%, var(--surface)); color: var(--c); }
-  .dev-name { flex: 1; min-width: 0; }
+  .dev-name { flex: 1 1 130px; min-width: 0; }
   .dev-name b { display: block; font-size: 15px; }
   .dev-name span { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
   .seg { display: inline-flex; padding: 3px; border-radius: 4px; background: var(--surface-2); gap: 2px; }
@@ -388,7 +389,7 @@
           <div><b id="modeTitle">ავტომატური რეჟიმი</b></div>
           <button class="btn soft" id="allAuto" type="button" disabled>ყველა ავტომატურზე</button>
         </div>
-        <div id="devList" style="display:grid;gap:12px"></div>
+        <div id="devList" style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"></div>
       </section>
 
       <!-- ================= HISTORY ================= -->
