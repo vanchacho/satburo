@@ -1,5 +1,5 @@
 // Light 3D greenhouse for the app's home card. Mirrors the website's model in a simpler form and
-// follows the live device state in window.APP (fans, heating, lights, watering, crop, house type).
+// follows the live device state in window.APP (fans, heating, lights, crop, house type).
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -252,7 +252,6 @@ function frame(now) {
   heatMat.emissiveIntensity = cur.heat * 1.8;
   const lc = DEV.light.color === 'grow' ? GROW : WARM;
   lampMat.emissive.copy(lc); lampMat.emissiveIntensity = cur.lamp * 3;
-  dripMat.emissiveIntensity = DEV.water.val ? 0.6 + Math.sin(now / 200) * 0.4 : 0;
 
   const night = isDark();
   hemi.intensity = night ? 0.95 : 1.4;

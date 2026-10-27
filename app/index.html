@@ -179,6 +179,7 @@
   .m-norm { font-size: 12px; color: var(--muted); }
   /* home tiles */
   .tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tgrid > :last-child:nth-child(odd) { grid-column: 1 / -1; }   /* an odd last tile spans the row */
   .tl { background: var(--surface); border: 1px solid var(--line); border-radius: 3px; padding: 12px; display: grid; gap: 8px; justify-items: start;
     text-align: left; font: inherit; color: inherit; min-width: 0; }
   .tl .ic { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 3px; background: var(--leaf-soft); color: var(--leaf); }
@@ -433,8 +434,6 @@
           <div class="timeline">
             <div class="ev"><time>03:12</time><i class="sun"></i><span>გათბობა ჩაირთო · სათბურში 15.8 °C</span></div>
             <div class="ev"><time>05:40</time><i class="sun"></i><span>გათბობა გამოირთო · 17.2 °C</span></div>
-            <div class="ev"><time>07:30</time><i class="blue"></i><span>მორწყვა დაიწყო · მიწის ტენი 68 %</span></div>
-            <div class="ev"><time>07:52</time><i class="blue"></i><span>მორწყვა დასრულდა · მიწის ტენი 78 %</span></div>
             <div class="ev"><time>11:05</time><i></i><span>ვენტილატორები ჩაირთო · 26.1 °C</span></div>
             <div class="ev"><time>11:20</time><i></i><span>ვენტილატორები 60 %-ზე</span></div>
           </div>
@@ -602,7 +601,7 @@
       t, rh, vpd: +(svp * (1 - rh / 100)).toFixed(2),
       co2: day ? 430 + Math.round(sun * 40) : 640,
       lux: Math.round(sun * 42000 / 100) * 100,
-      soil: Math.min(DATA.s[23], crop().soil[1] - 2), soilEnd: Math.min(DATA.s[23], crop().soil[1] - 2) - 3, soilDeep: crop().soil[1] - 1, soilT: +(14 + (t - 14) * 0.45).toFixed(1),
+      soil: Math.min(DATA.s[23], crop().soil[1] - 2), soilT: +(14 + (t - 14) * 0.45).toFixed(1),
       ec: 1.6, ph: 6.4,
       out: DATA.o[23],
     };
@@ -671,22 +670,19 @@
     fan:   { name: 'ვენტილატორები', unit: '%',  val: 0,  auto: true, max: 6 },
     heat:  { name: 'გათბობა',        unit: '°C', val: 24, auto: true, power: 0 },
     light: { name: 'განათება',       unit: '%',  val: 0,  auto: true, color: 'warm' },
-    water: { name: 'მორწყვა',        unit: '',   val: 0,  auto: true, next: '15:00' },
   };
   const ICON = {
     fan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M12 10c0-4 1-7 4-7s3 4-1 7M14 12c4 0 7 1 7 4s-4 3-7-1M12 14c0 4-1 7-4 7s-3-4 1-7M10 12c-4 0-7-1-7-4s4-3 7 1"/></svg>',
     heat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4 4 0 1 0 4 0Z"/><path d="M12 11v6"/></svg>',
     light: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3Z"/></svg>',
-    water: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></svg>',
   };
   function devSummary(k) {
     const d = DEV[k];
     if (k === 'fan') return d.val ? `ჩართულია · ${d.val} % · ჟალუზი ღიაა` : 'გამორთულია · ჟალუზი დახურულია';
     if (k === 'heat') return d.val <= 4 ? 'გამორთულია' : d.power ? `ათბობს ${d.val} °C-მდე` : `ჩაირთვება ${d.val} °C-ზე ქვემოთ`;
     if (k === 'light') return d.val ? `ჩართულია · ${d.val} %` : 'გამორთულია';
-    if (k === 'water') return d.val ? 'ტუმბო და სარქველი ჩართულია' : `შემდეგი მორწყვა ${d.next}-ზე`;
   }
-  const DCOL = { fan: 'fan', heat: 'heat', light: 'light', water: 'water' };   // device → its colour class
+  const DCOL = { fan: 'fan', heat: 'heat', light: 'light' };   // device → its colour class
   const isOn = k => (k === 'heat' ? DEV.heat.power > 0 : DEV[k].val > 0);
   function renderHome() {
     const cr = crop(), T = DATA.t, Hm = DATA.h, S = DATA.s;
@@ -699,9 +695,7 @@
       mrow('სინათლე', '', n.lux.toLocaleString('ka-GE'), 'lux', null) +
       mrow('გარეთ', '', n.out, '°C', null);
     $('secSoil').innerHTML =
-      mrow('მიწის ტენი · შუაში', '15 სმ სიღრმე', n.soil, '%', cr.soil) +
-      mrow('მიწის ტენი · ხაზის ბოლოსკენ', '15 სმ სიღრმე', n.soilEnd, '%', cr.soil) +
-      mrow('მიწის ტენი · ღრმად', '30 სმ · ზედმეტ მორწყვას აჩვენებს', n.soilDeep, '%', [cr.soil[0], cr.soil[1] + 5]) +
+      mrow('მიწის ტენი', '15 სმ სიღრმე', n.soil, '%', cr.soil) +
       mrow('მიწის ტემპერატურა', '15 სმ სიღრმე', n.soilT, '°C', [14, 26]) +
       mrow('სასუქი მიწაში', 'EC · მიახლოებითი, ცვლილებას აჩვენებს', n.ec.toFixed(1), 'dS/m', [1, 3]) +
       mrow('მიწის მჟავიანობა', 'pH · მიახლოებითი', n.ph.toFixed(1), '', [5.5, 7.2]);
@@ -722,8 +716,6 @@
       if (k === 'light') body += `<div class="seg wide" role="group" aria-label="სინათლის ფერი"><button type="button" data-color="warm" aria-pressed="${d.color === 'warm'}">თბილი თეთრი</button><button type="button" data-color="grow" aria-pressed="${d.color === 'grow'}">ზრდის (იისფერი)</button></div>`;
     } else if (k === 'heat') {
       body = `<input type="range" id="r-heat" min="4" max="35" step="1" value="${d.val}" aria-label="გათბობა">`;
-    } else if (k === 'water') {
-      body = `<button class="btn" type="button" id="waterNow">${d.val ? 'მორწყვის შეჩერება' : 'მორწყვა ახლა · 10 წთ'}</button>`;
     }
     return `<div class="card dev c-${DCOL[k]} ${isOn(k) ? 'active' : ''}" data-dev="${k}">
       <div class="dev-top"><span class="dev-ico">${ICON[k]}</span>
@@ -753,7 +745,6 @@
     if (mode) { d.auto = mode.dataset.mode === 'auto'; if (d.auto) autoLevels(); renderControl(); return; }
     const col = e.target.closest('[data-color]');
     if (col) { d.color = col.dataset.color; renderControl(); return; }
-    if (e.target.id === 'waterNow') { d.val = d.val ? 0 : 1; d.auto = !d.val; renderControl(); toast(d.val ? 'მორწყვა დაიწყო · 10 წუთი' : 'მორწყვა შეჩერდა'); }
   });
   // what automatic mode would choose right now (demo: midday, slightly warm)
   function autoLevels() {
@@ -761,7 +752,6 @@
     if (DEV.fan.auto) DEV.fan.val = Math.max(0, Math.min(100, Math.round((t - target - 0.3) / 3 * 20) * 5));   // shutter fans are the only ventilation
     if (DEV.heat.auto) { DEV.heat.val = Math.round(target - 0.5); DEV.heat.power = Math.max(0, Math.min(100, Math.round((DEV.heat.val - t + 0.3) / 1.2 * 20) * 5)); }
     if (DEV.light.auto) DEV.light.val = 0;
-    if (DEV.water.auto) DEV.water.val = 0;
   }
   $('allAuto').addEventListener('click', () => { Object.values(DEV).forEach(d => (d.auto = true)); autoLevels(); renderControl(); toast('ყველა მოწყობილობა ავტომატურ რეჟიმზეა'); });
 
@@ -793,8 +783,6 @@
   const ALERTS = [
     { day: 'დღეს', t: '03:12', sev: 'crit', kind: 'alarm', unread: true, title: 'ყინვის საფრთხე', text: 'სათბურში 15.8 °C, გარეთ −2 °C. გათბობა ჩაირთო, SMS გაიგზავნა.' },
     { day: 'დღეს', t: '05:40', sev: 'ok', kind: 'info', unread: true, title: 'ტემპერატურა ნორმაშია', text: 'სათბურში 17.2 °C. გათბობა გამოირთო.' },
-    { day: 'დღეს', t: '07:30', sev: 'warn', kind: 'alarm', unread: true, title: 'მიწის სენსორები არ ემთხვევა', text: 'შუაში მიწის ტენი 72 %, ხაზის ბოლოსკენ 41 %. შეამოწმეთ წვეთოვანი ხაზი. მორწყვა დროებით საათით მუშაობს.' },
-    { day: 'დღეს', t: '07:52', sev: 'info', kind: 'info', title: 'მორწყვა დასრულდა', text: 'მიწის ტენი 78 %. ხანგრძლივობა 22 წუთი.' },
     { day: 'გუშინ', t: '21:40', sev: 'warn', kind: 'alarm', title: 'სოკოვანი დაავადების საფრთხე', text: 'ჰაერის ტენი 88 %, მეტია 85 %-ზე. ვენტილატორები ჩაირთო 60 %-ზე.' },
     { day: 'გუშინ', t: '16:30', sev: 'crit', kind: 'alarm', title: 'ძრავა გადახურდა', text: 'ვენტილატორის ძრავის დაცვა ამოვარდა. ვენტილატორი გაითიშა. შეამოწმეთ და აღადგინეთ.' },
     { day: 'გუშინ', t: '14:05', sev: 'ok', kind: 'info', title: 'კავშირი აღდგა', text: 'მოწყობილობა 12 წუთის შემდეგ ისევ ონლაინაა.' },
@@ -897,6 +885,6 @@
   "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
 } }
 </script>
-<script type="module" src="greenhouse3d.js?v=3"></script>
+<script type="module" src="greenhouse3d.js?v=4"></script>
 </body>
 </html>
