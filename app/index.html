@@ -161,6 +161,14 @@
   .tiles.three .val { font-size: 22px; }
   .tiles.three .lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
   .spark.big { height: 40px; margin-top: 8px; }
+  /* home value lists: name on the left, value on the right, orange when out of range */
+  .mrow { display: flex; align-items: baseline; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .mrow:last-child { border-bottom: 0; }
+  .mrow .k { flex: 1; min-width: 0; font-size: 14.5px; }
+  .mrow .k small { display: block; font-size: 12px; color: var(--muted); }
+  .mrow .val { font: 700 17px/1.2 var(--sans); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .mrow .val small { display: block; font-size: 11.5px; font-weight: 600; }
+  .mrow.out .val { color: var(--warn); }
   /* home tiles */
   .tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .tl { background: var(--surface); border: 1px solid var(--line); border-radius: 3px; padding: 12px; display: grid; gap: 8px; justify-items: start;
@@ -367,13 +375,17 @@
           </div>
         </div>
 
-        <div class="tgrid">
-          <div class="tl"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></svg></span><span class="n">ჰაერის ტენი</span><span class="v" id="vH">64 %</span></div>
-          <div class="tl"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 18h18M6 14h12M12 14V6M12 9c0-2 1.5-3.5 4-3.5 0 2-1.5 3.5-4 3.5Zm0 0c0-2-1.5-3.5-4-3.5 0 2 1.5 3.5 4 3.5Z"/></svg></span><span class="n">მიწის ტენი</span><span class="v" id="vS">73 %</span></div>
-        </div>
-
         <div class="group-h">მოწყობილობები</div>
         <div class="tgrid" id="homeDevs"></div>
+
+        <div class="group-h">ჰაერი</div>
+        <div class="list" id="secAir"></div>
+
+        <div class="group-h">მიწა</div>
+        <div class="list" id="secSoil"></div>
+
+        <div class="group-h">წყალი და დენი</div>
+        <div class="list" id="secRes"></div>
 
         <div class="tip"><span>რჩევა</span><p id="homeTip"></p></div>
       </section>
@@ -576,6 +588,28 @@
   }
   let DATA = series(crop());
 
+  // current values for the dashboard; on the real system these come from the controller
+  function readNow() {
+    const t = DATA.t[23], rh = DATA.h[23], day = isDay(NOW_H);
+    const svp = 0.6108 * Math.exp(17.27 * t / (t + 237.3));
+    const sun = Math.max(0, Math.sin(Math.PI * (NOW_H - 6) / 14));
+    const kw = (DEV.fan.val / 100) * 1.1 + (DEV.heat.power / 100) * 18 + (DEV.light.val / 100) * 1.2 + (DEV.water.val ? 0.75 : 0) + 0.05;
+    return {
+      t, rh, vpd: +(svp * (1 - rh / 100)).toFixed(2),
+      co2: day ? 430 + Math.round(sun * 40) : 640,
+      lux: Math.round(sun * 42000 / 100) * 100,
+      soil: Math.min(DATA.s[23], crop().soil[1] - 2), soilT: +(14 + (t - 14) * 0.45).toFixed(1),
+      ec: 1.6, ph: 6.4, npk: ['ნორმა', 'დაბალი', 'ნორმა'],
+      tank: 74, pressure: DEV.water.val ? 2.3 : 2.8, kw: +kw.toFixed(2), out: DATA.o[23],
+    };
+  }
+  // one row: name, optional hint, value, and the range it should stay in
+  function mrow(name, hint, val, unit, range) {
+    const v = +val, lo = range && v < range[0], hi = range && v > range[1];
+    const flag = lo ? 'დაბალია' : hi ? 'მაღალია' : '';
+    return `<div class="mrow${flag ? ' out' : ''}"><div class="k">${name}${hint ? `<small>${hint}</small>` : ''}</div><div class="val">${val}${unit ? ' ' + unit : ''}${flag ? `<small>${flag}</small>` : ''}</div></div>`;
+  }
+
   /* ---------------- charts ---------------- */
   const NS = 'http://www.w3.org/2000/svg';
   const el = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
@@ -633,16 +667,33 @@
   };
   function devSummary(k) {
     const d = DEV[k];
-    if (k === 'fan') return d.val ? `ჩართულია · სიჩქარე ${d.val} %` : 'გამორთულია';
+    if (k === 'fan') return d.val ? `ჩართულია · ${d.val} % · ჟალუზი ღიაა` : 'გამორთულია · ჟალუზი დახურულია';
     if (k === 'heat') return d.val <= 4 ? 'გამორთულია' : d.power ? `ათბობს ${d.val} °C-მდე` : `ჩაირთვება ${d.val} °C-ზე ქვემოთ`;
     if (k === 'light') return d.val ? `ჩართულია · ${d.val} %` : 'გამორთულია';
-    if (k === 'water') return d.val ? 'ირწყვება' : `შემდეგი მორწყვა ${d.next}-ზე`;
+    if (k === 'water') return d.val ? 'ტუმბო და სარქველი ჩართულია' : `შემდეგი მორწყვა ${d.next}-ზე`;
   }
   const DCOL = { fan: 'fan', heat: 'heat', light: 'light', water: 'water' };   // device → its colour class
   const isOn = k => (k === 'heat' ? DEV.heat.power > 0 : DEV[k].val > 0);
   function renderHome() {
     const cr = crop(), T = DATA.t, Hm = DATA.h, S = DATA.s;
-    $('vT').innerHTML = `${T[23]}<small>°C</small>`; $('vH').textContent = `${Hm[23]} %`; $('vS').textContent = `${S[23]} %`;
+    $('vT').innerHTML = `${T[23]}<small>°C</small>`;
+    const n = readNow();
+    $('secAir').innerHTML =
+      mrow('ჰაერის ტენი', '', n.rh, '%', cr.rh) +
+      mrow('ჰაერის სიმშრალე', 'VPD · მცენარის სუნთქვა', n.vpd.toFixed(2), 'kPa', [0.4, 1.5]) +
+      mrow('ნახშირორჟანგი', 'CO2', n.co2, 'ppm', [350, 1500]) +
+      mrow('სინათლე', '', n.lux.toLocaleString('ka-GE'), 'lux', null) +
+      mrow('გარეთ', '', n.out, '°C', null);
+    $('secSoil').innerHTML =
+      mrow('მიწის ტენი', '', n.soil, '%', cr.soil) +
+      mrow('მიწის ტემპერატურა', '', n.soilT, '°C', [14, 26]) +
+      mrow('სასუქი მიწაში', 'EC', n.ec.toFixed(1), 'dS/m', [1, 3]) +
+      mrow('მჟავიანობა', 'pH', n.ph.toFixed(1), '', [5.5, 7.2]) +
+      ['აზოტი', 'ფოსფორი', 'კალიუმი'].map((nm, i) => `<div class="mrow${n.npk[i] === 'ნორმა' ? '' : ' out'}"><div class="k">${nm}<small>${'NPK'[i]}</small></div><div class="val" style="font-size:15px">${n.npk[i]}</div></div>`).join('');
+    $('secRes').innerHTML =
+      mrow('წყალი ავზში', '', n.tank, '%', [20, 100]) +
+      mrow('წყლის წნევა', '', n.pressure.toFixed(1), 'bar', [1, 6]) +
+      mrow('დენის ხარჯი ახლა', '', n.kw.toFixed(2), 'kW', null);
     $('homeDevs').innerHTML = Object.keys(DEV).map(k => `<button class="tl ${isOn(k) ? 'on' : 'dev-off'}" type="button" data-go="control"><span class="ic">${ICON[k]}</span><b>${DEV[k].name}</b><span class="st">${isOn(k) ? 'ჩართულია' : 'გამორთულია'}</span></button>`).join('');
     $('cropName').textContent = cr.name;
     const band = tempBand(23), ok = T[23] >= band[0] - 1 && T[23] <= band[1] + 1 && Hm[23] <= cr.rh[1] + 8;
@@ -731,8 +782,10 @@
   const ALERTS = [
     { day: 'დღეს', t: '03:12', sev: 'crit', kind: 'alarm', unread: true, title: 'ყინვის საფრთხე', text: 'სათბურში 15.8 °C, გარეთ −2 °C. გათბობა ჩაირთო, SMS გაიგზავნა.' },
     { day: 'დღეს', t: '05:40', sev: 'ok', kind: 'info', unread: true, title: 'ტემპერატურა ნორმაშია', text: 'სათბურში 17.2 °C. გათბობა გამოირთო.' },
+    { day: 'დღეს', t: '07:41', sev: 'crit', kind: 'alarm', unread: true, title: 'წყლის წნევა დაბალია', text: 'წნევა 0.4 bar. ტუმბო გაჩერდა, რომ უწყლოდ არ იმუშაოს. შეამოწმეთ ავზი და მილები.' },
     { day: 'დღეს', t: '07:52', sev: 'info', kind: 'info', title: 'მორწყვა დასრულდა', text: 'მიწის ტენი 78 %. ხანგრძლივობა 22 წუთი.' },
-    { day: 'გუშინ', t: '21:40', sev: 'warn', kind: 'alarm', title: 'ტენიანობა მაღალია', text: 'ჰაერის ტენიანობა 88 %. ვენტილატორები ჩაირთო 60 %-ზე.' },
+    { day: 'გუშინ', t: '21:40', sev: 'warn', kind: 'alarm', title: 'სოკოვანი დაავადების საფრთხე', text: 'ჰაერის ტენი 88 %, მეტია 85 %-ზე. ვენტილატორები ჩაირთო 60 %-ზე.' },
+    { day: 'გუშინ', t: '16:30', sev: 'crit', kind: 'alarm', title: 'ძრავა გადახურდა', text: 'ვენტილატორის ძრავის დაცვა ამოვარდა. ვენტილატორი გაითიშა. შეამოწმეთ და აღადგინეთ.' },
     { day: 'გუშინ', t: '14:05', sev: 'ok', kind: 'info', title: 'კავშირი აღდგა', text: 'მოწყობილობა 12 წუთის შემდეგ ისევ ონლაინაა.' },
     { day: 'გუშინ', t: '13:53', sev: 'warn', kind: 'alarm', title: 'კავშირი გაწყდა', text: 'მოწყობილობა არ პასუხობს. სათბური ავტომატურად მუშაობს.' },
     { day: '20 ოქტომბერი', t: '16:20', sev: 'crit', kind: 'alarm', title: 'წვიმა დაიწყო', text: 'გარეთ წვიმს. ვენტილატორები ტენიანობას აკონტროლებს.' },
